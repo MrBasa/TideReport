@@ -32,16 +32,16 @@ See the [Fisher][] and [Tide][] documentation for more details on installation.
 
 ## 🚀 Available Prompt Sections
 
-* `tide_report_weather`: Displays the current weather from `wttr.in`.
-* `tide_report_moon`: Displays the current moon phase from `wttr.in`.
-* `tide_report_tide`: Displays the next high/low tide from NOAA (US-based).
+* `weather`: Displays the current weather from `wttr.in`.
+* `moon`: Displays the current moon phase from `wttr.in`.
+* `tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
 
 Add any of the module items to your Tide prompt. For example:
 
 ```fish
-set -Ua tide_right_prompt_items tide_report_weather tide_report_moon tide_report_tide
+set -Ua tide_right_prompt_items weather moon tide
 ```
 
 ## ⚙️ Configuration
@@ -55,7 +55,7 @@ This setting applies to all modules in this plugin.
 | `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
 | `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in`  |
 
-### 󰞍 Tide Module (`tide_report_tide`)
+### 󰞍 Tide Module (`tide`)
 
 **This module requires you to set a Station ID.**
 
@@ -69,9 +69,12 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_tide_expire_seconds`  | How old data can be before it's considered invalid.             | `1800`       |
 | `tide_report_tide_arrow_rising`    | Symbol to show for an upcoming high tide.                       | `⇞`          |
 | `tide_report_tide_arrow_falling`   | Symbol to show for an upcoming low tide.                        | `⇟`          |
-| `tide_report_tide_unavailable_text`| Text to display when tide data is not available.                | `🌊...`      |
+| `tide_report_tide_unavailable_text`| Text to display when tide data is not available.                | `🌊...`       |
+| `tide_tide_color`                  | Prompt item color                                               | ``           |
+| `tide_tide_bg_color`               | Prompt item background color                                    | ``           |
+| `tide_tide_icon`                   | Prompt item color                                               | ``           |
 
-### 󰙾 Weather Module (`tide_report_weather`)
+### 󰙾 Weather Module (`weather`)
 
 | Variable                              | Description                                                             | Default         |
 | ------------------------------------- | ----------------------------------------------------------------------- | --------------- |
@@ -83,7 +86,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_weather_language`        | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`            |
 | `tide_report_weather_unavailable_text`| Text to display when weather data is not available.                     | `...`          |
 
-###  Moon Module (`tide_report_moon`)
+###  Moon Module (`moon`)
 
 | Variable                           | Description                                                     | Default     |
 | ---------------------------------- | --------------------------------------------------------------- | ----------- |

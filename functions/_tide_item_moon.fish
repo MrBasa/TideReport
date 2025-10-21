@@ -2,7 +2,7 @@
 #
 # This function handles all logic for displaying the moon phase module.
 
-function tide_report_moon --description "Displays moon phase in the Tide prompt"
+function _tide_item_moon --description "Displays moon phase in the Tide prompt"
     set -l cache_file ~/.cache/tide_report/moon.txt
     set -l url "$tide_report_wttr_url/Moon?format=$tide_report_moon_format"
 
