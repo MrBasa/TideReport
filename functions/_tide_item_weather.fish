@@ -7,6 +7,8 @@ function _tide_item_weather --description "Displays weather information in the T
     set -l cache_file ~/.cache/tide_report/weather.txt
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=$tide_report_weather_format&$tide_report_weather_units&lang=$tide_report_weather_language"
 
+    _tide_print_item weather $tide_weather_icon "HI!"
+
     # 1. Handle case where cache file does not exist
     if not test -f $cache_file
         echo $tide_report_weather_unavailable_text
