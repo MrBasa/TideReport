@@ -1,7 +1,7 @@
-# tide-report :: Generic Async Fetcher
+# TideReport :: Generic Async Fetcher
 # Fetches a URL, saves it to a cache file, and emits an event upon completion.
 
-function _tide-report_fetch --description "Fetches data and emits an event" --argument-names url cache_file event_name
+function _tide_report_fetch --description "Fetches data and emits an event" --argument-names url cache_file event_name
     # Ensure the cache directory exists
     mkdir -p (dirname $cache_file)
 

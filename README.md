@@ -32,16 +32,16 @@ See the [Fisher][] and [Tide][] documentation for more details on installation.
 
 ## 🚀 Available Prompt Sections
 
-* `tide-report_weather`: Displays the current weather from `wttr.in`.
-* `tide-report_moon`: Displays the current moon phase from `wttr.in`.
-* `tide-report_tide`: Displays the next high/low tide from NOAA (US-based).
+* `tide_report_weather`: Displays the current weather from `wttr.in`.
+* `tide_report_moon`: Displays the current moon phase from `wttr.in`.
+* `tide_report_tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
 
 Add any of the module items to your Tide prompt. For example:
 
 ```fish
-set -Ua tide_right_prompt_items tide-report_weather tide-report_moon tide-report_tide
+set -Ua tide_right_prompt_items tide_report_weather tide_report_moon tide_report_tide
 ```
 
 ## ⚙️ Configuration
@@ -52,10 +52,10 @@ This setting applies to all modules in this plugin.
 
 | Variable                             | Description                                      | Default            |
 | ------------------------------------ | ------------------------------------------------ | ------------------ |
-| `tide-report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
-| `tide-report_wttr.in_url`            | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in/` |
+| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
+| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in`  |
 
-### 󰞍 Tide Module (`tide-report_tide`)
+### 󰞍 Tide Module (`tide_report_tide`)
 
 **This module requires you to set a Station ID.**
 
@@ -63,34 +63,34 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 
 | Variable                           | Description                                                     | Default      |
 | ---------------------------------- | --------------------------------------------------------------- | ------------ |
-| `tide-report_tide_station_id`      | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"9087044"`  |
-| `tide-report_tide_units`           | `english` (feet) or `metric` (meters).                          | `english`    |
-| `tide-report_tide_refresh_seconds` | How old data can be before a background refresh is triggered.   | `900`        |
-| `tide-report_tide_expire_seconds`  | How old data can be before it's considered invalid.             | `1800`       |
-| `tide-report_tide_arrow_rising`    | Symbol to show for an upcoming high tide.                       | `⇞`          |
-| `tide-report_tide_arrow_falling`   | Symbol to show for an upcoming low tide.                        | `⇟`          |
-| `tide-report_tide_unavailable_text`| Text to display when tide data is not available.                | `🌊...`      |
+| `tide_report_tide_station_id`      | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"9087044"`  |
+| `tide_report_tide_units`           | `english` (feet) or `metric` (meters).                          | `english`    |
+| `tide_report_tide_refresh_seconds` | How old data can be before a background refresh is triggered.   | `900`        |
+| `tide_report_tide_expire_seconds`  | How old data can be before it's considered invalid.             | `1800`       |
+| `tide_report_tide_arrow_rising`    | Symbol to show for an upcoming high tide.                       | `⇞`          |
+| `tide_report_tide_arrow_falling`   | Symbol to show for an upcoming low tide.                        | `⇟`          |
+| `tide_report_tide_unavailable_text`| Text to display when tide data is not available.                | `🌊...`      |
 
-### 󰙾 Weather Module (`tide-report_weather`)
+### 󰙾 Weather Module (`tide_report_weather`)
 
 | Variable                              | Description                                                             | Default         |
 | ------------------------------------- | ----------------------------------------------------------------------- | --------------- |
-| `tide-report_weather_format`          | `wttr.in` format (`1`-`4`). See [wttr.in docs](https://wttr.in/:help).  | `2`             |
-| `tide-report_weather_units`           | `u` (USCS), `m` (Metric/Celsius), `M` (Metric/Wind Speed m/s)           | `m`             |
-| `tide-report_weather_location`        | Any location `wttr.in` accepts (e.g., `Paris`, `90210`).                | `""` (IP-based) |
-| `tide-report_weather_refresh_seconds` | How old data can be before a background refresh is triggered.           | `300`           |
-| `tide-report_weather_expire_seconds`  | How old data can be before it's considered invalid.                     | `600`           |
-| `tide-report_weather_language`        | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`            |
-| `tide-report_weather_unavailable_text`| Text to display when weather data is not available.                     | `...`          |
+| `tide_report_weather_format`          | `wttr.in` format (`1`-`4`). See [wttr.in docs](https://wttr.in/:help).  | `2`             |
+| `tide_report_weather_units`           | `u` (USCS), `m` (Metric/Celsius), `M` (Metric/Wind Speed m/s)           | `m`             |
+| `tide_report_weather_location`        | Any location `wttr.in` accepts (e.g., `Paris`, `90210`).                | `""` (IP-based) |
+| `tide_report_weather_refresh_seconds` | How old data can be before a background refresh is triggered.           | `300`           |
+| `tide_report_weather_expire_seconds`  | How old data can be before it's considered invalid.                     | `600`           |
+| `tide_report_weather_language`        | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`            |
+| `tide_report_weather_unavailable_text`| Text to display when weather data is not available.                     | `...`          |
 
-###  Moon Module (`tide-report_moon`)
+###  Moon Module (`tide_report_moon`)
 
 | Variable                           | Description                                                     | Default     |
 | ---------------------------------- | --------------------------------------------------------------- | ----------- |
-| `tide-report_moon_format`          | `wttr.in` moon format (e.g., `%m` for emoji, `%M` for name).    | `"%m"`      |
-| `tide-report_moon_refresh_seconds` | How old data can be before a background refresh is triggered.   | `3600`      |
-| `tide-report_moon_expire_seconds`  | How old data can be before it's considered invalid.             | `7200`      |
-| `tide-report_moon_unavailable_text`| Text to display when moon data is not available.                | `...`      |
+| `tide_report_moon_format`          | `wttr.in` moon format (e.g., `%m` for emoji, `%M` for name).    | `"%m"`      |
+| `tide_report_moon_refresh_seconds` | How old data can be before a background refresh is triggered.   | `3600`      |
+| `tide_report_moon_expire_seconds`  | How old data can be before it's considered invalid.             | `7200`      |
+| `tide_report_moon_unavailable_text`| Text to display when moon data is not available.                | `...`      |
 
 ## Acknowledgements
 * [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].
