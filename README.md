@@ -12,7 +12,7 @@ This plugin provides prompt items that display useful information (like weather,
 * **Helpful**: Provides succinct weather data, moon phase data, or if you really want to lean into the maritime theme, tide data.
 * **Growing?**: May expand this to provide other prompt sections such as: sunrise/sundown, weather forecast, or ???
 
-## Dependencies
+##  Dependencies
 
 * **`jq`**: The `tide` module requires `jq` for parsing JSON data. You can install it with your system's package manager (e.g., `sudo apt install jq`).
 * The latest version of [Fish][] (tested with `4.0.2`).
@@ -55,7 +55,7 @@ This setting applies to all modules in this plugin.
 | `tide-report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
 | `tide-report_wttr.in_url`            | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in/` |
 
-### Tide Module (`tide-report_tide`)
+### 󰞍 Tide Module (`tide-report_tide`)
 
 **This module requires you to set a Station ID.**
 
@@ -71,7 +71,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide-report_tide_arrow_falling`   | Symbol to show for an upcoming low tide.                        | `⇟`          |
 | `tide-report_tide_unavailable_text`| Text to display when tide data is not available.                | `🌊...`      |
 
-### Weather Module (`tide-report_weather`)
+### 󰙾 Weather Module (`tide-report_weather`)
 
 | Variable                              | Description                                                             | Default         |
 | ------------------------------------- | ----------------------------------------------------------------------- | --------------- |
@@ -83,7 +83,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide-report_weather_language`        | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`            |
 | `tide-report_weather_unavailable_text`| Text to display when weather data is not available.                     | `...`          |
 
-### Moon Module (`tide-report_moon`)
+###  Moon Module (`tide-report_moon`)
 
 | Variable                           | Description                                                     | Default     |
 | ---------------------------------- | --------------------------------------------------------------- | ----------- |
@@ -95,11 +95,21 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 ## Acknowledgements
 * [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].
 * [Moby Dick](https://www.gutenberg.org/ebooks/2701), the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
-* [NOAA](https://www.noaa.gov) - we'll miss them when they're gone.
+* [NOAA](https://www.noaa.gov) - we'll miss them when they're gone...  󰱭
 * [Igor Chubin](https://github.com/chubin) and all the contributors/sponsors of [wttr.in][].
 
 ### Other Handy Fish Plugins I Use:
-* ...
+* jorgebucaran/fisher
+* ilancosman/tide@v6
+* gazorby/fish-abbreviation-tips
+* laughedelic/pisces
+* meaningful-ooo/sponge
+* nickeb96/puffer-fish
+* jorgebucaran/spark.fish
+* jorgebucaran/humantime.fish
+* jhillyerd/plugin-git
+* PatrickF1/fzf.fish
+
 
 [fish]: https://fishshell.com/
 [fisher]: https://github.com/jorgebucaran/fisher
