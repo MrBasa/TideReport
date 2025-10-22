@@ -9,7 +9,7 @@ function _tide_item_moon --description "Fetches and displays moon phase for Tide
     set -l now (date +%s)
 
     # Check cache status
-    set -l cache_age -1
+    set -l cache_age 2592000
     if test -f $cache_file
         set -l mod_time (date -r $cache_file +%s 2>/dev/null)
         if test $status -eq 0

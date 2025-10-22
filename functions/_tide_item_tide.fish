@@ -59,7 +59,7 @@ function _tide_item_tide --description "Fetches and displays US-based tide infor
     set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
 
     # Check cache status
-    set -l cache_age -1
+    set -l cache_age 2592000
     if test -f $cache_file
         set -l mod_time (date -r $cache_file +%s 2>/dev/null)
         if test $status -eq 0
