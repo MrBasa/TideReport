@@ -18,7 +18,7 @@ set -q tide_report_weather_unavailable_text; or set -g tide_report_weather_unava
 # --- Moon Module ---
 set -q tide_report_moon_format;           or set -g tide_report_moon_format "%m"
 set -q tide_report_moon_refresh_seconds;  or set -g tide_report_moon_refresh_seconds 3600
-set -q tide_report_moon_expire_seconds;   or set -f tide_report_moon_expire_seconds 7200
+set -q tide_report_moon_expire_seconds;   or set -g tide_report_moon_expire_seconds 7200
 set -q tide_report_moon_unavailable_text; or set -g tide_report_moon_unavailable_text "..."
 #set -q tide_moon_color;                   or set -g tide_moon_color CCFF00
 #set -q tide_moon_bg_color;                or set -g tide_moon_color normal
