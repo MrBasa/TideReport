@@ -20,7 +20,7 @@ function _tide_item_moon --description "Displays moon phase in the Tide prompt"
     set -l cache_age (math $now - $cache_mod_time)
 
     # 3. Check if cache is expired
-    if test $cache_age -gt $tide_report_moon_expire_seconds
+    if test $cache_age -gt $tide_report_moon_expire_seconds #tide_report_moon_expire_seconds
         echo $tide_report_moon_unavailable_text
         set should_fetch true
     else
