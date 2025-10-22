@@ -9,7 +9,7 @@ function _tide_item_weather --description "Displays weather information in the T
 
     sleep 2
 
-    _tide_print_item weather $url
+    _tide_print_item weather $_tide_location_color$tide_git_icon' ' $url
     #_tide_print_item weather (curl -s --max-time 10 $url)
     return
 
