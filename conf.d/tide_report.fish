@@ -33,7 +33,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color
 
     # --- Tide Module ---
-    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "9087044" # REQUIRED 8443970
+    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "8443970" # REQUIRED
     set -q tide_report_tide_units             || set -Ux tide_report_tide_units "english" # 'english' or 'metric'
     set -q tide_report_tide_refresh_seconds   || set -Ux tide_report_tide_refresh_seconds 900
     set -q tide_report_tide_expire_seconds    || set -Ux tide_report_tide_expire_seconds 1800

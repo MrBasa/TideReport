@@ -4,10 +4,10 @@
 # --- Sample Data: ---
 # https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8443970&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=english&format=json
 # { "predictions" : [
-#   {"t":"2025-10-22 00:18", "v":"9.398", "type":"H"},
-#   {"t":"2025-10-22 06:15", "v":"1.085", "type":"L"},
-#   {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
-#   {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
+#    {"t":"2025-10-22 00:18", "v":"9.398", "type":"H"},
+#    {"t":"2025-10-22 06:15", "v":"1.085", "type":"L"},
+#    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
+#    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
 
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
@@ -42,7 +42,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     end
 
     # --- Helper Function: Parse Tide Data from Cache ---
-    function _parse_tide_data
+    function _parse_tide_data --description "Parses tide data from cache" --argument-names now
         # Find the first prediction that is in the future
         set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
 
@@ -64,7 +64,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
     # Check if cache is fresh
     if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
-        set output (_parse_tide_data)
+        set output (_parse_tide_data $now)
 
     # Cache is stale, expired, or missing. We must fetch.
     else
@@ -72,17 +72,17 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
         set -l tide_json_data (curl -s --max-time $timeout_sec $url)
         set -l curl_status $status
 
-        # Use the new NOAA-specific validator
+        # Use the NOAA-specific validator
         if _tide_report_validate_noaa $curl_status "$tide_json_data" "tide" "$url"
             # --- Validation PASSED ---
             mkdir -p (dirname $cache_file)
             echo $tide_json_data > $cache_file
-            set output (_parse_tide_data)
+            set output (_parse_tide_data $now)
         else
             # --- Validation FAILED ---
             # Fallback to stale (but not expired) cache if it exists
             if not $cache_is_expired
-                set output (_parse_tide_data)
+                set output (_parse_tide_data $now)
             else
                 # Stale cache is expired or never existed, show unavailable
                 set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
@@ -97,3 +97,4 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
     _tide_print_item tide $output
 end
+
