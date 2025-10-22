@@ -8,8 +8,8 @@ set -q tide_report_wttr_url;               or set -g tide_report_wttr_url "https
 set -q tide_report_weather_format;           or set -g tide_report_weather_format 2
 set -q tide_report_weather_units;            or set -g tide_report_weather_units m
 set -q tide_report_weather_location;         or set -g tide_report_weather_location ""
-set -q tide_report_weather_refresh_seconds;  or set -g tide_report_weather_refresh_seconds 300
-set -q tide_report_weather_expire_seconds;   or set -g tide_report_weather_expire_seconds 600
+set -q tide_report_weather_refresh_seconds;  or set -g tide_report_weather_refresh_seconds 5
+set -q tide_report_weather_expire_seconds;   or set -g tide_report_weather_expire_seconds 10
 set -q tide_report_weather_language;         or set -g tide_report_weather_language "en"
 set -q tide_report_weather_unavailable_text; or set -g tide_report_weather_unavailable_text "..."
 set -q tide_weather_color;                   or set -g tide_weather_color CCFF00

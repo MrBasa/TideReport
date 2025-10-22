@@ -9,7 +9,7 @@ function _tide_item_weather --description "Displays weather information in the T
 
     # 1. Handle case where cache file does not exist
     if not test -f $cache_file
-        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_report_weather_unavailable_text
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
@@ -18,7 +18,7 @@ function _tide_item_weather --description "Displays weather information in the T
     # TODO: `stat` command arguments differ between GNU (Linux) and BSD (macOS). This assumes GNU `stat`. For macOS, it would be `stat -f %m`.
     set -l mod_time (stat -c %Y $cache_file 2>/dev/null)
     if test $status -ne 0 # Handle error if stat fails
-        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_report_weather_unavailable_text
         return
     end
 
@@ -27,18 +27,18 @@ function _tide_item_weather --description "Displays weather information in the T
 
     # 3. Handle case where cache is expired
     if test $cache_age -gt $tide_report_weather_expire_seconds
-        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_report_weather_unavailable_text
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
 
     # 4. Handle case where cache is stale (but still valid)
     if test $cache_age -gt $tide_report_weather_refresh_seconds
-        _tide_print_item weather $tide_weather_icon' ' (cat $cache_file) # Display the current (stale) data
+        _tide_print_item weather (cat $cache_file) # Display the current (stale) data
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
 
     # 5. Handle case where cache is fresh
-    _tide_print_item weather $tide_weather_icon' ' (cat $cache_file)
+    _tide_print_item weather (cat $cache_file)
 end
