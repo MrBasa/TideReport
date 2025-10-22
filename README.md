@@ -4,6 +4,8 @@ A collection of simple, asynchronous, and configurable prompt sections for the [
 
 This plugin provides prompt items that display useful information (like weather, moon phase, and ocean tides) without slowing down your shell.
 
+** WORK IN PROGRESS **
+
 ## ✨ Key Features
 
 * **Truly Asynchronous**: Uses Tide's native event system to fetch data in the background and **update the prompt live** when the data arrives.
