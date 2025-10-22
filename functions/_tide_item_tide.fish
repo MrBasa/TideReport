@@ -12,44 +12,58 @@
 
 # This file defines the helper function first, then the main item function.
 
+# This file defines the helper function first, then the main item function.
+
 # --- "Private" Helper Function ---
-# (This function is unchanged from the previous, correct version)
+# This function will be robust and return an error token on any failure.
 function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
-    begin
-        set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
-        if test $pipestatus[2] -ne 0; or test -z "$predictions"
-            echo "__TIDE_REPORT_UNAVAILABLE__"
+    # We MUST check if the cache file exists before catting it.
+    if not test -f $cache_file
+        echo "__TIDE_REPORT_UNAVAILABLE__"
+        return
+    end
+
+    set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
+
+    # Check if jq failed (pipestatus[2]) or if predictions are empty
+    if test $pipestatus[2 -ne 0; or test -z "$predictions"
+        echo "__TIDE_REPORT_UNAVAILABLE__"
+        return
+    end
+
+    for line in $predictions
+        set -l parts (string split "\t" -- $line)
+        if test (count $parts) -ne 2; continue; end # Skip malformed lines
+
+        set -l date_str $parts[1]
+        set -l tide_type $parts[2]
+
+        set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
+        if test $status -ne 0; continue; end # Skip if date parsing fails
+
+        if test $tide_timestamp -gt $now
+            set -l tide_time (date -d "$date_str" +%H:%M)
+            set -l arrow
+            if test "$tide_type" = "H"
+                set arrow $tide_report_tide_arrow_rising
+            else
+                set arrow $tide_report_tide_arrow_falling
+            end
+
+            # This is the only "success" exit.
+            echo "$arrow$tide_time"
             return
         end
-        for line in $predictions
-            set -l parts (string split "\t" -- $line)
-            if test (count $parts) -ne 2; continue; end
-            set -l date_str $parts[1]
-            set -l tide_type $parts[2]
-            set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
-            if test $status -ne 0; continue; end
-            if test $tide_timestamp -gt $now
-                set -l tide_time (date -d "$date_str" +%H:%M)
-                set -l arrow
-                if test "$tide_type" = "H"
-                    set arrow $tide_report_tide_arrow_rising
-                else
-                    set arrow $tide_report_tide_arrow_falling
-                end
-                echo "$arrow$tide_time"
-                return
-            end
-        end
-        echo "__TIDE_REPORT_UNAVAILABLE__"
-    end; or begin
-        echo "__TIDE_REPORT_UNAVAILABLE__"
     end
+
+    # No future tides found
+    echo "__TIDE_REPORT_UNAVAILABLE__"
 end
 
 
 # --- Main Tide Prompt Item ---
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
-    # --- Pre-flight Checks ---
+    # --- Pre-flight Checks (Immediate Return) ---
     if not set -q tide_report_service_timeout_millis
         _tide_print_item tide "TideReport Config Not Loaded"
         return
@@ -67,72 +81,58 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     set -l cache_file ~/.cache/tide-report/tide.json
     set -l output ""
     set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=$tide_report_tide_station_id&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
+    set -l now (date +%s)
+    if test $status -ne 0; set now (date +%s); end # Failsafe for 'date'
 
-    # --- Main Logic Block (Try...) ---
-    begin
-        set -l now (date +%s)
+    # --- Check Cache Status ---
+    set -l cache_age -1
+    set -l cache_is_expired true
+    if test -f $cache_file
+        set -l mod_time (date -r $cache_file +%s 2>/dev/null)
+        if test $status -eq 0
+            set cache_age (math $now - $mod_time 2>/dev/null)
+            if test $status -ne 0; set cache_age -1; end # Failsafe for 'math'
 
-        # --- Check Cache Status ---
-        set -l cache_age -1
-        set -l cache_is_expired true
-        if test -f $cache_file
-            set -l mod_time (date -r $cache_file +%s 2>/dev/null)
-            if test $status -eq 0
-                set cache_age (math $now - $mod_time)
-                if test $cache_age -le $tide_report_tide_expire_seconds
-                    set cache_is_expired false
-                end
+            if test $cache_age -ge 0; and test $cache_age -le $tide_report_tide_expire_seconds
+                set cache_is_expired false
             end
         end
+    end
 
-        # Check if cache is fresh
-        if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
+    # Check if cache is fresh
+    if test $cache_age -ge 0; and test $cache_age -le $tide_report_tide_refresh_seconds
+        set output (__tide_report_parse_tide $now $cache_file)
+    # Cache is stale, expired, or missing. We must fetch.
+    else
+        set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000" 2>/dev/null)
+        if test $status -ne 0; set timeout_sec 3; end # Failsafe for 'math'
+
+        set -l tide_json_data (curl -s --max-time $timeout_sec $url)
+        set -l curl_status $status
+
+        if _tide_report_validate_noaa $curl_status "$tide_json_data" "tide" "$url"
+            mkdir -p (dirname $cache_file)
+            echo $tide_json_data > $cache_file
             set output (__tide_report_parse_tide $now $cache_file)
-        # Cache is stale, expired, or missing. We must fetch.
         else
-            set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
-            set -l tide_json_data (curl -s --max-time $timeout_sec $url)
-            set -l curl_status $status
-
-            if _tide_report_validate_noaa $curl_status "$tide_json_data" "tide" "$url"
-                mkdir -p (dirname $cache_file)
-                echo $tide_json_data > $cache_file
+            if not $cache_is_expired
+                # Fallback to stale (but valid) cache
                 set output (__tide_report_parse_tide $now $cache_file)
             else
-                if not $cache_is_expired
-                    set output (__tide_report_parse_tide $now $cache_file)
-                else
-                    set output "__TIDE_REPORT_UNAVAILABLE__"
-                end
+                # Stale cache is expired or never existed
+                set output "__TIDE_REPORT_UNAVAILABLE__"
             end
         end
-
-        # --- Final Massage ---
-        set output (string replace --all '\t' ' ' -- $output)
-        set output (string replace --all --regex ' {2,}' ' ' -- $output)
-
-    # --- CATCH BLOCK (UN-CRASHABLE) ---
-    end; or begin
-        set -l error_status $status
-        set -l log_file "/tmp/tide-report-panic.log"
-
-        # Log the error. These are simple echos and WILL NOT FAIL.
-        # FIX: Correctly substitute (date) and simplify 'if' check
-        echo "--- UNEXPECTED TIDE ERROR ---" >> $log_file
-        echo "Timestamp: "(date) >> $log_file
-        echo "Function: _tide_item_tide" >> $log_file
-        echo "Exit Status: $error_status" >> $log_file
-        if test -n "$url"
-            echo "URL: $url" >> $log_file
-        end
-
-        set output "__TIDE_REPORT_UNAVAILABLE__"
     end
 
     # --- Final Output ---
-    # Handle the "unavailable" token here, so the catch block is clean.
     if test "$output" = "__TIDE_REPORT_UNAVAILABLE__"
         set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+    else
+        # Only massage if output is valid
+        set output (string replace --all '\t' ' ' -- $output)
+        set output (string replace --all --regex ' {2,}' ' ' -- $output)
     end
+
     _tide_print_item tide $output
 end
