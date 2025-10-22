@@ -1,35 +1,52 @@
 # Tide Report :: Default Configuration
 
-# --- Universal Settings ---
-set -q tide_report_service_timeout_millis; or set -g tide_report_service_timeout_millis 3000
-set -q tide_report_wttr_url;               or set -g tide_report_wttr_url "https://wttr.in"
+function _tide_report_install --on-event tide_report_install
+    echo "Installing Tide Report Configuration..."
+    # --- Universal Settings ---
+    set -q tide_report_service_timeout_millis  || set -Ux tide_report_service_timeout_millis 3000
+    set -q tide_report_wttr_url                || set -Ux tide_report_wttr_url "https://wttr.in"
 
-# --- Weather Module ---
-set -q tide_report_weather_format;           or set -g tide_report_weather_format 2
-set -q tide_report_weather_units;            or set -g tide_report_weather_units m
-set -q tide_report_weather_location;         or set -g tide_report_weather_location ""
-set -q tide_report_weather_refresh_seconds;  or set -g tide_report_weather_refresh_seconds 5
-set -q tide_report_weather_expire_seconds;   or set -g tide_report_weather_expire_seconds 10
-set -q tide_report_weather_language;         or set -g tide_report_weather_language "en"
-set -q tide_report_weather_unavailable_text; or set -g tide_report_weather_unavailable_text "..."
-#set -q tide_weather_color;                   or set -g tide_weather_color CCFF00
-#set -q tide_weather_bg_color;                or set -g tide_weather_color normal
+    # --- Weather Module ---
+    set -q tide_report_weather_format            || set -u tide_report_weather_format 2
+    set -q tide_report_weather_units             || set -Ux tide_report_weather_units m
+    set -q tide_report_weather_location          || set -Ux tide_report_weather_location ""
+    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 5
+    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 10
+    set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
+    set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
+    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
+    #set -q tide_weather_color                    || set -Ux tide_weather_color CCFF00
+    #set -q tide_weather_bg_color                 || set -Ux tide_weather_color normal
 
-# --- Moon Module ---
-set -q tide_report_moon_format;           or set -g tide_report_moon_format "%m"
-set -q tide_report_moon_refresh_seconds;  or set -g tide_report_moon_refresh_seconds 3600
-set -q tide_report_moon_expire_seconds;   or set -g tide_report_moon_expire_seconds 7200
-set -q tide_report_moon_unavailable_text; or set -g tide_report_moon_unavailable_text "..."
-#set -q tide_moon_color;                   or set -g tide_moon_color CCFF00
-#set -q tide_moon_bg_color;                or set -g tide_moon_color normal
+    # --- Moon Module ---
+    set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
+    set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
+    set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
+    set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
+    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
+    #set -q tide_moon_color                    || set -Ux tide_moon_color CCFF00
+    #set -q tide_moon_bg_color                 || set -Ux tide_moon_color normal
 
-# --- Tide Module ---
-set -q tide_report_tide_station_id;        or set -g tide_report_tide_station_id "" # REQUIRED
-set -q tide_report_tide_units;             or set -g tide_report_tide_units "english" # 'english' or 'metric'
-set -q tide_report_tide_refresh_seconds;   or set -g tide_report_tide_refresh_seconds 900
-set -q tide_report_tide_expire_seconds;    or set -g tide_report_tide_expire_seconds 1800
-set -q tide_report_tide_arrow_rising;      or set -g tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
-set -q tide_report_tide_arrow_falling;     or set -g tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
-set -q tide_report_tide_unavailable_text;  or set -g tide_report_tide_unavailable_text "🌊..."
-#set -q tide_tide_color;                    or set -g tide_tide_color CCFF00
-#set -q tide_tide_bg_color;                 or set -g tide_tide_color normal
+    # --- Tide Module ---
+    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "" # REQUIRED
+    set -q tide_report_tide_units             || set -Ux tide_report_tide_units "english" # 'english' or 'metric'
+    set -q tide_report_tide_refresh_seconds   || set -Ux tide_report_tide_refresh_seconds 900
+    set -q tide_report_tide_expire_seconds    || set -Ux tide_report_tide_expire_seconds 1800
+    set -q tide_report_tide_arrow_rising      || set -Ux tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
+    set -q tide_report_tide_arrow_falling     || set -Ux tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
+    set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊"
+    set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
+    #set -q tide_tide_color                    || set -Ux tide_tide_color CCFF00
+    #set -q tide_tide_bg_color                 || set -Ux tide_tide_color normal
+end
+
+function _tide_report_update --on-event tide_report_update
+    _tide_fish_colorize "Doing a update..."
+    _tide_report_install
+end
+
+function _tide_report_uninstall --on-event _tide_report_uninstall
+    echo "Removing Tide Report Configuration..."
+    set -e (set -U --names | string match --entire -r '^_?tide_report')
+    functions --erase (functions --all | string match --entire -r '^_?tide_report')
+end

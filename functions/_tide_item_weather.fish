@@ -8,13 +8,6 @@ function _tide_item_weather --description "Fetches and displays weather informat
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=$tide_report_weather_format&$tide_report_weather_units&lang=$tide_report_weather_language"
     set -l now (date +%s)
 
-    _tide_print_item weather (random 0 9)
-    sleep 2
-    _tide_print_item weather (random 0 9)
-    sleep 2
-    _tide_print_item weather (random 0 9)
-    return
-
     # Check cache status
     set -l cache_age -1
     if test -f $cache_file
@@ -38,14 +31,14 @@ function _tide_item_weather --description "Fetches and displays weather informat
             # Fetch succeeded, update cache and print new data.
             mkdir -p (dirname $cache_file)
             echo $weather_data > $cache_file
-            _tide_print_item weather $weather_data
+            #_tide_print_item weather $weather_data
         end
         # If fetch fails, we already printed "unavailable", so we just end.
 
     else if test $cache_age -gt $tide_report_weather_refresh_seconds
         # --- Cache is stale (but not expired) ---
         # Immediately print the stale cache data.
-        _tide_print_item weather (cat $cache_file)
+        #_tide_print_item weather (cat $cache_file)
 
         # Synchronously fetch new data in the background.
         set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
@@ -56,6 +49,8 @@ function _tide_item_weather --description "Fetches and displays weather informat
             mkdir -p (dirname $cache_file)
             echo $weather_data > $cache_file
             _tide_print_item weather $weather_data
+        else
+            _tide_print_item weather $tide_report_weather_unavailable_text
         end
     else
         # --- Cache is fresh ---
