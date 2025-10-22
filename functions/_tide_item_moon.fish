@@ -3,40 +3,37 @@
 # This function handles all logic for displaying the moon phase module.
 
 function _tide_item_moon --description "Displays moon phase in the Tide prompt"
-    set -l cache_file ~/.cache/tide_report/moon.txt
+    set -l cache_file ~/.cache/tide-report/moon.txt
+    set -l now (date +%s)
+    set -l should_fetch false
     set -l url "$tide_report_wttr_url/Moon?format=$tide_report_moon_format"
 
-    # 1. Handle case where cache file does not exist
+    # 1. Check if cache file exists
     if not test -f $cache_file
-        echo $tide_report_moon_unavailable_text
-        _tide_report_fetch $url $cache_file
+        set prompt_text $tide_report_moon_unavailable_text
+        _tide_report_fetch $url $cache_file "tide_report_moon_updated"
         return
     end
 
-    # 2. Get the age of the cache file (assumes GNU stat for -c %Y)
-    set -l mod_time (stat -c %Y $cache_file 2>/dev/null)
-    if test $status -ne 0
-        echo $tide_report_moon_unavailable_text
-        return
-    end
+    # 2. If it exists, calculate its age
+    set -l cache_mod_time (date -r $cache_file +%s)
+    set -l cache_age (math $now - $cache_mod_time)
 
-    set -l current_time (date +%s)
-    set -l cache_age (math $current_time - $mod_time)
-
-    # 3. Handle case where cache is expired
+    # 3. Check if cache is expired
     if test $cache_age -gt $tide_report_moon_expire_seconds
         echo $tide_report_moon_unavailable_text
-        _tide_report_fetch $url $cache_file
-        return
+        set should_fetch true
+    else
+        # 4. If not expired, display data and check if it's stale
+        cat $cache_file
+        if test $cache_age -gt $tide_report_moon_refresh_seconds
+            set should_fetch true
+        end
     end
 
-    # 4. Handle case where cache is stale (but still valid)
-    if test $cache_age -gt $tide_report_moon_refresh_seconds
-        cat $cache_file # Display the current (stale) data
-        _tide_report_fetch $url $cache_file # Trigger refresh
-        return
+    # 5. Trigger fetch if needed
+    if $should_fetch
+        _tide_report_fetch $url $cache_file "tide_report_moon_updated"
     end
-
-    # 5. Handle case where cache is fresh
-    cat $cache_file
 end
+

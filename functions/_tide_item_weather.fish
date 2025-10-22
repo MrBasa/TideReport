@@ -7,11 +7,9 @@ function _tide_item_weather --description "Displays weather information in the T
     set -l cache_file ~/.cache/tide_report/weather.txt
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=$tide_report_weather_format&$tide_report_weather_units&lang=$tide_report_weather_language"
 
-    _tide_print_item weather $tide_weather_icon "HI!"
-
     # 1. Handle case where cache file does not exist
     if not test -f $cache_file
-        echo $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
@@ -20,7 +18,7 @@ function _tide_item_weather --description "Displays weather information in the T
     # TODO: `stat` command arguments differ between GNU (Linux) and BSD (macOS). This assumes GNU `stat`. For macOS, it would be `stat -f %m`.
     set -l mod_time (stat -c %Y $cache_file 2>/dev/null)
     if test $status -ne 0 # Handle error if stat fails
-        echo $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
         return
     end
 
@@ -29,18 +27,18 @@ function _tide_item_weather --description "Displays weather information in the T
 
     # 3. Handle case where cache is expired
     if test $cache_age -gt $tide_report_weather_expire_seconds
-        echo $tide_report_weather_unavailable_text
+        _tide_print_item weather $tide_weather_icon' ' $tide_report_weather_unavailable_text
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
 
     # 4. Handle case where cache is stale (but still valid)
     if test $cache_age -gt $tide_report_weather_refresh_seconds
-        cat $cache_file # Display the current (stale) data
+        _tide_print_item weather $tide_weather_icon' ' (cat $cache_file) # Display the current (stale) data
         _tide_report_fetch $url $cache_file "tide_report_weather_updated"
         return
     end
 
     # 5. Handle case where cache is fresh
-    cat $cache_file
+    _tide_print_item weather $tide_weather_icon' ' (cat $cache_file)
 end
