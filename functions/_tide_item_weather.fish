@@ -33,7 +33,7 @@ function _tide_item_weather --description "Fetches and displays weather informat
         set -l curl_status $status
 
         # 3. Validate the new data
-        if _tide_report_validate $curl_status "$weather_data" "weather" "$url"
+        if _tide_report_validate_wttr $curl_status "$weather_data" "weather" "$url"
             # --- Validation PASSED ---
             set output $weather_data
             # Update cache
