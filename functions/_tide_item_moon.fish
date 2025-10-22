@@ -33,7 +33,7 @@ function _tide_item_moon --description "Fetches and displays moon phase for Tide
         set -l curl_status $status
 
         # Validate the new data
-        if _tide_report_validate $curl_status "$moon_data" "moon" "$url"
+        if _tide_report_validate_wttr $curl_status "$moon_data" "moon" "$url"
             # --- Validation PASSED ---
             set output $moon_data
             mkdir -p (dirname $cache_file)
