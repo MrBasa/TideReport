@@ -44,6 +44,7 @@ Add any of the module items to your Tide prompt. For example:
 
 ```fish
 set -Ua tide_right_prompt_items weather moon tide
+tide reload
 ```
 
 ## ⚙️ Configuration
