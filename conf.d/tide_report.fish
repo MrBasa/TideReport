@@ -27,7 +27,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
     set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
-    set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
+    set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text "X"
     set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
     set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color

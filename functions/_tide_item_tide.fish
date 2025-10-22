@@ -13,11 +13,11 @@
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Pre-flight Checks ---
     if not type -q jq
-        _tide_print_item tide "jq not found"
+        _tide_print_item tide (set_color $tide_report_tide_unavailable_color)"jq not found"
         return
     end
     if test -z "$tide_report_tide_station_id"
-        _tide_print_item tide "No Station ID"
+        _tide_print_item tide (set_color $tide_report_tide_unavailable_color)"No Station ID"
         return
     end
 
@@ -58,7 +58,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
             echo "$arrow$tide_time"
         else
             # No future tides found for today
-            echo $tide_report_tide_unavailable_text
+            echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
         end
     end
 
@@ -85,7 +85,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
                 set output (_parse_tide_data)
             else
                 # Stale cache is expired or never existed, show unavailable
-                set output $tide_report_tide_unavailable_color$tide_report_tide_unavailable_text
+                set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
             end
         end
     end
