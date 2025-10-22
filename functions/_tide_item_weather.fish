@@ -51,6 +51,9 @@ function _tide_item_weather --description "Fetches and displays weather informat
     end
 
     # --- Final Output ---
+    # Massage the output: replace tabs and multiple spaces with a single space
+    set output (string replace --all '\t' ' ' -- $output)
+    set output (string replace --all --regex ' {2,}' ' ' -- $output)
+
     _tide_print_item weather $output
 end
-
