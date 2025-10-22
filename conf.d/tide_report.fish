@@ -4,8 +4,8 @@ function _tide_report_install --on-event tide_report_install
     echo "Installing Tide Report Configuration..."
 
     # Borrow default color from time to pick up the theme.
-    set -l default_color $tide_time_color || set -l default_color 303030
-    set -l default_bg_color tide_time_bg_color || set -l default_bg_color 303030
+    set -l default_color $tide_time_color       || set -l default_color 5F8787
+    set -l default_bg_color $tide_time_bg_color || set -l default_bg_color 303030
 
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis  || set -Ux tide_report_service_timeout_millis 3000
