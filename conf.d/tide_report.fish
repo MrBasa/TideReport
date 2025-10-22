@@ -53,8 +53,15 @@ function _tide_report_uninstall --on-event tide_report_uninstall
     echo "Removing Tide Report Configuration..."
 
     # Delete vars
-    set -e (set -U --names | string match --entire -r '^_?tide_report')
-    set -e (set -U --names | string match --entire -r '^_?tide_weather')
+    set -l vars_to_erase
+    set -a vars_to_erase (set -U --names | string match --entire -r '^_?tide_report')
+    set -a vars_to_erase (set -U --names | string match --entire -r '^_?tide_weather')
+    set -a vars_to_erase (set -U --names | string match --entire -r '^_?tide_moon')
+    set -a vars_to_erase (set -U --names | string match --entire -r '^_?tide_tide')
+
+    if test -n "$vars_to_erase"
+        set -e $vars_to_erase
+    end
 
     # Delete funcs
     builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
