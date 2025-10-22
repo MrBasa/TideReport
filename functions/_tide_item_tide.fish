@@ -14,6 +14,9 @@ function _tide_item_tide --description "Displays US-based tide information in th
         return
     end
 
+    _tide_print_item tide "Tide"
+    return
+
     set -l cache_file ~/.cache/tide_report/tide.json
     set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=tide_report_fish&begin_date=(date -u +%Y%m%d)&range=24&datum=MLLW&station=$tide_report_tide_station_id&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
 

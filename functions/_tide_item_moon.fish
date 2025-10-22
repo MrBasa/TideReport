@@ -8,6 +8,9 @@ function _tide_item_moon --description "Displays moon phase in the Tide prompt"
     set -l should_fetch false
     set -l url "$tide_report_wttr_url/Moon?format=$tide_report_moon_format"
 
+    _tide_print_item moon "Moon"
+    return
+
     # 1. Check if cache file exists
     if not test -f $cache_file
         set prompt_text $tide_report_moon_unavailable_text
