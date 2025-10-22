@@ -15,8 +15,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
     set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
-    #set -q tide_weather_color                    || set -Ux tide_weather_color CCFF00
-    #set -q tide_weather_bg_color                 || set -Ux tide_weather_color normal
+    set -q tide_weather_color                    || set -Ux tide_weather_color CCFF00
+    set -q tide_weather_bg_color                 || set -Ux tide_weather_color normal
 
     # --- Moon Module ---
     set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
@@ -43,11 +43,6 @@ end
 function _tide_report_update --on-event tide_report_update
     _tide_fish_colorize "Doing a update..."
     _tide_report_install
-end
-
-function _tide_report_remove --on-event tide_report_remove
-    echo REMOVE!
-    _tide_report_uninstall
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
