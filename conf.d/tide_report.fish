@@ -45,7 +45,12 @@ function _tide_report_update --on-event tide_report_update
     _tide_report_install
 end
 
-function _tide_report_uninstall --on-event _tide_report_uninstall
+function _tide_report_remove --on-event tide_report_remove
+    echo REMOVE!
+    _tide_report_uninstall
+end
+
+function _tide_report_uninstall --on-event tide_report_uninstall
     echo "Removing Tide Report Configuration..."
 
     # Delete vars

@@ -27,12 +27,13 @@ function _tide_item_weather --description "Fetches and displays weather informat
         set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
         set -l weather_data (curl -s --max-time $timeout_sec $url | string collect)
 
+        _tide_print_item weather $url
+
         if test $status -eq 0 -a -n "$weather_data"
             # Fetch succeeded, update cache and print new data.
             mkdir -p (dirname $cache_file)
             echo $weather_data > $cache_file
             #_tide_print_item weather $weather_data
-            _tide_print_item weather $url
         end
         # If fetch fails, we already printed "unavailable", so we just end.
 
