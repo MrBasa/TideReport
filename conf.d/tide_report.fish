@@ -75,5 +75,5 @@ function _tide_report_uninstall --on-event tide_report_uninstall
         set -U tide_left_prompt_items (string match -rv '^(weather|moon|tide)$' $tide_left_prompt_items)
     end
 
-    tide refresh
+    tide reload
 end
