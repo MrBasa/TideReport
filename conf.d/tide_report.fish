@@ -43,6 +43,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
     set -q tide_tide_bg_color                 || set -Ux tide_tide_bg_color $default_bg_color
+
+    tide reload
 end
 
 function _tide_report_update --on-event tide_report_update
