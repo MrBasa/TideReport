@@ -2,6 +2,11 @@
 
 function _tide_report_install --on-event tide_report_install
     echo "Installing Tide Report Configuration..."
+
+    # Borrow default color from time to pick up the theme.
+    set -l default_color $tide_time_color || set -l default_color 303030
+    set -l default_bg_color tide_time_bg_color || set -l default_bg_color 303030
+
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis  || set -Ux tide_report_service_timeout_millis 3000
     set -q tide_report_wttr_url                || set -Ux tide_report_wttr_url "https://wttr.in"
@@ -15,8 +20,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
     set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
-    set -q tide_weather_color                    || set -Ux tide_weather_color 5F8787
-    set -q tide_weather_bg_color                 || set -Ux tide_weather_bg_color 303030
+    set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
+    set -q tide_weather_bg_color                 || set -Ux tide_weather_bg_color $default_bg_color
 
     # --- Moon Module ---
     set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
@@ -24,8 +29,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
     set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
-    #set -q tide_moon_color                    || set -Ux tide_moon_color CCFF00
-    #set -q tide_moon_bg_color                 || set -Ux tide_moon_color normal
+    set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
+    set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color
 
     # --- Tide Module ---
     set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "" # REQUIRED
@@ -36,8 +41,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_arrow_falling     || set -Ux tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
     set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊"
     set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
-    #set -q tide_tide_color                    || set -Ux tide_tide_color CCFF00
-    #set -q tide_tide_bg_color                 || set -Ux tide_tide_color normal
+    set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
+    set -q tide_tide_bg_color                 || set -Ux tide_tide_bg_color $default_bg_color
 end
 
 function _tide_report_update --on-event tide_report_update
