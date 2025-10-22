@@ -10,23 +10,49 @@
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
 
+
 # --- "Private" Helper Function ---
-# (This function is unchanged from the previous, correct version)
+# Usage: __tide_report_parse_tide $now_timestamp $cache_file_path
 function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
+    # This entire function is wrapped in a try/catch block
+    # as a final safeguard.
     begin
+        # --- CRITICAL FIX: Check pipestatus correctly ---
+        # Run the pipe first, save output to a variable.
         set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
-        if test $pipestatus[2] -ne 0; or test -z "$predictions"
+
+        # Check the status of 'jq' (index 2) immediately.
+        if test $pipestatus[2] -ne 0
+            # jq itself failed (e.g., invalid JSON).
+            echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+            return # Propagates status 0 (from echo)
+        end
+        # --- End of fix ---
+
+        # Check if jq simply found no predictions
+        if test -z "$predictions"
             echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
             return
         end
+
         for line in $predictions
             set -l parts (string split "\t" -- $line)
-            if test (count $parts) -ne 2; continue; end
+            if test (count $parts) -ne 2
+                continue # Malformed line
+            end
+
             set -l date_str $parts[1]
             set -l tide_type $parts[2]
+
+            # Use 'date -d', which is much more flexible
             set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
-            if test $status -ne 0; continue; end
+            if test $status -ne 0
+                continue # date command failed to parse
+            end
+
+            # Compare timestamp to $now
             if test $tide_timestamp -gt $now
+                # This is the first future tide.
                 set -l tide_time (date -d "$date_str" +%H:%M)
                 set -l arrow
                 if test "$tide_type" = "H"
@@ -35,17 +61,23 @@ function __tide_report_parse_tide --description "Parses tide data from cache" --
                     set arrow $tide_report_tide_arrow_falling
                 end
                 echo "$arrow$tide_time"
-                return
+                return # We are done
             end
         end
+
+        # If loop finishes, no future tides were found
         echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+
+    # --- This is the "catch" block for the helper ---
     end; or begin
+        # Catch any other unexpected error (e.g., in 'string split')
         echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
 end
 
 
 # --- Main Tide Prompt Item ---
+# (This part is unchanged from the previous version)
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Pre-flight Checks ---
     if not type -q jq
@@ -60,9 +92,6 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Setup Variables ---
     set -l cache_file ~/.cache/tide-report/tide.json
     set -l output ""
-
-    # --- CRITICAL FIX: Define URL *outside* the try block ---
-    # This ensures $url is in scope for the 'catch' block.
     set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=$tide_report_tide_station_id&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
 
     # --- Main Logic Block (Try...) ---
@@ -116,8 +145,6 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
         echo "Timestamp: (date)" >> $log_file
         echo "Function: _tide_item_tide" >> $log_file
         echo "Exit Status: $error_status" >> $log_file
-
-        # This check will now work, because $url is in scope
         if set -q url
             echo "URL: $url" >> $log_file
         end
