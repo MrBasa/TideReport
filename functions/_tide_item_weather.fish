@@ -8,6 +8,13 @@ function _tide_item_weather --description "Fetches and displays weather informat
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=$tide_report_weather_format&$tide_report_weather_units&lang=$tide_report_weather_language"
     set -l now (date +%s)
 
+    _tide_print_item weather "One"
+    sleep 2
+    _tide_print_item weather "Two"
+    sleep 2
+    _tide_print_item weather "Three"
+    return
+
     # Check cache status
     set -l cache_age -1
     if test -f $cache_file
