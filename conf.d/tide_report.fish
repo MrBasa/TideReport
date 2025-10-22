@@ -33,13 +33,13 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color
 
     # --- Tide Module ---
-    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "" # REQUIRED
+    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "9087044" # REQUIRED 8443970
     set -q tide_report_tide_units             || set -Ux tide_report_tide_units "english" # 'english' or 'metric'
     set -q tide_report_tide_refresh_seconds   || set -Ux tide_report_tide_refresh_seconds 900
     set -q tide_report_tide_expire_seconds    || set -Ux tide_report_tide_expire_seconds 1800
     set -q tide_report_tide_arrow_rising      || set -Ux tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
     set -q tide_report_tide_arrow_falling     || set -Ux tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
-    set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊"
+    set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊X"
     set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
     set -q tide_tide_bg_color                 || set -Ux tide_tide_bg_color $default_bg_color
