@@ -23,25 +23,11 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
     # --- Setup Variables ---
     set -l cache_file ~/.cache/tide-report/tide.json
-    # Request "hilo" interval to get High/Low tide types
     set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=$tide_report_tide_station_id&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
-    set -l now (date +%s)
     set -l output ""
 
-    # --- Check Cache Status ---
-    set -l cache_age -1
-    set -l cache_is_expired true
-    if test -f $cache_file
-        set -l mod_time (date -r $cache_file +%s 2>/dev/null)
-        if test $status -eq 0
-            set cache_age (math $now - $mod_time)
-            if test $cache_age -le $tide_report_tide_expire_seconds
-                set cache_is_expired false
-            end
-        end
-    end
-
     # --- Helper Function: Parse Tide Data from Cache ---
+    # This must be defined *outside* the begin/end block to be available.
     function _parse_tide_data --description "Parses tide data from cache" --argument-names now
         # Find the first prediction that is in the future
         set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
@@ -62,39 +48,71 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
         end
     end
 
-    # Check if cache is fresh
-    if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
-        set output (_parse_tide_data $now)
+    # --- Main Logic Block (Try...) ---
+    # If any command inside fails, the `or` block is executed.
+    begin
+        set -l now (date +%s)
 
-    # Cache is stale, expired, or missing. We must fetch.
-    else
-        set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
-        set -l tide_json_data (curl -s --max-time $timeout_sec $url)
-        set -l curl_status $status
-
-        # Use the NOAA-specific validator
-        if _tide_report_validate_noaa $curl_status "$tide_json_data" "tide" "$url"
-            # --- Validation PASSED ---
-            mkdir -p (dirname $cache_file)
-            echo $tide_json_data > $cache_file
-            set output (_parse_tide_data $now)
-        else
-            # --- Validation FAILED ---
-            # Fallback to stale (but not expired) cache if it exists
-            if not $cache_is_expired
-                set output (_parse_tide_data $now)
-            else
-                # Stale cache is expired or never existed, show unavailable
-                set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+        # --- Check Cache Status ---
+        set -l cache_age -1
+        set -l cache_is_expired true
+        if test -f $cache_file
+            set -l mod_time (date -r $cache_file +%s 2>/dev/null)
+            if test $status -eq 0
+                set cache_age (math $now - $mod_time)
+                if test $cache_age -le $tide_report_tide_expire_seconds
+                    set cache_is_expired false
+                end
             end
         end
+
+        # Check if cache is fresh
+        if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
+            set output (_parse_tide_data $now)
+
+        # Cache is stale, expired, or missing. We must fetch.
+        else
+            set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
+            set -l tide_json_data (curl -s --max-time $timeout_sec $url)
+            set -l curl_status $status
+
+            # Use the NOAA-specific validator
+            if _tide_report_validate_noaa $curl_status "$tide_json_data" "tide" "$url"
+                # --- Validation PASSED ---
+                mkdir -p (dirname $cache_file)
+                echo $tide_json_data > $cache_file
+                set output (_parse_tide_data $now)
+            else
+                # --- Validation FAILED ---
+                # Fallback to stale (but not expired) cache if it exists
+                if not $cache_is_expired
+                    set output (_parse_tide_data $now)
+                else
+                    # Stale cache is expired or never existed, show unavailable
+                    set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+                end
+            end
+        end
+
+        # --- Final Massage ---
+        set output (string replace --all '\t' ' ' -- $output)
+        set output (string replace --all --regex ' {2,}' ' ' -- $output)
+
+    # --- Catch Unexpected Errors ---
+    or
+        set -l error_status $status
+        set -l log_file (mktemp --tmpdir tide-report-panic.XXXXXX.log)
+        echo "--- UNEXPECTED TIDE ERROR ---" >> $log_file
+        echo "Timestamp: (date)" >> $log_file
+        echo "Function: _tide_item_tide" >> $log_file
+        echo "Exit Status: $error_status" >> $log_file
+        echo "URL: $url" >> $log_file
+
+        # Set output to unavailable
+        set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
 
     # --- Final Output ---
-    # Massage the output: replace tabs and multiple spaces with a single space
-    set output (string replace --all '\t' ' ' -- $output)
-    set output (string replace --all --regex ' {2,}' ' ' -- $output)
-
     _tide_print_item tide $output
 end
 
