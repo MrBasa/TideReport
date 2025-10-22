@@ -9,7 +9,34 @@
 #    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
+# This file defines the helper function first, then the main item function.
+# This is fast because the helper is defined *once* when the file is loaded,
+# not every time the prompt is rendered.
 
+# --- "Private" Helper Function ---
+# Usage: __tide_report_parse_tide $now_timestamp $cache_file_path
+function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
+    # Find the first prediction that is in the future
+    set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
+
+    if test -n "$next_tide"; and test "$next_tide" != "null"
+        set -l tide_type (echo $next_tide | jq -r '.type')
+        set -l tide_time (echo $next_tide | jq -r '.t' | strptime -f '%Y-%m-%d %H:%M' | strftime '%H:%M')
+        set -l arrow
+        if test "$tide_type" = "H"
+            set arrow $tide_report_tide_arrow_rising
+        else
+            set arrow $tide_report_tide_arrow_falling
+        end
+        echo "$arrow$tide_time"
+    else
+        # No future tides found for today
+        echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+    end
+end
+
+# --- Main Tide Prompt Item ---
+# Displays the next high or low tide from NOAA.
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Pre-flight Checks ---
     if not type -q jq
@@ -24,27 +51,6 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Setup Variables ---
     set -l cache_file ~/.cache/tide-report/tide.json
     set -l output ""
-
-    # --- Helper Function: Parse Tide Data from Cache ---
-    function _parse_tide_data --description "Parses tide data from cache" --argument-names now
-        # Find the first prediction that is in the future
-        set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
-
-        if test -n "$next_tide"; and test "$next_tide" != "null"
-            set -l tide_type (echo $next_tide | jq -r '.type')
-            set -l tide_time (echo $next_tide | jq -r '.t' | strptime -f '%Y-%m-%d %H:%M' | strftime '%H:%M')
-            set -l arrow
-            if test "$tide_type" = "H"
-                set arrow $tide_report_tide_arrow_rising
-            else
-                set arrow $tide_report_tide_arrow_falling
-            end
-            echo "$arrow$tide_time"
-        else
-            # No future tides found for today
-            echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
-        end
-    end
 
     # --- Main Logic Block (Try...) ---
     begin
@@ -66,7 +72,8 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
         # Check if cache is fresh
         if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
-            set output (_parse_tide_data $now)
+            # Call the helper function (defined above in this file)
+            set output (__tide_report_parse_tide $now $cache_file)
 
         # Cache is stale, expired, or missing. We must fetch.
         else
@@ -79,12 +86,12 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
                 # --- Validation PASSED ---
                 mkdir -p (dirname $cache_file)
                 echo $tide_json_data > $cache_file
-                set output (_parse_tide_data $now)
+                set output (__tide_report_parse_tide $now $cache_file)
             else
                 # --- Validation FAILED ---
                 # Fallback to stale (but not expired) cache if it exists
                 if not $cache_is_expired
-                    set output (_parse_tide_data $now)
+                    set output (__tide_report_parse_tide $now $cache_file)
                 else
                     # Stale cache is expired or never existed, show unavailable
                     set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
@@ -113,6 +120,5 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     end
 
     # --- Final Output ---
-    # This is now guaranteed to print *something* safely.
     _tide_print_item tide $output
 end
