@@ -16,7 +16,6 @@ function __tide_report_parse_tide --description "Parses tide data from cache" --
     begin
         set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
         if test $pipestatus[2] -ne 0; or test -z "$predictions"
-            # Return a generic error string. The main function will color it.
             echo "__TIDE_REPORT_UNAVAILABLE__"
             return
         end
@@ -39,10 +38,8 @@ function __tide_report_parse_tide --description "Parses tide data from cache" --
                 return
             end
         end
-        # No future tides found
         echo "__TIDE_REPORT_UNAVAILABLE__"
     end; or begin
-        # Catch any unexpected error (e.g., in 'string split')
         echo "__TIDE_REPORT_UNAVAILABLE__"
     end
 end
@@ -51,6 +48,10 @@ end
 # --- Main Tide Prompt Item ---
 function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Pre-flight Checks ---
+    if not set -q tide_report_service_timeout_millis
+        _tide_print_item tide "TideReport Config Not Loaded"
+        return
+    end
     if not type -q jq
         _tide_print_item tide (set_color $tide_report_tide_unavailable_color)"jq not found"
         return
@@ -111,8 +112,8 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- CATCH BLOCK (UN-CRASHABLE) ---
     end; or begin
         set -l error_status $status
-        # Use mktemp to get a filename, but echo directly to avoid failure
-        set -l log_file (mktemp --tmpdir tide-report-panic.XXXXXX.log)
+        # Use a hardcoded log file path to avoid mktemp failure
+        set -l log_file "/tmp/tide-report-panic.log"
 
         # Log the error. These are simple echos and WILL NOT FAIL.
         echo "--- UNEXPECTED TIDE ERROR ---" >> $log_file
@@ -123,7 +124,6 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
             echo "URL: $url" >> $log_file
         end
 
-        # Set output to the "unavailable" token.
         set output "__TIDE_REPORT_UNAVAILABLE__"
     end
 
