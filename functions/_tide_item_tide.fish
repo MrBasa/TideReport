@@ -10,60 +10,45 @@
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
 
-# This file defines the main item function, with the parser nested inside.
+# This file defines the helper function first, then the main item function.
 
-function _tide_item_tide --description "Fetches and displays next tide for Tide"
-    # --- "Private" Helper Function ---
-    # Defined first, so it's available to the logic below.
-    function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
-        begin
-            # Use jq to get a list of "date\ttype" strings
-            set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
-
-            # $pipestatus[2] checks the 'jq' command specifically.
-            if test $pipestatus[2] -ne 0; or test -z "$predictions"
-                echo "__TIDE_REPORT_UNAVAILABLE__"
+# --- "Private" Helper Function ---
+# (This function is unchanged from the previous, correct version)
+function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
+    begin
+        set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
+        if test $pipestatus[2] -ne 0; or test -z "$predictions"
+            echo "__TIDE_REPORT_UNAVAILABLE__"
+            return
+        end
+        for line in $predictions
+            set -l parts (string split "\t" -- $line)
+            if test (count $parts) -ne 2; continue; end
+            set -l date_str $parts[1]
+            set -l tide_type $parts[2]
+            set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
+            if test $status -ne 0; continue; end
+            if test $tide_timestamp -gt $now
+                set -l tide_time (date -d "$date_str" +%H:%M)
+                set -l arrow
+                if test "$tide_type" = "H"
+                    set arrow $tide_report_tide_arrow_rising
+                else
+                    set arrow $tide_report_tide_arrow_falling
+                end
+                echo "$arrow$tide_time"
                 return
             end
-
-            for line in $predictions
-                set -l parts (string split "\t" -- $line)
-                if test (count $parts) -ne 2; continue; end
-
-                set -l date_str $parts[1]
-                set -l tide_type $parts[2]
-
-                # Use fish's 'date' command, which is more forgiving than 'jq fromdate'
-                # and handle its failure.
-                set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
-                if test $status -ne 0; continue; end # Skip if date parsing fails
-
-                # Check if this tide is in the future
-                if test $tide_timestamp -gt $now
-                    set -l tide_time (date -d "$date_str" +%H:%M)
-                    set -l arrow
-                    if test "$tide_type" = "H"
-                        set arrow $tide_report_tide_arrow_rising
-                    else
-                        set arrow $tide_report_tide_arrow_falling
-                    end
-                    echo "$arrow$tide_time"
-                    return # We found the next tide, exit
-                end
-            end
-
-            # If the loop finishes, no future tides were found for today
-            echo "__TIDE_REPORT_UNAVAILABLE__"
-
-        # Catch any unexpected error *inside* the helper (e.g., in 'string split')
-        end; or begin
-            echo "__TIDE_REPORT_UNAVAILABLE__"
         end
+        echo "__TIDE_REPORT_UNAVAILABLE__"
+    end; or begin
+        echo "__TIDE_REPORT_UNAVAILABLE__"
     end
+end
 
 
-    # --- Main Tide Prompt Item Logic ---
-
+# --- Main Tide Prompt Item ---
+function _tide_item_tide --description "Fetches and displays next tide for Tide"
     # --- Pre-flight Checks ---
     if not set -q tide_report_service_timeout_millis
         _tide_print_item tide "TideReport Config Not Loaded"
@@ -130,11 +115,14 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     end; or begin
         set -l error_status $status
         set -l log_file "/tmp/tide-report-panic.log"
+
+        # Log the error. These are simple echos and WILL NOT FAIL.
+        # FIX: Correctly substitute (date) and simplify 'if' check
         echo "--- UNEXPECTED TIDE ERROR ---" >> $log_file
-        echo "Timestamp: (date)" >> $log_file
+        echo "Timestamp: "(date) >> $log_file
         echo "Function: _tide_item_tide" >> $log_file
         echo "Exit Status: $error_status" >> $log_file
-        if set -q url
+        if test -n "$url"
             echo "URL: $url" >> $log_file
         end
 
@@ -142,6 +130,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     end
 
     # --- Final Output ---
+    # Handle the "unavailable" token here, so the catch block is clean.
     if test "$output" = "__TIDE_REPORT_UNAVAILABLE__"
         set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
