@@ -43,7 +43,7 @@ function _tide_item_moon --description "Fetches and displays moon phase for Tide
             if not $cache_is_expired
                 set output (cat $cache_file)
             else
-                set output $tide_report_moon_unavailable_color$tide_report_moon_unavailable_text
+                set output (set_color $tide_report_moon_unavailable_color)$tide_report_moon_unavailable_text
             end
         end
     end

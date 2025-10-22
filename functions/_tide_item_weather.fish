@@ -45,7 +45,7 @@ function _tide_item_weather --description "Fetches and displays weather informat
             if not $cache_is_expired
                 set output (cat $cache_file)
             else
-                set output $tide_report_weather_unavailable_color$tide_report_weather_unavailable_text
+                set output (set_color $tide_report_weather_unavailable_color)$tide_report_weather_unavailable_text
             end
         end
     end

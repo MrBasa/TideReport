@@ -23,11 +23,9 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
     # --- Setup Variables ---
     set -l cache_file ~/.cache/tide-report/tide.json
-    set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=$tide_report_tide_station_id&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
     set -l output ""
 
     # --- Helper Function: Parse Tide Data from Cache ---
-    # This must be defined *outside* the begin/end block to be available.
     function _parse_tide_data --description "Parses tide data from cache" --argument-names now
         # Find the first prediction that is in the future
         set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
@@ -49,8 +47,8 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
     end
 
     # --- Main Logic Block (Try...) ---
-    # If any command inside fails, the `or` block is executed.
     begin
+        set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=$tide_report_tide_station_id&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
         set -l now (date +%s)
 
         # --- Check Cache Status ---
@@ -99,20 +97,22 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
         set output (string replace --all --regex ' {2,}' ' ' -- $output)
 
     # --- Catch Unexpected Errors ---
-    or
+    end; or begin
         set -l error_status $status
         set -l log_file (mktemp --tmpdir tide-report-panic.XXXXXX.log)
         echo "--- UNEXPECTED TIDE ERROR ---" >> $log_file
         echo "Timestamp: (date)" >> $log_file
         echo "Function: _tide_item_tide" >> $log_file
         echo "Exit Status: $error_status" >> $log_file
-        echo "URL: $url" >> $log_file
+        if set -q url
+            echo "URL: $url" >> $log_file
+        end
 
         # Set output to unavailable
         set output (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
 
     # --- Final Output ---
+    # This is now guaranteed to print *something* safely.
     _tide_print_item tide $output
 end
-
