@@ -18,7 +18,7 @@ function _tide_item_weather --description "Fetches and displays weather informat
     end
 
     # Determine final output based on cache status
-    if test $cache_age -gt $tide_report_weather_expire_seconds
+    if test $cache_age -eq -1; or test $cache_age -gt $tide_report_weather_expire_seconds
         # --- Cache is missing or expired ---
         # Immediately print "unavailable" text.
         _tide_print_item weather $tide_report_weather_unavailable_text
