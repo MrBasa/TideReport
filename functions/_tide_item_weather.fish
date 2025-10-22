@@ -21,7 +21,7 @@ function _tide_item_weather --description "Fetches and displays weather informat
     if test $cache_age -eq -1; or test $cache_age -gt $tide_report_weather_expire_seconds
         # --- Cache is missing or expired ---
         # Immediately print "unavailable" text.
-        _tide_print_item weather $tide_report_weather_unavailable_text
+        #_tide_print_item weather $tide_report_weather_unavailable_text
 
         # Now, synchronously fetch new data.
         set -l timeout_sec (math -s3 "$tide_report_service_timeout_millis / 1000")
@@ -32,6 +32,7 @@ function _tide_item_weather --description "Fetches and displays weather informat
             mkdir -p (dirname $cache_file)
             echo $weather_data > $cache_file
             #_tide_print_item weather $weather_data
+            _tide_print_item weather $url
         end
         # If fetch fails, we already printed "unavailable", so we just end.
 
