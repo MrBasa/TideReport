@@ -18,7 +18,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 5
     set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 10
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
-    set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
+    set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text "?"
     set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
     set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
     set -q tide_weather_bg_color                 || set -Ux tide_weather_bg_color $default_bg_color
@@ -27,7 +27,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
     set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
-    set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text "X"
+    set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text "?"
     set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
     set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color
@@ -39,7 +39,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_expire_seconds    || set -Ux tide_report_tide_expire_seconds 1800
     set -q tide_report_tide_arrow_rising      || set -Ux tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
     set -q tide_report_tide_arrow_falling     || set -Ux tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
-    set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊X"
+    set -q tide_report_tide_unavailable_text  || set -Ux tide_report_tide_unavailable_text "🌊?"
     set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
     set -q tide_tide_bg_color                 || set -Ux tide_tide_bg_color $default_bg_color
