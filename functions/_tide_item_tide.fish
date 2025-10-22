@@ -10,41 +10,67 @@
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
 
-# This file defines the helper function first, then the main item function.
-
 # --- "Private" Helper Function ---
 # Usage: __tide_report_parse_tide $now_timestamp $cache_file_path
 function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
-    # This entire function is wrapped in a try/catch block.
-    # If any command fails (jq, strptime, etc.), it will
-    # jump to the 'or' block and return the unavailable text.
+    # This entire function is wrapped in a try/catch block
+    # as a final safeguard.
     begin
-        # Find the first prediction that is in the future.
-        # We "fix" the date string from the API (with a space)
-        # by converting it to a full ISO 8601 string (with T and Z)
-        # so that fromdate can parse it.
-        set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | sub(" "; "T") + "Z" | fromdate > $now)] | first')
+        # Use jq for simple, robust extraction.
+        # We use a tab '\t' as a delimiter.
+        set -l predictions (cat $cache_file | jq -r '.predictions[] | "\(.t)\t\(.type)"' 2>/dev/null)
 
-        if test -n "$next_tide"; and test "$next_tide" != "null"
-            set -l tide_type (echo $next_tide | jq -r '.type')
-            # The strptime format %Y-%m-%d %H:%M correctly matches the API's "space" format
-            set -l tide_time (echo $next_tide | jq -r '.t' | strptime -f '%Y-%m-%d %H:%M' | strftime '%H:%M')
-            set -l arrow
-            if test "$tide_type" = "H"
-                set arrow $tide_report_tide_arrow_rising
-            else
-                set arrow $tide_report_tide_arrow_falling
-            end
-            echo "$arrow$tide_time"
-        else
-            # No future tides found for today
+        # Check the status of the 'jq' command in the pipe.
+        if test $pipestatus[2] -ne 0
+            # jq itself failed (e.g., invalid JSON).
             echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+            return
         end
+
+        # Check if jq simply found no predictions
+        if test -z "$predictions"
+            echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
+            return
+        end
+
+        for line in $predictions
+            set -l parts (string split "\t" -- $line)
+            if test (count $parts) -ne 2
+                continue # Malformed line
+            end
+
+            set -l date_str $parts[1]
+            set -l tide_type $parts[2]
+
+            # Use 'date -d', which is much more flexible
+            # and can parse 'T...Z' or ' ' separators.
+            # We silence its stderr as well.
+            set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
+            if test $status -ne 0
+                continue # date command failed to parse
+            end
+
+            # Compare timestamp to $now
+            if test $tide_timestamp -gt $now
+                # This is the first future tide.
+                set -l tide_time (date -d "$date_str" +%H:%M)
+                set -l arrow
+                if test "$tide_type" = "H"
+                    set arrow $tide_report_tide_arrow_rising
+                else
+                    set arrow $tide_report_tide_arrow_falling
+                end
+                echo "$arrow$tide_time"
+                return # We are done
+            end
+        end
+
+        # If loop finishes, no future tides were found
+        echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
 
     # --- This is the "catch" block for the helper ---
     end; or begin
-        # Any error in the 'begin' block (jq, strptime, etc.) will land here.
-        # We return the unavailable text so the prompt never crashes.
+        # Catch any other unexpected error (e.g., in 'string split')
         echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
 end
