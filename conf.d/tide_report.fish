@@ -47,6 +47,19 @@ end
 
 function _tide_report_uninstall --on-event _tide_report_uninstall
     echo "Removing Tide Report Configuration..."
+
+    # Delete vars
     set -e (set -U --names | string match --entire -r '^_?tide_report')
-    functions --erase (functions --all | string match --entire -r '^_?tide_report')
+
+    # Delete funcs
+    builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
+
+    # Remove items from left and right prompts
+    if set -q tide_right_prompt_items
+        set -U tide_right_prompt_items (string match -rv '^(weather|moon|tide)$' $tide_right_prompt_items)
+    end
+
+    if set -q tide_left_prompt_items
+        set -U tide_left_prompt_items (string match -rv '^(weather|moon|tide)$' $tide_left_prompt_items)
+    end
 end
