@@ -9,31 +9,46 @@
 #    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
+
 # This file defines the helper function first, then the main item function.
-# This is fast because the helper is defined *once* when the file is loaded,
-# not every time the prompt is rendered.
 
 # --- "Private" Helper Function ---
 # Usage: __tide_report_parse_tide $now_timestamp $cache_file_path
 function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
-    # Find the first prediction that is in the future
-    set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | fromdate > $now)] | first')
+    # This entire function is wrapped in a try/catch block.
+    # If any command fails (jq, strptime, etc.), it will
+    # jump to the 'or' block and return the unavailable text.
+    begin
+        # Find the first prediction that is in the future.
+        # We "fix" the date string from the API (with a space)
+        # by converting it to a full ISO 8601 string (with T and Z)
+        # so that fromdate can parse it.
+        set -l next_tide (cat $cache_file | jq -r --argjson now $now '[.predictions[] | select(.t | sub(" "; "T") + "Z" | fromdate > $now)] | first')
 
-    if test -n "$next_tide"; and test "$next_tide" != "null"
-        set -l tide_type (echo $next_tide | jq -r '.type')
-        set -l tide_time (echo $next_tide | jq -r '.t' | strptime -f '%Y-%m-%d %H:%M' | strftime '%H:%M')
-        set -l arrow
-        if test "$tide_type" = "H"
-            set arrow $tide_report_tide_arrow_rising
+        if test -n "$next_tide"; and test "$next_tide" != "null"
+            set -l tide_type (echo $next_tide | jq -r '.type')
+            # The strptime format %Y-%m-%d %H:%M correctly matches the API's "space" format
+            set -l tide_time (echo $next_tide | jq -r '.t' | strptime -f '%Y-%m-%d %H:%M' | strftime '%H:%M')
+            set -l arrow
+            if test "$tide_type" = "H"
+                set arrow $tide_report_tide_arrow_rising
+            else
+                set arrow $tide_report_tide_arrow_falling
+            end
+            echo "$arrow$tide_time"
         else
-            set arrow $tide_report_tide_arrow_falling
+            # No future tides found for today
+            echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
         end
-        echo "$arrow$tide_time"
-    else
-        # No future tides found for today
+
+    # --- This is the "catch" block for the helper ---
+    end; or begin
+        # Any error in the 'begin' block (jq, strptime, etc.) will land here.
+        # We return the unavailable text so the prompt never crashes.
         echo (set_color $tide_report_tide_unavailable_color)$tide_report_tide_unavailable_text
     end
 end
+
 
 # --- Main Tide Prompt Item ---
 # Displays the next high or low tide from NOAA.
@@ -72,7 +87,7 @@ function _tide_item_tide --description "Fetches and displays next tide for Tide"
 
         # Check if cache is fresh
         if test $cache_age -ne -1; and test $cache_age -le $tide_report_tide_refresh_seconds
-            # Call the helper function (defined above in this file)
+            # Call the armored helper function
             set output (__tide_report_parse_tide $now $cache_file)
 
         # Cache is stale, expired, or missing. We must fetch.
