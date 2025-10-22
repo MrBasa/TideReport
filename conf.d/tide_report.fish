@@ -1,7 +1,7 @@
 # Tide Report :: Default Configuration
 
 function _tide_report_install --on-event tide_report_install
-    echo (set_color yellow)"Installing Tide Report Configuration..."
+    echo (set_color yellow)"Installing Tide Report Configuration..."(set_color normal)
 
     # Borrow default color from time to pick up the theme.
     set -l default_color $tide_time_color       || set -l default_color 5F8787
@@ -50,7 +50,7 @@ function _tide_report_update --on-event tide_report_update
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
-    echo (set_color yellow)"Removing Tide Report Configuration..."
+    echo (set_color yellow)"Removing Tide Report Configuration..."(set_color normal)
 
     # Delete vars
     set -l vars_to_erase
