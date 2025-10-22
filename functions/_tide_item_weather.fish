@@ -9,7 +9,7 @@ function _tide_item_weather --description "Displays weather information in the T
 
     sleep 2
 
-    _tide_print_item weather (date +%H:%M:%S)
+    _tide_print_item weather (date +%H:%M:%S) $url
     #_tide_print_item weather (curl -s --max-time 10 $url)
     return
 
