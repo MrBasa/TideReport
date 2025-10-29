@@ -35,7 +35,7 @@ function __tide_report_parse_tide --description "Parses tide data from cache" --
         set -l tide_type $parts[2]
 
         set -l tide_timestamp (date -d "$date_str" +%s 2>/dev/null)
-        if test $status -ne 0; continue; end # Skip if date parsing fails
+        #if test $status -ne 0; continue; end # Skip if date parsing fails
 
         if test $tide_timestamp -gt $now
             set -l tide_time (date -d "$date_str" +%H:%M)
