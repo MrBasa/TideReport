@@ -10,10 +10,6 @@
 #    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 # ]}
 
-# This file defines the helper function first, then the main item function.
-
-# This file defines the helper function first, then the main item function.
-
 # --- "Private" Helper Function ---
 # This function will be robust and return an error token on any failure.
 function __tide_report_parse_tide --description "Parses tide data from cache" --argument-names now cache_file
