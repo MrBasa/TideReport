@@ -13,7 +13,7 @@ function _tide_item_moon --description "Displays moon phase, fetches asynchronou
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
 
     # Call the shared async logic handler
-    _tide_report_handle_async_item \
+    _tide_report_handle_async_wttr \
         $item_name \
         $cache_file \
         $url \

@@ -1,5 +1,57 @@
 # TideReport :: Private Helper Functions for WTTR data
 
+function _tide_report_handle_async_wttr --description "Handles display and async fetching for cached items" \
+    --argument-names item_name cache_file url refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
+
+    set -l now (date +%s)
+    set -l output ""
+    set -l trigger_fetch false
+
+    # Check cache status
+    set -l cache_age -1
+    set -l cache_exists false
+    set -l cache_is_expired true
+    if test -f "$cache_file"
+        set cache_exists true
+        # Suppress errors from stat/date if file disappears between checks
+        set -l mod_time (date -r "$cache_file" +%s 2>/dev/null)
+        if test $status -eq 0
+            set cache_age (math $now - $mod_time)
+            if test $cache_age -le $expire_seconds
+                set cache_is_expired false
+            end
+        end
+    end
+
+    # --- Determine what to display and if fetch is needed ---
+    if $cache_exists; and not $cache_is_expired
+        # Cache exists and is NOT expired
+        set output (cat "$cache_file")
+        # Trigger fetch only if cache is STALE (older than refresh_seconds)
+        if test $cache_age -gt $refresh_seconds
+            set trigger_fetch true
+        end
+    else
+        # Cache doesn't exist OR it's expired
+        set output (set_color "$unavailable_color")$unavailable_text(set_color normal)
+        set trigger_fetch true
+    end
+
+    # --- Trigger background fetch if needed and not already running ---
+    if $trigger_fetch; and not _tide_report_is_fetching $item_name
+        # Launch the fetch function in the background.
+        fish -c "_tide_report_fetch_and_cache '$item_name' '$url' '$cache_file' '$timeout_sec'" &>/dev/null &
+    end
+
+    # --- Output ---
+    # Massage the output: replace tabs and multiple spaces with a single space
+    set output_massaged (string replace --all '\t' ' ' -- $output)
+    set output_massaged (string replace --all --regex ' {2,}' ' ' -- $output_massaged)
+
+    _tide_print_item $item_name $output_massaged
+    return 0
+end
+
 function _tide_report_is_fetching --description "Checks if a background fetch is running for a data type" --argument data_type
     set -l lock_file "/tmp/tide_report_fetching_$data_type.lock"
 
@@ -61,58 +113,6 @@ function _tide_report_fetch_and_cache --description "Fetches, validates, and cac
 
     # Lock file is removed automatically by the --on-process-exit handler
     # or trap. No explicit rm needed here unless using older fish without function events.
-end
-
-function _tide_report_handle_async_item --description "Handles display and async fetching for cached items" \
-    --argument-names item_name cache_file url refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
-
-    set -l now (date +%s)
-    set -l output ""
-    set -l trigger_fetch false
-
-    # Check cache status
-    set -l cache_age -1
-    set -l cache_exists false
-    set -l cache_is_expired true
-    if test -f "$cache_file"
-        set cache_exists true
-        # Suppress errors from stat/date if file disappears between checks
-        set -l mod_time (date -r "$cache_file" +%s 2>/dev/null)
-        if test $status -eq 0
-            set cache_age (math $now - $mod_time)
-            if test $cache_age -le $expire_seconds
-                set cache_is_expired false
-            end
-        end
-    end
-
-    # --- Determine what to display and if fetch is needed ---
-    if $cache_exists; and not $cache_is_expired
-        # Cache exists and is NOT expired
-        set output (cat "$cache_file")
-        # Trigger fetch only if cache is STALE (older than refresh_seconds)
-        if test $cache_age -gt $refresh_seconds
-            set trigger_fetch true
-        end
-    else
-        # Cache doesn't exist OR it's expired
-        set output (set_color "$unavailable_color")$unavailable_text(set_color normal)
-        set trigger_fetch true
-    end
-
-    # --- Trigger background fetch if needed and not already running ---
-    if $trigger_fetch; and not _tide_report_is_fetching $item_name
-        # Launch the fetch function in the background.
-        fish -c "_tide_report_fetch_and_cache '$item_name' '$url' '$cache_file' '$timeout_sec'" &>/dev/null &
-    end
-
-    # --- Output ---
-    # Massage the output: replace tabs and multiple spaces with a single space
-    set output_massaged (string replace --all '\t' ' ' -- $output)
-    set output_massaged (string replace --all --regex ' {2,}' ' ' -- $output_massaged)
-
-    _tide_print_item $item_name $output_massaged
-    return 0
 end
 
 function _tide_report_validate_wttr --description "Validates fetched data and logs errors" --argument-names curl_status data log_name url
