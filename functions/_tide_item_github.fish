@@ -48,7 +48,7 @@ function _tide_item_github --description "Fetches and displays GitHub informatio
     #    set_color $tide_report_github_color_issues; echo -ns ' !'$issues
     #    set_color $tide_report_github_color_prs; echo -ns ' PR'$prs)
 
-    _tide_print_item git $tide_report_github_icon' ' (
+    _tide_print_item git $tide_report_github_icon (
         # If the test fails, the rest of the line is skipped.
         test -n "$stars" -a "$stars" != "0"; and set_color $tide_report_github_color_stars; and echo -ns ' ★'$stars
         test -n "$forks" -a "$forks" != "0"; and set_color $tide_report_github_color_forks; and echo -ns ' ⑂'$forks
