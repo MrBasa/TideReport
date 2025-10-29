@@ -79,11 +79,11 @@ function _tide_report_uninstall --on-event tide_report_uninstall
 
     # Remove items from left and right prompts
     if set -q tide_right_prompt_items
-        set -U tide_right_prompt_items (string match -rv '^(weather|moon|tide)$' $tide_right_prompt_items)
+        set -U tide_right_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_right_prompt_items)
     end
 
     if set -q tide_left_prompt_items
-        set -U tide_left_prompt_items (string match -rv '^(weather|moon|tide)$' $tide_left_prompt_items)
+        set -U tide_left_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_left_prompt_items)
     end
 
     tide reload
