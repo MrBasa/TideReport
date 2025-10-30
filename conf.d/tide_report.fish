@@ -72,7 +72,7 @@ function _tide_report_uninstall --on-event tide_report_uninstall
     echo (set_color yellow)"Removing Tide Report Configuration..."(set_color normal)
 
     # Delete vars
-    set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide)')
+    set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
 
     if test (count $vars_to_erase) -gt 0
         set -U -e $vars_to_erase
