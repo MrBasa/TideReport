@@ -19,7 +19,7 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
         $url \
         $refresh_seconds \
         $expire_seconds \
-        "$unavailable_text" \
+        $unavailable_text \
         $unavailable_color \
         $timeout_sec
 end

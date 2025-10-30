@@ -29,7 +29,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
-    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
+    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color yellow
 
     # --- Moon Module ---
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
@@ -38,7 +38,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
-    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
+    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color yellow
 
     # --- Tide Module ---
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color

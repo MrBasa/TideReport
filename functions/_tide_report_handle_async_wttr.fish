@@ -33,14 +33,14 @@ function _tide_report_handle_async_wttr --description "Handles display and async
         end
     else
         # Cache doesn't exist OR it's expired
-        set output (set_color "$unavailable_color")$unavailable_text(set_color normal)
+        set output (set_color $unavailable_color)$unavailable_text
         set trigger_fetch true
     end
 
     # --- Trigger background fetch if needed and not already running ---
-    if $trigger_fetch; and not _tide_report_is_fetching $item_name
+    if $trigger_fetch; and not _tide_report_is_fetching $item_name $_tide_report_tmp_dir
         # Launch the fetch function in the background.
-        _tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec &>/dev/null &
+        _tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $_tide_report_tmp_dir &>/dev/null &
     end
 
     # --- Output ---
@@ -52,8 +52,8 @@ function _tide_report_handle_async_wttr --description "Handles display and async
     return 0
 end
 
-function _tide_report_is_fetching --description "Checks if a background fetch is running for a data type" --argument data_type
-    set -l lock_file "$_tide_report_tmp_dir/tide_report_fetching_$data_type.lock"
+function _tide_report_is_fetching --description "Checks if a background fetch is running for a data type" --argument data_type tmp_dir
+    set -l lock_file "$tmp_dir/tide_report_fetching_$data_type.lock"
 
     # 6 hour fail-safe threshold
     set -l stale_threshold_seconds 21600
@@ -69,7 +69,7 @@ function _tide_report_is_fetching --description "Checks if a background fetch is
     set -l mod_time (date -r "$lock_file" +%s 2>/dev/null)
 
     # Check if mod_time failed OR if lock is stale
-    if not $mod_time; or test (math $now - $mod_time) -gt $stale_threshold_seconds
+    if test -z "$mod_time"; or test (math $now - $mod_time) -gt $stale_threshold_seconds
         # Error getting file time or stale, assume invalid
         rm -f "$lock_file" &>/dev/null
         return 1 # Not locked
@@ -79,8 +79,10 @@ function _tide_report_is_fetching --description "Checks if a background fetch is
     return 0 # Locked
 end
 
-function _tide_report_fetch_and_cache --description "Fetches, validates, and caches data in the background" --argument data_type url cache_file timeout_sec
-    set -l lock_file "$_tide_report_tmp_dir/tide_report_fetching_$data_type.lock"
+function _tide_report_fetch_and_cache --description "Fetches, validates, and caches data in the background" \
+    --argument data_type url cache_file timeout_sec tmp_dir
+
+    set -l lock_file "$tmp_dir/tide_report_fetching_$data_type.lock"
 
     # Create lock file with PID
     if not echo $fish_pid > "$lock_file"
@@ -89,16 +91,16 @@ function _tide_report_fetch_and_cache --description "Fetches, validates, and cac
     end
 
     # Ensure lock file is removed on exit, error, or interrupt
-    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_file --inherit-variable logfile
+    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_file
         rm -f "$lock_file" &>/dev/null
     end
 
     # Perform the fetch
-    set -l fetched_data (curl -s --max-time $timeout_sec "$url" | string collect)
+    set -l fetched_data (curl -s -A "tide-report-script" --max-time $timeout_sec "$url" | string collect)
     set -l curl_status $status
 
     # Validate and cache if successful
-    if _tide_report_validate_wttr $curl_status "$fetched_data" "$data_type" "$url"
+    if _tide_report_validate_wttr $curl_status "$fetched_data" "$data_type" "$url" "$tmp_dir"
         # Validation passed, update cache
         mkdir -p (dirname "$cache_file") &>/dev/null
         # Use a temporary file and atomic move to prevent partial reads
@@ -115,8 +117,8 @@ function _tide_report_fetch_and_cache --description "Fetches, validates, and cac
     # else: Validation failed, do nothing
 end
 
-function _tide_report_validate_wttr --description "Validates fetched data and logs errors" --argument-names curl_status data data_type url
-    set -l log_file "$_tide_report_tmp_dir/tide_report_$data_type.error.log"
+function _tide_report_validate_wttr --description "Validates fetched data and logs errors" --argument-names curl_status data data_type url tmp_dir
+    set -l log_file "$tmp_dir/tide_report_$data_type.error.log"
     set -l log_message
     set -l is_valid true
 
