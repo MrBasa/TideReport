@@ -11,14 +11,22 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_service_timeout_millis || set -Ux tide_report_service_timeout_millis 3000
     set -q tide_report_wttr_url               || set -Ux tide_report_wttr_url "https://wttr.in"
 
+     # --- Temp Dir ---
+    set -l tmp_base "$XDG_RUNTIME_DIR"
+    if not test -d "$tmp_base"
+        set tmp_base "/tmp"
+    end
+    set -gx _tide_report_tmp_dir "$tmp_base/tide_report"
+    mkdir -p "$_tide_report_tmp_dir" &>/dev/null
+
     # --- Weather Module ---
     set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
     set -q tide_weather_bg_color                 || set -Ux tide_weather_bg_color $default_bg_color
     set -q tide_report_weather_format            || set -Ux tide_report_weather_format 2
     set -q tide_report_weather_units             || set -Ux tide_report_weather_units m
     set -q tide_report_weather_location          || set -Ux tide_report_weather_location ""
-    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 5
-    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 20
+    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 300
+    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
     set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
