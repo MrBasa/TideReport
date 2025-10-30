@@ -56,10 +56,10 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_github_color                 || set -Ux tide_github_color $default_color
     set -q tide_github_bg_color              || set -Ux tide_github_bg_color $default_bg_color
     set -q tide_report_github_icon           || set -Ux tide_report_github_icon ""
-    set -q tide_report_github_color_stars    || set -Ux tide_report_github_color_stars $tide_github_color
-    set -q tide_report_github_color_forks    || set -Ux tide_report_github_color_forks $tide_github_color
-    set -q tide_report_github_color_issues   || set -Ux tide_report_github_color_issues $tide_github_color
-    set -q tide_report_github_color_prs      || set -Ux tide_report_github_color_prs $tide_github_color
+    set -q tide_report_github_color_stars    || set -Ux tide_report_github_color_stars bryellow
+    set -q tide_report_github_color_forks    || set -Ux tide_report_github_color_forks bryellow
+    set -q tide_report_github_color_issues   || set -Ux tide_report_github_color_issues bryellow
+    set -q tide_report_github_color_prs      || set -Ux tide_report_github_color_prs bryellow
 
     tide reload
 end
