@@ -25,8 +25,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_format            || set -Ux tide_report_weather_format 2
     set -q tide_report_weather_units             || set -Ux tide_report_weather_units m
     set -q tide_report_weather_location          || set -Ux tide_report_weather_location ""
-    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 300
-    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600
+    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 300 # 5 minutes
+    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600 # 10 minutes
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
     set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
@@ -35,15 +35,15 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
     set -q tide_moon_bg_color                 || set -Ux tide_moon_bg_color $default_bg_color
     set -q tide_report_moon_format            || set -Ux tide_report_moon_format "%m"
-    set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
-    set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
+    set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 14400 # 4 hours
+    set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 28800 # 8 hours
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
     set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
 
     # --- Tide Module ---
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
     set -q tide_tide_bg_color                 || set -Ux tide_tide_bg_color $default_bg_color
-    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "8443970" # REQUIRED
+    set -q tide_report_tide_station_id        || set -Ux tide_report_tide_station_id "8443970" # Boston
     set -q tide_report_tide_units             || set -Ux tide_report_tide_units "english" # 'english' or 'metric'
     set -q tide_report_tide_refresh_seconds   || set -Ux tide_report_tide_refresh_seconds 900
     set -q tide_report_tide_expire_seconds    || set -Ux tide_report_tide_expire_seconds 1800

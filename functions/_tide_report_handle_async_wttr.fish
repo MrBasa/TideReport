@@ -55,8 +55,8 @@ end
 function _tide_report_is_fetching --description "Checks if a background fetch is running for a data type" --argument data_type tmp_dir
     set -l lock_file "$tmp_dir/tide_report_fetching_$data_type.lock"
 
-    # 6 hour fail-safe threshold
-    set -l stale_threshold_seconds 21600
+    # 2 minute fail-safe threshold
+    set -l stale_threshold_seconds 120
 
     # Check if the lock file exists
     if not test -f "$lock_file"
