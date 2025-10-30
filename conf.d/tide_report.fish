@@ -9,18 +9,22 @@ set -gx _tide_report_tmp_dir "$tmp_base/tide_report"
 mkdir -p "$_tide_report_tmp_dir" &>/dev/null
 
 function _tide_report_install --on-event tide_report_install
-    echo (set_color yellow)"Installing Tide Report Configuration..."(set_color normal)
-
-    # TODO: Check dependencies!
-    if ! command -v "$dep" &> /dev/null; then
-        # "print warning"
-        echo "Error: Required dependency '$dep' is not installed."
-        ((missing_deps++)) # Increment the missing counter
-    fi
+    echo (set_color brwhite)"Installing Tide Report Configuration..."(set_color normal)
 
     # Borrow default color from time to pick up the theme.
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
+
+    # --- Check dependencies ---
+    if ! command -v "gh" &> /dev/null; then
+        echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."
+    fi
+    if ! command -v "jq" &> /dev/null; then
+        echo (set_color bryellow)"WARNING: Required dependency 'jq' (jQuery) is not installed. Required for github and tide prompt items."
+    fi
+    if ! command -v "curl" &> /dev/null; then
+        echo (set_color bryellow)"WARNING: Required dependency 'jq' (jQuery) is not installed. Required for weather, moon, and tide prompt items."
+    fi
 
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis || set -Ux tide_report_service_timeout_millis 3000
@@ -76,7 +80,7 @@ function _tide_report_update --on-event tide_report_update
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
-    echo (set_color yellow)"Removing Tide Report Configuration..."(set_color normal)
+    echo (set_color brwhite)"Removing Tide Report Configuration..."(set_color normal)
 
     # Delete vars
     set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')

@@ -23,32 +23,31 @@ function _tide_report_handle_async_wttr --description "Handles display and async
         end
     end
 
-    # --- Determine what to display and if fetch is needed ---
+    # --- Check Cache ---
     if $cache_exists; and not $cache_is_expired
         # Cache exists and is NOT expired
         set output (cat "$cache_file")
-        # Trigger fetch only if cache is STALE (older than refresh_seconds)
+        # Trigger fetch only if cache is stale (older than refresh_seconds)
         if test $cache_age -gt $refresh_seconds
             set trigger_fetch true
         end
     else
-        # Cache doesn't exist OR it's expired
+        # Cache doesn't exist or it's expired
         set output (set_color $unavailable_color)$unavailable_text
         set trigger_fetch true
     end
 
-    # --- Trigger background fetch if needed and not already running ---
+    # --- Trigger Background Fetch ---
     if $trigger_fetch; and not _tide_report_is_fetching $item_name $_tide_report_tmp_dir
-        # Launch the fetch function in the background.
         _tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $_tide_report_tmp_dir &>/dev/null &
     end
 
     # --- Output ---
     # Massage the output: replace tabs and multiple spaces with a single space
-    set output_massaged (string replace --all '\t' ' ' -- $output)
-    set output_massaged (string replace --all --regex ' {2,}' ' ' -- $output_massaged)
+    set output (string replace --all '\t' ' ' -- $output)
+    set output (string replace --all --regex ' {2,}' ' ' -- $output)
 
-    _tide_print_item $item_name $output_massaged
+    _tide_print_item $item_name $output
     return 0
 end
 
