@@ -68,7 +68,7 @@ This setting applies to all modules in this plugin.
 
 | Variable                           | Description                                                     | Default           |
 | ---------------------------------- | --------------------------------------------------------------- | ----------------- |
-| `tide_github_color`                | Prompt item color                                               | `(theme default)` |
+| `tide_github_color`                | Prompt item color                                               | `white`           |
 | `tide_github_bg_color`             | Prompt item background color                                    | `(theme default)` |
 | `tide_report_github_icon`          | Icon to display for the GitHub section.                         | ``               |
 | `tide_report_github_color_stars`   | Color for the 'stars' count.                                    | `bryellow`        |
