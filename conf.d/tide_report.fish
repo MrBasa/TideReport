@@ -1,5 +1,13 @@
 # Tide Report :: Default Configuration
 
+# --- Temp Dir ---
+set -l tmp_base "$XDG_RUNTIME_DIR"
+if not test -d "$tmp_base"
+    set tmp_base "/tmp"
+end
+set -gx _tide_report_tmp_dir "$tmp_base/tide_report"
+mkdir -p "$_tide_report_tmp_dir" &>/dev/null
+
 function _tide_report_install --on-event tide_report_install
     echo (set_color yellow)"Installing Tide Report Configuration..."(set_color normal)
 
@@ -10,14 +18,6 @@ function _tide_report_install --on-event tide_report_install
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis || set -Ux tide_report_service_timeout_millis 3000
     set -q tide_report_wttr_url               || set -Ux tide_report_wttr_url "https://wttr.in"
-
-     # --- Temp Dir ---
-    set -l tmp_base "$XDG_RUNTIME_DIR"
-    if not test -d "$tmp_base"
-        set tmp_base "/tmp"
-    end
-    set -gx _tide_report_tmp_dir "$tmp_base/tide_report"
-    mkdir -p "$_tide_report_tmp_dir" &>/dev/null
 
     # --- Weather Module ---
     set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
