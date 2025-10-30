@@ -29,7 +29,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
-    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color yellow
+    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
 
     # --- Moon Module ---
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
@@ -38,7 +38,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 3600
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 7200
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
-    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color yellow
+    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
 
     # --- Tide Module ---
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
@@ -53,13 +53,13 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_unavailable_color || set -Ux tide_report_tide_unavailable_color red
 
     # --- GitHub Module ---
-    set -q tide_github_color                 || set -Ux tide_github_color $default_color
+    set -q tide_github_color                 || set -Ux tide_github_color green #$default_color
     set -q tide_github_bg_color              || set -Ux tide_github_bg_color $default_bg_color
     set -q tide_report_github_icon           || set -Ux tide_report_github_icon ""
-    set -q tide_report_github_color_stars    || set -Ux tide_report_github_color_stars yellow
-    set -q tide_report_github_color_forks    || set -Ux tide_report_github_color_forks yellow
-    set -q tide_report_github_color_issues   || set -Ux tide_report_github_color_issues yellow
-    set -q tide_report_github_color_prs      || set -Ux tide_report_github_color_prs yellow
+    set -q tide_report_github_color_stars    || set -Ux tide_report_github_color_stars $tide_github_color
+    set -q tide_report_github_color_forks    || set -Ux tide_report_github_color_forks $tide_github_color
+    set -q tide_report_github_color_issues   || set -Ux tide_report_github_color_issues $tide_github_color
+    set -q tide_report_github_color_prs      || set -Ux tide_report_github_color_prs $tide_github_color
 
     tide reload
 end
