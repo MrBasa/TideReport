@@ -18,6 +18,7 @@ function _tide_item_github --description "Fetches and displays GitHub informatio
     # --- Get repo name & owner ---
     set -l current_repo (gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)
     if test -z "$current_repo"
+        # Not a GitHub repo
         return 0
     end
 
@@ -42,12 +43,7 @@ function _tide_item_github --description "Fetches and displays GitHub informatio
         | read -l stars forks issues prs
 
     # --- Output ---
-    #_tide_print_item git $tide_report_github_icon' ' (
-    #    set_color $tide_report_github_color_stars; echo -ns ' ★'$stars
-    #    set_color $tide_report_github_color_forks; echo -ns ' ⑂'$forks
-    #    set_color $tide_report_github_color_issues; echo -ns ' !'$issues
-    #    set_color $tide_report_github_color_prs; echo -ns ' PR'$prs)
-
+    # Icon is printed always if in GitHub repo
     _tide_print_item github $tide_report_github_icon (
         # If the test fails, the rest of the line is skipped.
         test -n "$stars" -a "$stars" != "0"; and set_color $tide_report_github_color_stars; and echo -ns ' ★'$stars

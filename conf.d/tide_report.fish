@@ -11,6 +11,13 @@ mkdir -p "$_tide_report_tmp_dir" &>/dev/null
 function _tide_report_install --on-event tide_report_install
     echo (set_color yellow)"Installing Tide Report Configuration..."(set_color normal)
 
+    # TODO: Check dependencies!
+    if ! command -v "$dep" &> /dev/null; then
+        # "print warning"
+        echo "Error: Required dependency '$dep' is not installed."
+        ((missing_deps++)) # Increment the missing counter
+    fi
+
     # Borrow default color from time to pick up the theme.
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
@@ -29,7 +36,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600 # 10 minutes
     set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
     set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
-    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color red
+    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color brred
 
     # --- Moon Module ---
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
@@ -38,7 +45,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_refresh_seconds   || set -Ux tide_report_moon_refresh_seconds 14400 # 4 hours
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 28800 # 8 hours
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
-    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color red
+    set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color brred
 
     # --- Tide Module ---
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color
