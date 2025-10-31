@@ -16,19 +16,20 @@ function _tide_report_install --on-event tide_report_install
     set -l default_bg_color $tide_time_bg_color
 
     # --- Check dependencies ---
-    if ! command -v "gh" &> /dev/null; then
+    if ! command -v "gh" &> /dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."
-    fi
-    if ! command -v "jq" &> /dev/null; then
-        echo (set_color bryellow)"WARNING: Required dependency 'jq' (jQuery) is not installed. Required for github and tide prompt items."
-    fi
-    if ! command -v "curl" &> /dev/null; then
-        echo (set_color bryellow)"WARNING: Required dependency 'jq' (jQuery) is not installed. Required for weather, moon, and tide prompt items."
-    fi
+    end
+    if ! command -v "jq" &> /dev/null
+        echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github and tide prompt items."
+    end
+    if ! command -v "curl" &> /dev/null
+        echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."
+    end
 
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis || set -Ux tide_report_service_timeout_millis 3000
     set -q tide_report_wttr_url               || set -Ux tide_report_wttr_url "https://wttr.in"
+    set -q tide_report_lock_timeout_seconds   || set -Ux tide_report_lock_timeout_seconds 60
 
     # --- Weather Module ---
     set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
