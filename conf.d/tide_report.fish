@@ -32,16 +32,17 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_lock_timeout_seconds   || set -Ux tide_report_lock_timeout_seconds 60
 
     # --- Weather Module ---
-    set -q tide_weather_color                    || set -Ux tide_weather_color $default_color
-    set -q tide_weather_bg_color                 || set -Ux tide_weather_bg_color $default_bg_color
-    set -q tide_report_weather_format            || set -Ux tide_report_weather_format 2
-    set -q tide_report_weather_units             || set -Ux tide_report_weather_units m
-    set -q tide_report_weather_location          || set -Ux tide_report_weather_location ""
-    set -q tide_report_weather_refresh_seconds   || set -Ux tide_report_weather_refresh_seconds 300 # 5 minutes
-    set -q tide_report_weather_expire_seconds    || set -Ux tide_report_weather_expire_seconds 600 # 10 minutes
-    set -q tide_report_weather_language          || set -Ux tide_report_weather_language "en"
-    set -q tide_report_weather_unavailable_text  || set -Ux tide_report_weather_unavailable_text ""
-    set -q tide_report_weather_unavailable_color || set -Ux tide_report_weather_unavailable_color brred
+    set -q tide_weather_color                      || set -Ux tide_weather_color $default_color
+    set -q tide_weather_bg_color                   || set -Ux tide_weather_bg_color $default_bg_color
+    set -q tide_report_weather_format              || set -Ux tide_report_weather_format 2
+    set -q tide_report_weather_units               || set -Ux tide_report_weather_units m
+    set -q tide_report_weather_location            || set -Ux tide_report_weather_location ""
+    set -q tide_report_weather_refresh_seconds     || set -Ux tide_report_weather_refresh_seconds 300 # 5 minutes
+    set -q tide_report_weather_expire_seconds      || set -Ux tide_report_weather_expire_seconds 600 # 10 minutes
+    set -q tide_report_weather_language            || set -Ux tide_report_weather_language "en"
+    set -q tide_report_weather_unavailable_text    || set -Ux tide_report_weather_unavailable_text ""
+    set -q tide_report_weather_unavailable_color   || set -Ux tide_report_weather_unavailable_color brred
+    set -q _tide_report_weather_timestamp          || set -Ux _tide_report_weather_timestamp 0 # Lock variable
 
     # --- Moon Module ---
     set -q tide_moon_color                    || set -Ux tide_moon_color $default_color
@@ -51,6 +52,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_expire_seconds    || set -Ux tide_report_moon_expire_seconds 28800 # 8 hours
     set -q tide_report_moon_unavailable_text  || set -Ux tide_report_moon_unavailable_text ""
     set -q tide_report_moon_unavailable_color || set -Ux tide_report_moon_unavailable_color brred
+    set -q _tide_report_moon_timestamp        || set -Ux _tide_report_moon_timestamp 0 # Lock variable
 
     # --- Tide Module ---
     set -q tide_tide_color                    || set -Ux tide_tide_color $default_color

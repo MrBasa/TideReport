@@ -40,7 +40,7 @@ function _tide_report_handle_async_wttr --description "Handles display and async
     # --- Trigger Background Fetch ---
     if $trigger_fetch
         # Use an item-specific universal variable for the lock
-        set -l lock_var_name "_tide_report_fetching_($item_name)_timestamp"
+        set -l lock_var_name "_tide_report_($item_name)_timestamp"
         set -l lock_time (set $lock_var_name)
         if test -z "$lock_time"; set lock_time 0; end # Default to 0 if unset
 
