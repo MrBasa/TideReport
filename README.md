@@ -68,15 +68,16 @@ This setting applies to all modules in this plugin.
 
 **Requires `gh` CLI to be installed and authenticated.**
 
-| Variable                           | Description                                                     | Default           |
-| ---------------------------------- | --------------------------------------------------------------- | ----------------- |
-| `tide_github_color`                | Prompt item color                                               | `white`           |
-| `tide_github_bg_color`             | Prompt item background color                                    | `(theme default)` |
-| `tide_report_github_icon`          | Icon to display for the GitHub section.                         | ``               |
-| `tide_report_github_color_stars`   | Color for the 'stars' count.                                    | `bryellow`        |
-| `tide_report_github_color_forks`   | Color for the 'forks' count.                                    | `bryellow`        |
-| `tide_report_github_color_issues`  | Color for the 'issues' count.                                   | `bryellow`        |
-| `tide_report_github_color_prs`     | Color for the 'pull requests' count.                            | `bryellow`        |
+| Variable                             | Description                                                     | Default           |
+| ------------------------------------ | --------------------------------------------------------------- | ----------------- |
+| `tide_github_color`                  | Prompt item color                                               | `white`           |
+| `tide_github_bg_color`               | Prompt item background color                                    | `(theme default)` |
+| `tide_report_github_icon`            | Icon to display for the GitHub section.                         | ``               |
+| `tide_report_github_color_stars`     | Color for the 'stars' count.                                    | `bryellow`        |
+| `tide_report_github_color_forks`     | Color for the 'forks' count.                                    | `bryellow`        |
+| `tide_report_github_color_issues`    | Color for the 'issues' count.                                   | `bryellow`        |
+| `tide_report_github_color_prs`       | Color for the 'pull requests' count.                            | `bryellow`        |
+| `tide_report_github_refresh_seconds` | GitHub data cache time for a given repository.                  | 30                |
 
 ### ☔ Weather Module (`weather`)
 

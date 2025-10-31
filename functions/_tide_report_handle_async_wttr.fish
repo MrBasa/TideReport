@@ -38,8 +38,35 @@ function _tide_report_handle_async_wttr --description "Handles display and async
     end
 
     # --- Trigger Background Fetch ---
-    if $trigger_fetch; and not _tide_report_is_fetching $item_name $_tide_report_tmp_dir
-        _tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $_tide_report_tmp_dir &>/dev/null &
+    if $trigger_fetch
+        # Use an item-specific universal variable for the lock
+        set -l lock_var_name "_tide_report_fetching_($item_name)_timestamp"
+        set -l lock_time (set $lock_var_name)
+        if test -z "$lock_time"; set lock_time 0; end # Default to 0 if unset
+
+        set -l is_locked false
+        if test $lock_time -gt 0
+            # Lock is set, check if it's stale
+            set -l lock_age (math $now - $lock_time)
+            if test $lock_age -le $tide_report_lock_timeout_seconds
+                set is_locked true # Lock is active and not stale
+            end
+            # If lock is stale, we'll ignore it and proceed
+        end
+
+        if not $is_locked
+            # Set the lock with the current time
+            set -U $lock_var_name $now
+
+            # 2. Start the background fetch
+            _tide_report_fetch_and_cache \
+                $item_name \
+                $url \
+                $cache_file \
+                $timeout_sec \
+                $_tide_report_tmp_dir \
+                $lock_var_name &>/dev/null &
+        end
     end
 
     # --- Output ---
@@ -51,47 +78,12 @@ function _tide_report_handle_async_wttr --description "Handles display and async
     return 0
 end
 
-function _tide_report_is_fetching --description "Checks if a background fetch is running for a data type" --argument data_type tmp_dir
-    set -l lock_file "$tmp_dir/tide_report_fetching_$data_type.lock"
-
-    # 2 minute fail-safe threshold
-    set -l stale_threshold_seconds 120
-
-    # Check if the lock file exists
-    if not test -f "$lock_file"
-        # No file - not locked
-        return 1
-    end
-
-    # Lock file exists, check its age
-    set -l now (date +%s)
-    set -l mod_time (date -r "$lock_file" +%s 2>/dev/null)
-
-    # Check if mod_time failed OR if lock is stale
-    if test -z "$mod_time"; or test (math $now - $mod_time) -gt $stale_threshold_seconds
-        # Error getting file time or stale, assume invalid
-        rm -f "$lock_file" &>/dev/null
-        return 1 # Not locked
-    end
-
-    # File exists and not expired
-    return 0 # Locked
-end
-
 function _tide_report_fetch_and_cache --description "Fetches, validates, and caches data in the background" \
-    --argument data_type url cache_file timeout_sec tmp_dir
+    --argument data_type url cache_file timeout_sec tmp_dir lock_var_name
 
-    set -l lock_file "$tmp_dir/tide_report_fetching_$data_type.lock"
-
-    # Create lock file with PID
-    if not echo $fish_pid > "$lock_file"
-      # Failed to create lock, maybe concurrent write? Exit silently.
-      return 1
-    end
-
-    # Ensure lock file is removed on exit, error, or interrupt
-    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_file
-        rm -f "$lock_file" &>/dev/null
+    # Ensure lock variable is cleared on exit, error, or interrupt
+    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var_name
+        set -U $lock_var_name 0
     end
 
     # Perform the fetch
