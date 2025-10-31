@@ -75,6 +75,9 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_github_color_issues    || set -Ux tide_report_github_color_issues bryellow
     set -q tide_report_github_color_prs       || set -Ux tide_report_github_color_prs bryellow
     set -q tide_report_github_refresh_seconds || set -Ux tide_report_github_refresh_seconds 30
+    set -q _tide_report_gh_timestamp          || set -Ux _tide_report_gh_timestamp 0
+    set -q _tide_report_gh_last_repo          || set -Ux _tide_report_gh_last_repo ""
+    set -q _tide_report_gh_cached_output      || set -Ux _tide_report_gh_cached_output ""
 
     tide reload
 end
