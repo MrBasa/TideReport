@@ -14,6 +14,8 @@ This plugin provides prompt items that display useful information (weather, moon
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
 * **Growing?**: May expand this to provide other prompt sections such as: sunrise/sundown, weather forecast, or ???
 
+![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
+
 ## 🔗 Dependencies
 
 * **`curl`**: Required by the `weather`, `moon`, and `tide` modules to fetch data.
