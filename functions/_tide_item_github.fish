@@ -39,7 +39,7 @@ function _tide_item_github --description "Fetches and displays GitHub informatio
 
     # --- Parsing and Formatting ---
     echo "$github_data" | jq \
-        '.data.repository | "\(.stargazerCount)\n\(.forkCount)\n\(.issues.totalCount)\n\(.pullRequests.totalCount)"' -r 2>/dev/null \
+        '.data.repository | "\(.stargazerCount) \(.forkCount) \(.issues.totalCount) \(.pullRequests.totalCount)"' -r 2>/dev/null \
         | read -l stars forks issues prs
 
     # --- Output ---
@@ -52,3 +52,7 @@ function _tide_item_github --description "Fetches and displays GitHub informatio
         test -n "$prs" -a "$prs" != "0"; and set_color $tide_report_github_color_prs; and echo -ns ' PR'$prs
     )
 end
+
+gh api /graphql -X POST -f 'query=query($owner: String!, $repo: String!) { repository(owner: $owner, name: $repo) { stargazerCount forkCount issues(states: OPEN) { totalCount } pullRequests(states: OPEN) { totalCount } } }' -f 'variables={"owner":"MrBasa", "repo":"TideReport"}'
+
+
