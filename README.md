@@ -14,7 +14,9 @@ This plugin provides prompt items that display useful information (weather, moon
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
 * **Growing?**: May expand this to provide other prompt sections such as: sunrise/sundown, weather forecast, or ???
 
-##  Dependencies
+![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
+
+## 🔗 Dependencies
 
 * **`curl`**: Required by the `weather`, `moon`, and `tide` modules to fetch data.
 * **`gh`**: The [GitHub CLI](https://cli.github.com). Required by the `github` module. You must be authenticated (`gh auth login`).
@@ -62,7 +64,7 @@ This setting applies to all modules in this plugin.
 | `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
 | `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in`  |
 
-### [GH] GitHub Module (`github`)
+### 🤖 GitHub Module (`github`)
 
 **Requires `gh` CLI to be installed and authenticated.**
 
@@ -76,7 +78,7 @@ This setting applies to all modules in this plugin.
 | `tide_report_github_color_issues`  | Color for the 'issues' count.                                   | `bryellow`        |
 | `tide_report_github_color_prs`     | Color for the 'pull requests' count.                            | `bryellow`        |
 
-### Weather Module (`weather`)
+### ☔ Weather Module (`weather`)
 
 | Variable                                | Description                                                             | Default           |
 | --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
@@ -91,7 +93,7 @@ This setting applies to all modules in this plugin.
 | `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | ``               |
 | `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `brred`           |
 
-### Moon Module (`moon`)
+### 🌕 Moon Module (`moon`)
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |
@@ -103,7 +105,7 @@ This setting applies to all modules in this plugin.
 | `tide_report_moon_unavailable_text`   | Text to display when moon data is not available.                | ``               |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `brred`           |
 
-### Tide Module (`tide`)
+### 🌊 Tide Module (`tide`)
 
 **This module requires `jq` and you must set a Station ID (default Boston).**
 
