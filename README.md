@@ -102,18 +102,18 @@ This setting applies to all modules in this plugin.
 
 ### ☔ Weather Module (`weather`)
 
-| Variable                                | Description                                                             | Default           |
-| --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
-| `tide_weather_color`                    | Prompt item color                                                       | `(theme default)` |
-| `tide_weather_bg_color`                 | Prompt item background color                                            | `(theme default)` |
-| `tide_report_weather_format`            | `wttr.in` format (`1`-`4`). See [wttr.in docs](https://wttr.in/:help).  | `2`               |
-| `tide_report_weather_units`             | `u` (USCS), `m` (Metric/Celsius), `M` (Metric/Wind Speed m/s)           | `m`               |
-| `tide_report_weather_location`          | Any location `wttr.in` accepts (e.g., `Paris`, `90210`).                | `""` (IP-based)   |
-| `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300`             |
-| `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `600`             |
-| `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`              |
-| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | ``               |
-| `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `brred`           |
+| Variable                                | Description                                                             | Default            |
+| --------------------------------------- | ----------------------------------------------------------------------- | ------------------ |
+| `tide_weather_color`                    | Prompt item color                                                       | `(theme default)`  |
+| `tide_weather_bg_color`                 | Prompt item background color                                            | `(theme default)`  |
+| `tide_report_weather_format`            | `wttr.in` format (`1`-`4`). See [wttr.in docs](https://wttr.in/:help).  | `2`                |
+| `tide_report_weather_units`             | `u` (USCS), `m` (Metric/Celsius), `M` (Metric/Wind Speed m/s)           | `m`                |
+| `tide_report_weather_location`          | Any location `wttr.in` accepts (e.g., `Paris`, `90210`).                | `""` (IP-based)    |
+| `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300` (5 minutes)  |
+| `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `600` (10 minutes) |
+| `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`               |
+| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | ``                |
+| `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `brred`            |
 
 ### 🌕 Moon Module (`moon`)
 
@@ -122,8 +122,8 @@ This setting applies to all modules in this plugin.
 | `tide_moon_color`                     | Prompt item color                                               | `(theme default)` |
 | `tide_moon_bg_color`                  | Prompt item background color                                    | `(theme default)` |
 | `tide_report_moon_format`             | `wttr.in` moon format (e.g., `%m` for emoji, `%M` for name).    | `"%m"`            |
-| `tide_report_moon_refresh_seconds`    | How old data can be before a background refresh is triggered.   | `14400`           |
-| `tide_report_moon_expire_seconds`     | How old data can be before it's considered invalid.             | `28800`           |
+| `tide_report_moon_refresh_seconds`    | How old data can be before a background refresh is triggered.   | `14400` (4 hours) |
+| `tide_report_moon_expire_seconds`     | How old data can be before it's considered invalid.             | `28800` (8 hours) |
 | `tide_report_moon_unavailable_text`   | Text to display when moon data is not available.                | ``               |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `brred`           |
 
@@ -139,8 +139,8 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_tide_bg_color`                 | Prompt item background color                                    | `(theme default)`  |
 | `tide_report_tide_station_id`        | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"8443970"`        |
 | `tide_report_tide_units`             | `english` (feet) or `metric` (meters).                          | `metric`           |
-| `tide_report_tide_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`            |
-| `tide_report_tide_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`            |
+| `tide_report_tide_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400` (4 hours)  |
+| `tide_report_tide_expire_seconds`    | How old data can be before it's considered invalid.             | `28800` (8 hours)  |
 | `tide_report_tide_symbol_high`       | Symbol to show for an upcoming high tide.                       | `⇞`                |
 | `tide_report_tide_symbol_low`        | Symbol to show for an upcoming low tide.                        | `⇟`                |
 | `tide_report_tide_symbol_color`      | Color for the high/low tide symbol.                             | `brwhite`          |
