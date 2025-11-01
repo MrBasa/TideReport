@@ -56,10 +56,11 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_tide_bg_color                 || set -U tide_tide_bg_color $default_bg_color
     set -q tide_report_tide_station_id        || set -U tide_report_tide_station_id "8443970" # Boston
     set -q tide_report_tide_units             || set -U tide_report_tide_units "metric" # 'english' or 'metric'
-    set -q tide_report_tide_refresh_seconds   || set -U tide_report_tide_refresh_seconds 900
-    set -q tide_report_tide_expire_seconds    || set -U tide_report_tide_expire_seconds 1800
-    set -q tide_report_tide_arrow_rising      || set -U tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
-    set -q tide_report_tide_arrow_falling     || set -U tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
+    set -q tide_report_tide_refresh_seconds   || set -U tide_report_tide_refresh_seconds 14400 # 4 hours
+    set -q tide_report_tide_expire_seconds    || set -U tide_report_tide_expire_seconds 28800 # 8 hours
+    set -q tide_report_tide_symbol_high       || set -U tide_report_tide_symbol_high "⇞" # Arrow for next high tide
+    set -q tide_report_tide_symbol_low        || set -U tide_report_tide_symbol_low "⇟" # Arrow for next low tide
+    set -q tide_report_tide_symbol_color      || set -U tide_report_tide_symbol_color blue
     set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color brred
     set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
@@ -94,7 +95,7 @@ function _tide_report_uninstall --on-event tide_report_uninstall
     # Delete funcs
     builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
 
-    # Remove items from left and right prompts
+    # Remove Tide Report items from left and right prompts
     if set -q tide_right_prompt_items
         set -U tide_right_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_right_prompt_items)
     end
