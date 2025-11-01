@@ -87,7 +87,7 @@ function _tide_report_fetch_and_cache --description "Fetches, validates, and cac
     end
 
     # Perform the fetch
-    set -l fetched_data (curl -s -A "tide-report-script" --max-time $timeout_sec "$url" | string collect)
+    set -l fetched_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$url" | string collect)
     set -l curl_status $status
 
     # Validate and cache if successful
