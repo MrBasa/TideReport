@@ -17,22 +17,17 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
         return
     end
 
+    # Get current epoch (cross-platform)
     set -l now (command date +%s)
+    # Get current date for URL (cross-platform)
+    set -l current_date (command date +%Y%m%d)
+
+    # Determine GNU/BSD date command for the parser
     set -l gnu_date_cmd
     if command -q gdate
         set gnu_date_cmd gdate
     else if command date --version >/dev/null 2>&1
         set gnu_date_cmd date
-    end
-
-    set -l current_date
-    if test -n "$gnu_date_cmd"
-        set current_date ($gnu_date_cmd -d @$now +%Y%m%d 2>/dev/null)
-    else
-        set current_date (command date -r $now +%Y%m%d 2>/dev/null)
-    end
-    if test -z "$current_date"
-        set current_date (command date +%Y%m%d)
     end
 
     set -l cache_file ~/.cache/tide-report/tide.json
@@ -69,12 +64,13 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
         if set -q $lock_var
             set lock_time $$lock_var
         end
-        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && _tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
+        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && __tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
     end
 
     _tide_print_item tide $output
 end
 
+# --- Parse Tide Data ---
 function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
     if not test -f "$cache_file"
         return 1
@@ -150,7 +146,8 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
     return 1 # Failure
 end
 
-function _tide_report_fetch_tide --argument url cache_file lock_var
+# --- Fetch Tide Data ---
+function __tide_report_fetch_tide --argument url cache_file lock_var
     function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end

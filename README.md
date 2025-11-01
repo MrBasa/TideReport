@@ -4,11 +4,11 @@ A collection of simple, asynchronous, and configurable prompt sections for the [
 
 This plugin provides prompt items that display useful information (weather, moon phase, ocean tides, and GitHub repo stats) without slowing down your shell.
 
-** THIS IS A WORK IN PROGRESS - weather, moon, and github modules should be in working order **
+** THIS IS A WORK IN PROGRESS **
 
 ## ✨ Key Features
 
-* **Asynchronous**: Uses Tide's native event system to fetch data in the background.
+* **Asynchronous**: Uses Tide's native event system to fetch data in the background for `weather`, `moon`, and `tide`.
 * **Modular**: Provides independent prompt items. Use only the ones you want.
 * **Configurable**: Easily customize the format, units, location, and refresh rates.
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
@@ -55,6 +55,28 @@ tide reload
 
 ## ⚙️ Configuration
 Set any of the following variables universally or add them to your `config.fish` to override defaults.
+
+## ⚡ Caching Behavior
+
+To keep your prompt fast, this plugin fetches data in the background and relies on cached data. This is done to prevent slow network requests from blocking your shell.
+
+All file-based caches are stored in `~/.cache/tide-report/`.
+
+### Weather, Moon, and Tide Modules
+
+These modules use an asynchronous, file-based caching system with two timers:
+1.  **Refresh (`..._refresh_seconds`)**: This is the "stale" timer. If you load your prompt and the cached data is older than this value, the prompt will **show the stale data** and trigger a fetch in the background. Your prompt is not blocked.
+2.  **Expire (`..._expire_seconds`)**: This is the "invalid" timer. If the cached data is older than this value (or doesn't exist), the prompt will **show the unavailable text** (e.g., `🌊`) and trigger a background fetch.
+
+This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
+
+### GitHub Module
+
+The `github` module's caching is simpler and based on Fish's universal variables (not files).
+* It caches data per-repository.
+* Data is fetched *synchronously* (this is a fast local `gh` command) if:
+    1.  You change to a new directory that is a git repository.
+    2.  You are in the same repository, but the cache is older than `tide_report_github_refresh_seconds`.
 
 ### Global Settings
 
@@ -115,16 +137,19 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 
 | Variable                             | Description                                                     | Default            |
 | ------------------------------------ | --------------------------------------------------------------- | ------------------ |
-| `tide_report_tide_station_id`        | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"8443970"`        |
-| `tide_report_tide_units`             | `english` (feet) or `metric` (meters).                          | `english`          |
-| `tide_report_tide_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `900`              |
-| `tide_report_tide_expire_seconds`    | How old data can be before it's considered invalid.             | `1800`             |
-| `tide_report_tide_arrow_rising`      | Symbol to show for an upcoming high tide.                       | `⇞`                |
-| `tide_report_tide_arrow_falling`     | Symbol to show for an upcoming low tide.                        | `⇟`                |
-| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊`                |
-| `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
-| `tide_tide_color`                    | Prompt item color                                               | `(theme default)`  |
+| `tide_tide_color`                    | Prompt item color                                               | `0087AF`           |
 | `tide_tide_bg_color`                 | Prompt item background color                                    | `(theme default)`  |
+| `tide_report_tide_station_id`        | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"8443970"`        |
+| `tide_report_tide_units`             | `english` (feet) or `metric` (meters).                          | `metric`           |
+| `tide_report_tide_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`            |
+| `tide_report_tide_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`            |
+| `tide_report_tide_symbol_high`       | Symbol to show for an upcoming high tide.                       | `⇞`                |
+| `tide_report_tide_symbol_low`        | Symbol to show for an upcoming low tide.                        | `⇟`                |
+| `tide_report_tide_symbol_color`      | Color for the high/low tide symbol.                             | `brwhite`          |
+| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊`                |
+| `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `brred`            |
+| `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
+
 
 ## Acknowledgements
 * [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].

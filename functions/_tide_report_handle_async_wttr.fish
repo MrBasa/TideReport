@@ -25,7 +25,7 @@ function _tide_report_handle_async_wttr --argument-names item_name cache_file ur
     if $trigger_fetch
         set -l lock_var "_tide_report_$item_name_lock"
         set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
-        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && _tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $lock_var &
+        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && __tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $lock_var &
     end
 
     # Clean and output
@@ -34,7 +34,7 @@ function _tide_report_handle_async_wttr --argument-names item_name cache_file ur
 end
 
 # --- Fetch, Validate & Cache ---
-function _tide_report_fetch_and_cache --argument data_type url cache_file timeout_sec lock_var
+function __tide_report_fetch_and_cache --argument data_type url cache_file timeout_sec lock_var
     # Auto-cleanup lock on exit
     function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
