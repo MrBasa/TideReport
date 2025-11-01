@@ -11,7 +11,7 @@ mkdir -p "$_tide_report_tmp_dir" &>/dev/null
 function _tide_report_install --on-event tide_report_install
     echo (set_color brwhite)"Installing Tide Report Configuration..."(set_color normal)
 
-    # Borrow default color from time to pick up the theme.
+    # Borrow default color from time module to pick up the theme.
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
 
@@ -52,7 +52,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_unavailable_color || set -U tide_report_moon_unavailable_color brred
 
     # --- Tide Module ---
-    set -q tide_tide_color                    || set -U tide_tide_color $default_color
+    set -q tide_tide_color                    || set -U tide_tide_color 303f9f
     set -q tide_tide_bg_color                 || set -U tide_tide_bg_color $default_bg_color
     set -q tide_report_tide_station_id        || set -U tide_report_tide_station_id "8443970" # Boston
     set -q tide_report_tide_units             || set -U tide_report_tide_units "metric" # 'english' or 'metric'
@@ -60,7 +60,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_expire_seconds    || set -U tide_report_tide_expire_seconds 28800 # 8 hours
     set -q tide_report_tide_symbol_high       || set -U tide_report_tide_symbol_high "⇞" # Arrow for next high tide
     set -q tide_report_tide_symbol_low        || set -U tide_report_tide_symbol_low "⇟" # Arrow for next low tide
-    set -q tide_report_tide_symbol_color      || set -U tide_report_tide_symbol_color blue
+    set -q tide_report_tide_symbol_color      || set -U tide_report_tide_symbol_color brwhite
     set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color brred
     set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
@@ -79,6 +79,7 @@ function _tide_report_install --on-event tide_report_install
 end
 
 function _tide_report_update --on-event tide_report_update
+    command rm -rf ~/.cache/tide-report
     _tide_report_install
 end
 
@@ -103,6 +104,8 @@ function _tide_report_uninstall --on-event tide_report_uninstall
     if set -q tide_left_prompt_items
         set -U tide_left_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_left_prompt_items)
     end
+
+    command rm -rf ~/.cache/tide-report
 
     tide reload
 end

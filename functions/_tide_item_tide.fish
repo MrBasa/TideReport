@@ -1,5 +1,5 @@
 # TideReport :: Tide Prompt Item
-# Displays the next high or low tide from NOAA.
+# This function handles all logic for displaying the tide prediction module.
 #
 # --- Sample Data: ---
 # https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8443970&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=english&format=json
@@ -31,7 +31,9 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
     else
         set current_date (command date -r $now +%Y%m%d 2>/dev/null)
     end
-    test -z "$current_date"; and set current_date (command date +%Y%m%d)
+    if test -z "$current_date"
+        set current_date (command date +%Y%m%d)
+    end
 
     set -l cache_file ~/.cache/tide-report/tide.json
     set -l output
@@ -46,33 +48,30 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
         set -l cache_age (math $now - $mod_time)
 
         if test $cache_age -le $tide_report_tide_expire_seconds
-            # Use status to check for parser success
             if set output (__tide_report_parse_tide $now "$cache_file" "$gnu_date_cmd")
-                # Success: output is already set and colored by the parser
                 test $cache_age -gt $tide_report_tide_refresh_seconds && set trigger_fetch true
             else
-                # Data/Parsing Error
                 set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text!data"
                 set trigger_fetch true
             end
         else
-            # Expired Cache
             set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text"
             set trigger_fetch true
         end
     else
-        # No Cache
         set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text"
         set trigger_fetch true
     end
 
     if $trigger_fetch
         set -l lock_var "_tide_report_tide_lock"
-        set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
+        set -l lock_time 0
+        if set -q $lock_var
+            set lock_time $$lock_var
+        end
         test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && _tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
     end
 
-    # Output is now guaranteed to have the correct color
     _tide_print_item tide $output
 end
 
@@ -96,7 +95,7 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
 
     for line in $predictions
         set -l parts (string split " " -- $line)
-        if test (count $parts) -lt 4
+        if test -z "$parts[4]"
             continue
         end
 
@@ -127,18 +126,18 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
                 set -l arrow_symbol
                 test "$tide_type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
 
-                # Color the successful output here
-                set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color normal)
+                set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
                 set -l output_string "$arrow$tide_time"
 
                 if set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" = "true"
-                    set -l final_value $tide_value_metric
+                    set -l level_value $tide_value_metric
                     set -l unit_suffix "m"
                     if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
-                        set final_value (math --scale=1 $tide_value_metric \* 3.28084)
+                        set level_value "$tide_value_metric * 3.28084"
                         set unit_suffix "ft"
                     end
-                    set -l level (printf "%.1f" $final_value 2>/dev/null)
+                    set -l level (math --scale=1 $level_value)
+
                     if test $status -eq 0; and test -n "$level"
                         set output_string "$output_string $level$unit_suffix"
                     end
@@ -161,7 +160,6 @@ function _tide_report_fetch_tide --argument url cache_file lock_var
         return
     end
     if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' >/dev/null 2>&1
-        mkdir -p (dirname "$cache_file")
-        printf "%s" "$tide_data" > "$cache_file"
+        mkdir -p (dirname "$cache_file"); and printf "%s" "$tide_data" > "$cache_file"
     end
 end
