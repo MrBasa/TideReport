@@ -61,7 +61,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_arrow_rising      || set -U tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
     set -q tide_report_tide_arrow_falling     || set -U tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
     set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
-    set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color red
+    set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color brred
 
     # --- GitHub Module ---
     set -q tide_github_color                  || set -U tide_github_color white
