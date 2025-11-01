@@ -4,11 +4,9 @@ A collection of simple, asynchronous, and configurable prompt sections for the [
 
 This plugin provides prompt items that display useful information (weather, moon phase, ocean tides, and GitHub repo stats) without slowing down your shell.
 
-** THIS IS A WORK IN PROGRESS **
-
 ## ✨ Key Features
 
-* **Asynchronous**: Uses Tide's native event system to fetch data in the background for `weather`, `moon`, and `tide`.
+* **Asynchronous**: Fetches data in the background for slower remote API calls such wttr.in and NOAA for `weather`, `moon`, and `tide` data.
 * **Modular**: Provides independent prompt items. Use only the ones you want.
 * **Configurable**: Easily customize the format, units, location, and refresh rates.
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
@@ -31,7 +29,7 @@ This plugin provides prompt items that display useful information (weather, moon
 Install with [Fisher][]:
 
 ```fish
-fisher install MrBasa/TideReport
+fisher install MrBasa/TideReport@v1
 ```
 
 Or add `MrBasa/TideReport` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
@@ -56,7 +54,7 @@ tide reload
 ## ⚙️ Configuration
 Set any of the following variables universally or add them to your `config.fish` to override defaults.
 
-## ⚡ Caching Behavior
+## 📂 Caching Behavior
 
 To keep your prompt fast, this plugin fetches data in the background and relies on cached data. This is done to prevent slow network requests from blocking your shell.
 
@@ -152,22 +150,22 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 
 
 ## Acknowledgements
-* [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].
+* [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][] respectively. I used the existing Tide items as a template for creating the new modules.
 * [Moby Dick](https://www.gutenberg.org/ebooks/2701), the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
 * [NOAA](https://www.noaa.gov) - we'll miss them when they're gone... 🇺🇸😢
 * [Igor Chubin](https://github.com/chubin) and all the contributors/sponsors of [wttr.in][].
 
 ### Other Handy Fish Plugins I Use:
-* jorgebucaran/fisher
-* ilancosman/tide@v6
-* gazorby/fish-abbreviation-tips
-* laughedelic/pisces
-* meaningful-ooo/sponge
-* nickeb96/puffer-fish
-* jorgebucaran/spark.fish
-* jorgebucaran/humantime.fish
-* jhillyerd/plugin-git
-* PatrickF1/fzf.fish
+* [jorgebucaran/fisher](https://github.com/jorgebucaran/fisher)
+* [ilancosman/tide](https://github.com/ilancosman/tide)
+* [gazorby/fish-abbreviation-tips](https://github.com/gazorby/fish-abbreviation-tips)
+* [laughedelic/pisces](https://github.com/laughedelic/pisces)
+* [meaningful-ooo/sponge](https://github.com/meaningful-ooo/sponge)
+* [nickeb96/puffer-fish](https://github.com/nickeb96/puffer-fish)
+* [jorgebucaran/spark.fish](https://github.com/jorgebucaran/spark.fish)
+* [jorgebucaran/humantime.fish](https://github.com/jorgebucaran/humantime.fish)
+* [jhillyerd/plugin-git](https://github.com/jhillyerd/plugin-git)
+* [PatrickF1/fzf.fish](https://github.com/PatrickF1/fzf.fish)
 
 
 [fish]: https://fishshell.com/
