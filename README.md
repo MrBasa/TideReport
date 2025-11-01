@@ -32,7 +32,7 @@ Install with [Fisher][]:
 fisher install MrBasa/TideReport@v1
 ```
 
-Or add `MrBasa/TideReport` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
+Or add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
 ## 🚀 Available Prompt Sections
