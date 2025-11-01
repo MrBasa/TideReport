@@ -52,7 +52,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_moon_unavailable_color || set -U tide_report_moon_unavailable_color brred
 
     # --- Tide Module ---
-    set -q tide_tide_color                    || set -U tide_tide_color 303f9f
+    set -q tide_tide_color                    || set -U tide_tide_color 0087AF
     set -q tide_tide_bg_color                 || set -U tide_tide_bg_color $default_bg_color
     set -q tide_report_tide_station_id        || set -U tide_report_tide_station_id "8443970" # Boston
     set -q tide_report_tide_units             || set -U tide_report_tide_units "metric" # 'english' or 'metric'
