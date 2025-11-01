@@ -55,13 +55,14 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_tide_color                    || set -U tide_tide_color $default_color
     set -q tide_tide_bg_color                 || set -U tide_tide_bg_color $default_bg_color
     set -q tide_report_tide_station_id        || set -U tide_report_tide_station_id "8443970" # Boston
-    set -q tide_report_tide_units             || set -U tide_report_tide_units "english" # 'english' or 'metric'
+    set -q tide_report_tide_units             || set -U tide_report_tide_units "metric" # 'english' or 'metric'
     set -q tide_report_tide_refresh_seconds   || set -U tide_report_tide_refresh_seconds 900
     set -q tide_report_tide_expire_seconds    || set -U tide_report_tide_expire_seconds 1800
     set -q tide_report_tide_arrow_rising      || set -U tide_report_tide_arrow_rising "⇞" # Arrow for next high tide
     set -q tide_report_tide_arrow_falling     || set -U tide_report_tide_arrow_falling "⇟" # Arrow for next low tide
     set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color brred
+    set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
 
     # --- GitHub Module ---
     set -q tide_github_color                  || set -U tide_github_color white

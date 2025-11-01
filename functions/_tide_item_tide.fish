@@ -20,20 +20,23 @@ function _tide_item_tide
 
     # Setup variables
     set -l cache_file ~/.cache/tide-report/tide.json
-    set -l now (date +%s)
+    set -l now (command date +%s)
     set -l output
     set -l trigger_fetch false
 
     # Get current date and construct URL for 48-hour range
-    set -l current_date (date +%Y%m%d)
-    set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=$tide_report_tide_units&format=json"
+    set -l current_date (command date +%Y%m%d)
+
+    # --- CHANGE: Always fetch units in metric for consistent caching ---
+    set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&interval=hilo&datum=MLLW&time_zone=gmt&units=metric&format=json"
     set url "$url&station=$tide_report_tide_station_id"
     set url "$url&begin_date=$current_date"
     set url "$url&range=48"
 
     # Check cache status
     if test -f "$cache_file"
-        set -l mod_time (date -r "$cache_file" +%s)
+        # 2>/dev/null suppresses errors if file disappears; 'or echo 0' handles it
+        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
         set -l cache_age (math $now - $mod_time)
 
         if test $cache_age -le $tide_report_tide_expire_seconds
@@ -55,14 +58,14 @@ function _tide_item_tide
         set trigger_fetch true
     end
 
-    # Trigger background fetch if needed
+    # Trigger background fetch if needed, using logic from user's reference file
     if $trigger_fetch
         set -l lock_var "_tide_report_tide_lock"
+        # Get lock time, default to 0 if not set
         set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
-        if test (math $now - $lock_time) -gt 120
-            set -U $lock_var $now
-            _tide_report_fetch_tide "$url" "$cache_file" $lock_var &
-        end
+
+        # If lock is older than 120s, set lock and run fetch
+        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && _tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
     end
 
     # Final output
@@ -72,105 +75,130 @@ function _tide_item_tide
     _tide_print_item tide $output
 end
 
+# This function now correctly handles GMT/UTC time
 function __tide_report_parse_tide --argument-names now cache_file
-    # Debug: log start
-    echo "=== Tide Parse Start ===" > ~/tmp.log
-
-    # Simple validation - check if file exists and has predictions
+    # Simple validation
     if not test -f "$cache_file"
-        echo "Cache file doesn't exist" >> ~/tmp.log
+        return 1
+    end
+    # Suppress jq error output on invalid JSON
+    if not jq -e '.predictions | length > 0' "$cache_file" >/dev/null 2>&1
         return 1
     end
 
-    if not jq -e '.predictions | length > 0' "$cache_file" >/dev/null
-        echo "jq validation failed" >> ~/tmp.log
-        return 1
+    # --- Determine date command *name* *once* ---
+    set -l gnu_date_cmd
+    if command -q gdate  # GNU date on macOS (Homebrew)
+        set gnu_date_cmd gdate
+    else if command date --version >/dev/null 2>&1  # GNU date on Linux
+        set gnu_date_cmd date
     end
+    # $gnu_date_cmd is now 'gdate', 'date', or empty (if BSD date)
+    # -----------------------------------------------------------------
 
-    # Extract predictions
-    set -l predictions (jq -r '.predictions[] | "\(.t) \(.type)"' "$cache_file")
+    # --- Get user's desired time format, default to %H:%M ---
+    set -l time_format %H:%M
+    if set -q tide_time_format; and test -n "$tide_time_format"
+        set time_format $tide_time_format
+    end
+    # -----------------------------------------------------------------
+
+    # Extract predictions, now including the value 'v'
+    set -l predictions (jq -r '.predictions[] | "\(.t) \(.type) \(.v)"' "$cache_file" 2>/dev/null)
     if test $status -ne 0; or test -z "$predictions"
-        echo "jq extraction failed" >> ~/tmp.log
         return 1
     end
 
     for line in $predictions
-        # Simple split by space - first two parts are date, last part is type
         set -l parts (string split " " -- $line)
-        if test (count $parts) -lt 3
+        if test (count $parts) -lt 4
             continue
         end
 
-        # Reconstruct date string (first two parts)
         set -l date_str "$parts[1] $parts[2]"
         set -l tide_type $parts[3]
+        set -l tide_value_metric $parts[4] # This value is now always in meters
 
-        # Debug: log what we're parsing
-        echo "Parsing: '$date_str' type: '$tide_type'" >> ~/tmp.log
-
-        # Cross-platform date parsing
+        # --- Cross-platform date parsing (parse as UTC) ---
         set -l tide_timestamp
-        if command -q gdate  # GNU date on macOS
-            set tide_timestamp (gdate -d "$date_str" +%s 2>&1)
-        else if date --version >/dev/null 2>&1  # GNU date on Linux
-            set tide_timestamp (date -d "$date_str" +%s 2>&1)
-        else  # BSD date (macOS)
-            set tide_timestamp (date -j -f "%Y-%m-%d %H:%M" "$date_str" +%s 2>&1)
+        if test -n "$gnu_date_cmd"
+            # GNU date (gdate or Linux date)
+            set tide_timestamp ($gnu_date_cmd -d "$date_str UTC" +%s 2>&1)
+        else
+            # BSD date (default macOS)
+            set tide_timestamp (TZ=UTC command date -j -f "%Y-%m-%d %H:%M" "$date_str" +%s 2>&1)
         end
-        set -l date_status $status
 
-        # Debug: log date parsing result
-        echo "Date parse status: $date_status, output: '$tide_timestamp'" >> ~/tmp.log
-
-        if test $date_status -ne 0; or test -z "$tide_timestamp"
+        if test $status -ne 0; or test -z "$tide_timestamp"
             continue
         end
 
-        # Check if this is a future tide
+        # Check if this is a future tide (now a correct comparison)
         if test $tide_timestamp -gt $now
-            # Cross-platform time formatting
+
+            # --- Cross-platform time formatting (format as local time) ---
             set -l tide_time
-            if command -q gdate
-                set tide_time (gdate -d "$date_str" +%H:%M 2>&1)
-            else if date --version >/dev/null 2>&1
-                set tide_time (date -d "$date_str" +%H:%M 2>&1)
+            if test -n "$gnu_date_cmd"
+                # GNU date (gdate or Linux date)
+                set tide_time ($gnu_date_cmd -d @$tide_timestamp +$time_format 2>&1)
             else
-                set tide_time (date -j -f "%Y-%m-%d %H:%M" "$date_str" +%H:%M 2>&1)
+                # BSD date (default macOS)
+                set tide_time (command date -r $tide_timestamp +$time_format 2>&1)
             end
-            set -l format_status $status
 
-            # Debug: log time formatting result
-            echo "Time format status: $format_status, output: '$tide_time'" >> ~/tmp.log
-
-            if test -n "$tide_time"; and test $format_status -eq 0
+            if test -n "$tide_time"; and test $status -eq 0
                 set -l arrow
                 test "$tide_type" = "H" && set arrow $tide_report_tide_arrow_rising || set arrow $tide_report_tide_arrow_falling
-                echo "Success: $arrow$tide_time" >> ~/tmp.log
-                echo "$arrow$tide_time"
+
+                set -l output_string "$arrow$tide_time"
+
+                # --- CHANGE: Convert metric value to english if needed ---
+                if set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" = "true"
+
+                    set -l final_value $tide_value_metric
+                    set -l unit_suffix "m" # Default to metric
+
+                    # Check if user wants english units
+                    if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
+                        set final_value (math --scale=1 $tide_value_metric \* 3.28084)
+                        set unit_suffix "ft"
+                    end
+
+                    # Format to one decimal place
+                    set -l level (printf "%.1f" $final_value 2>/dev/null)
+                    if test $status -eq 0; and test -n "$level"
+                        set output_string "$output_string $level$unit_suffix"
+                    end
+                end
+
+                echo $output_string
                 return 0
             end
-        else
-            echo "Tide in past: $tide_timestamp <= $now" >> ~/tmp.log
         end
     end
 
-    echo "No future tides found" >> ~/tmp.log
     return 1
 end
 
+# This function is unchanged
 function _tide_report_fetch_tide --argument url cache_file lock_var
-    # Auto-cleanup lock
-    function _remove_lock --on-process-exit $fish_pid --inherit-variable lock_var
+    # Auto-cleanup lock on exit, interrupt, or termination
+    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
 
     # Fetch and validate data
     set -l tide_data (curl -s --max-time 3 "$url")
-    if test $status -eq 0; and test -n "$tide_data"; and echo "$tide_data" | jq -e '.predictions | length > 0' >/dev/null
+    set -l curl_status $status
+
+    if test $curl_status -ne 0; or test -z "$tide_data"
+        return
+    end
+
+    # Use 'printf' for robust piping to jq
+    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' >/dev/null 2>&1
         mkdir -p (dirname "$cache_file")
-        echo "$tide_data" > "$cache_file"
-        echo "Data fetched and cached" >> ~/tmp.log
-    else
-        echo "Fetch failed: status=$status, data_length="(string length "$tide_data") >> ~/tmp.log
+        # Use 'printf' for robust file writing
+        printf "%s" "$tide_data" > "$cache_file"
     end
 end
