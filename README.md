@@ -70,7 +70,7 @@ These modules use an asynchronous, file-based caching system with two timers:
 
 This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
 
-The `weather` and `moon` modules are highly efficient, sharing a single API call and a single cache file (`~/.cache/tide-report/wttr.json`).
+The `weather` and `moon` modules share a single API call and a single cache file (`~/.cache/tide-report/wttr.json`).
 
 ### GitHub Module
 
