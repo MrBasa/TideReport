@@ -112,4 +112,3 @@ function _tide_report_uninstall --on-event tide_report_uninstall
 
     tide reload
 end
-8
