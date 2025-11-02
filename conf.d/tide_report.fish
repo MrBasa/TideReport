@@ -1,7 +1,14 @@
 # Tide Report :: Default Configuration
 
 function _tide_report_install --on-event tide_report_install
-    echo (set_color white)"Installing Tide Report Configuration..."(set_color normal)
+    # --- Check for Dev Branch Install ---
+    if contains mrbasa/tidereport (string lower $_fisher_plugins)
+        echo (set_color bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
+        echo "  fisher install MrBasa/TideReport@v1"
+        sleep 3
+    end
+
+    echo (set_color brwhite)"Installing Tide Report Configuration..."(set_color normal)
 
     # Borrow default color from time module to pick up the theme.
     set -l default_color $tide_time_color
@@ -9,14 +16,14 @@ function _tide_report_install --on-event tide_report_install
 
     # --- Check dependencies ---
     if ! command -v "gh" &> /dev/null
-        echo (set_color yellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."
+        echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
     end
     if ! command -v "jq" &> /dev/null
         # jq is now required for weather and moon as well
-        echo (set_color yellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."
+        echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
     end
     if ! command -v "curl" &> /dev/null
-        echo (set_color yellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."
+        echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
     end
 
     # --- Universal Settings ---
@@ -90,7 +97,7 @@ function _tide_report_update --on-event tide_report_update
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
-    echo (set_color white)"Removing Tide Report Configuration & Cache..."(set_color normal)
+    echo (set_color brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
     # Delete vars
     set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
