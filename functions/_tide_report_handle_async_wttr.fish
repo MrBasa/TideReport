@@ -1,6 +1,6 @@
 # TideReport :: Private Helper Functions for WTTR data
 
-# This is the main async handler for the JSON cache
+# --- Main async handler for the wttr.in JSON cache ---
 function _tide_report_handle_async_wttr --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
     set -l now (command date +%s)
     set -l trigger_fetch false

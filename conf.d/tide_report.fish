@@ -29,7 +29,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_weather_bg_color                   || set -U tide_weather_bg_color $default_bg_color
     set -q tide_report_weather_symbol_color        || set -U tide_report_weather_symbol_color white
     set -q tide_report_weather_format              || set -U tide_report_weather_format "%c %t %d%w" # See README
-    set -q tide_report_weather_location            || set -U tide_report_weather_location "" # Empty = IP-based location
+    set -q tide_report_weather_location            || set -U tide_report_weather_location "" # Empty => IP-based location
     set -q tide_report_weather_refresh_seconds     || set -U tide_report_weather_refresh_seconds 300 # 5 minutes
     set -q tide_report_weather_expire_seconds      || set -U tide_report_weather_expire_seconds 600 # 10 minutes
     set -q tide_report_weather_language            || set -U tide_report_weather_language "en"

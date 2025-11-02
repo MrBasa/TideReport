@@ -76,7 +76,6 @@ function __tide_report_parse_weather --argument-names cache_file
     set cond_text (string replace -a '\t' ' ' -- $cond_text | string replace -ra ' {2,}' ' ')
 
     # %c: Condition Emoji (e.g., ☀️)
-    # BUGFIX: Pass the reliable weather 'code' instead of the empty 'icon_url'
     set -l cond_emoji (__tide_report_get_weather_emoji "$code")
 
     # %w: Wind (e.g., 15mph)
@@ -91,7 +90,7 @@ function __tide_report_parse_weather --argument-names cache_file
     set -l feels_like_str (printf "%+d°" $feels_like_val)
 
     # %d: Wind Direction Arrow (e.g., ⬆)
-    set -l wind_arrow_symbol (_tide_report_get_wind_arrow "$wind_dir")
+    set -l wind_arrow_symbol (__tide_report_get_wind_arrow "$wind_dir")
     set -l wind_arrow (set_color $tide_report_weather_symbol_color)$wind_arrow_symbol(set_color $tide_weather_color)
 
     # Build the final output string
@@ -107,7 +106,7 @@ function __tide_report_parse_weather --argument-names cache_file
     _tide_print_item weather $output
 end
 
-# --- Helper to map wttr.in weatherCode to emoji ---
+# --- Map wttr.in weatherCode to emoji ---
 function __tide_report_get_weather_emoji --argument-names code
     switch "$code"
         case 113; echo "☀️"; # Sunny / Clear
@@ -124,7 +123,7 @@ function __tide_report_get_weather_emoji --argument-names code
 end
 
 # --- Helper to map wttr.in wind direction to an arrow ---
-function _tide_report_get_wind_arrow --argument-names direction
+function __tide_report_get_wind_arrow --argument-names direction
     switch "$direction"
         case "N"; echo "⬆"
         case "NNE" "NE"; echo "⬈"

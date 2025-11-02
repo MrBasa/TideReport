@@ -2,10 +2,9 @@
 #
 # This is the main function that Tide calls to display GitHub data. 
 
-function _tide_item_github
-    # --- Quick Checks
+function _tide_item_github --description "Displays GitHub stats"
+    # --- Quick Checks ---
     git rev-parse --is-inside-work-tree &>/dev/null || return 0 # Not git dir
-    # Hard-coded error color to red
     gh auth status &>/dev/null || begin; _tide_print_item github (set_color red)"!auth"; return 0; end
 
     set -q _tide_report_gh_timestamp || set -U _tide_report_gh_timestamp 0
