@@ -3,12 +3,12 @@
 function _tide_report_install --on-event tide_report_install
     # --- Check for Dev Branch Install ---
     if contains mrbasa/tidereport (string lower $_fisher_plugins)
-        echo (set_color brred)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
-        echo "  fisher install MrBasa/TideReport"(set_color cyan)"@v1"(set_color normal)
+        echo (set_color --bold bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
+        echo "  fisher install MrBasa/TideReport"(set_color cyan --bold)"@v1"(set_color normal)
         sleep 3
     end
 
-    echo (set_color brwhite)"Installing Tide Report Configuration..."(set_color normal)
+    echo (set_color --bold brwhite)"Installing Tide Report Configuration..."(set_color normal)
 
     # Borrow default color from time module to pick up the theme.
     set -l default_color $tide_time_color
@@ -97,7 +97,7 @@ function _tide_report_update --on-event tide_report_update
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
-    echo (set_color brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
+    echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
     # Delete vars
     set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
