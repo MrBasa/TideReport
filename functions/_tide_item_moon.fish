@@ -23,20 +23,39 @@ function _tide_item_moon --description "Displays moon phase, fetches asynchronou
         $timeout_sec
 
         # Cache is valid, parse and print
-        _tide_report_parse_moon "$cache_file"
+        __tide_report_parse_moon "$cache_file"
     end
 end
 
 # --- Internal Parser Function ---
-function _tide_report_parse_moon --argument-names cache_file
-    # Read the moon_phase emoji directly from the JSON cache
-    set -l moon_phase (jq -r '.weather[0].astronomy[0].moon_phase' "$cache_file" 2>/dev/null)
+function __tide_report_parse_moon --argument-names cache_file
+    # Read the moon_phase text directly from the JSON cache
+    # This field is language-independent (always English) per wttr.in JSON format.
+    set -l moon_phase_text (jq -r '.weather[0].astronomy[0].moon_phase' "$cache_file" 2>/dev/null)
 
-    if test $status -ne 0; or test -z "$moon_phase"
+    if test $status -ne 0; or test -z "$moon_phase_text"
         # Fallback if jq fails (e.g., empty file)
         _tide_print_item moon (set_color $tide_report_moon_unavailable_color)$tide_report_moon_unavailable_text
         return
     end
 
-    _tide_print_item moon $moon_phase
+    # BUGFIX: Translate text to emoji
+    set -l moon_emoji (_tide_report_get_moon_emoji "$moon_phase_text")
+    _tide_print_item moon $moon_emoji
+end
+
+# BUGFIX: Added this helper function to map the English text to an emoji
+# Helper to map wttr.in moon phase text to an emoji
+function _tide_report_get_moon_emoji --argument-names phase_text
+    switch "$phase_text"
+        case "New Moon"; echo "🌑"
+        case "Waxing Crescent"; echo "🌒"
+        case "First Quarter"; echo "🌓"
+        case "Waxing Gibbous"; echo "🌔"
+        case "Full Moon"; echo "🌕"
+        case "Waning Gibbous"; echo "🌖"
+        case "Last Quarter"; echo "🌗"
+        case "Waning Crescent"; echo "🌘"
+        case "*"; echo "❔" # Default
+    end
 end

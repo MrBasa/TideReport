@@ -82,11 +82,11 @@ The `github` module's caching is simpler and based on Fish's universal variables
 
 These settings apply to all modules in this plugin.
 
-| Variable                             | Description                                      | Default            |
-| ------------------------------------ | ------------------------------------------------ | ------------------ |
-| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.   | `3000`             |
-| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.    | `https://wttr.in`  |
-| `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS) | `m`              |
+| Variable                             | Description                                          | Default            |
+| ------------------------------------ | ---------------------------------------------------- | ------------------ |
+| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.       | `3000`             |
+| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.        | `https://wttr.in`  |
+| `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS) | `m`                |
 
 ### 🤖 GitHub Module (`github`)
 
@@ -107,6 +107,7 @@ The module displays stats for the current repository, with icons you can customi
 | ------------------------------------ | --------------------------------------------------------------- | ----------------- |
 | `tide_github_color`                  | Prompt item color                                               | `(theme default)` |
 | `tide_github_bg_color`               | Prompt item background color                                    | `(theme default)` |
+| `tide_report_weather_symbol_color`   | Color for symbols in weather ouput                              | `white`           |
 | `tide_report_github_icon_stars`      | Icon for stars.                                                 | `★`               |
 | `tide_report_github_icon_forks`      | Icon for forks.                                                 | `⑂`               |
 | `tide_report_github_icon_watchers`   | Icon for watchers.                                              | `👁`               |
@@ -121,9 +122,9 @@ The module displays stats for the current repository, with icons you can customi
 
 ### ☔ Weather Module (`weather`)
 
-**This module now requires `jq` for parsing JSON.**
+**This module requires `jq` for parsing JSON.**
 
-The weather format is now a string with custom specifiers.
+The weather format is a string with custom specifiers.
 
 | Specifier | Description                                   | Example     |
 | :---      | :---                                          | :---        |
@@ -131,7 +132,9 @@ The weather format is now a string with custom specifiers.
 | `%C`      | Condition text                                | `Clear`     |
 | `%c`      | Condition emoji                               | `☀️`        |
 | `%w`      | Wind speed and unit                           | `15km/h`    |
+| `%d`      | Wind direction arrow                          | `⬆`         |
 | `%h`      | Humidity                                      | `80%`       |
+| `%f`      | 'Feels like' temperature                      | `Overcast`  |
 
 | Variable                                | Description                                                             | Default           |
 | --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
@@ -147,7 +150,7 @@ The weather format is now a string with custom specifiers.
 
 ### 🌕 Moon Module (`moon`)
 
-**This module now requires `jq` and shares a cache with the `weather` module.** It simply displays the moon phase emoji provided by `wttr.in`.
+**This module requires `jq` and shares a cache with the `weather` module.** It simply displays the moon phase emoji provided by `wttr.in`.
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |

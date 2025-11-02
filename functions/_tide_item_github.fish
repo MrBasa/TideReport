@@ -44,5 +44,5 @@ function _tide_item_github
         end
     end
 
-    test -n "$_tide_report_gh_cache" && _tide_print_item github "$_tide_report_gh_cache"
+    test -n "$_tide_report_gh_cache" && _tide_print_item github "$tide_report_github_icon$_tide_report_gh_cache"
 end

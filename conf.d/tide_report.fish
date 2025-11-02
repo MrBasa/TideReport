@@ -27,9 +27,9 @@ function _tide_report_install --on-event tide_report_install
     # --- Weather Module ---
     set -q tide_weather_color                      || set -U tide_weather_color $default_color
     set -q tide_weather_bg_color                   || set -U tide_weather_bg_color $default_bg_color
-    # Changed default to a format string. See README for options.
-    set -q tide_report_weather_format              || set -U tide_report_weather_format "%t %c"
-    set -q tide_report_weather_location            || set -U tide_report_weather_location ""
+    set -q tide_report_weather_symbol_color        || set -U tide_report_weather_symbol_color white
+    set -q tide_report_weather_format              || set -U tide_report_weather_format "%c %t %d%w" # See README
+    set -q tide_report_weather_location            || set -U tide_report_weather_location "" # Empty = IP-based location
     set -q tide_report_weather_refresh_seconds     || set -U tide_report_weather_refresh_seconds 300 # 5 minutes
     set -q tide_report_weather_expire_seconds      || set -U tide_report_weather_expire_seconds 600 # 10 minutes
     set -q tide_report_weather_language            || set -U tide_report_weather_language "en"
@@ -59,11 +59,12 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
     # --- GitHub Module ---
-    set -q tide_github_color                  || set -U tide_github_color $default_color
+    set -q tide_github_color                  || set -U tide_github_color white
     set -q tide_github_bg_color               || set -U tide_github_bg_color $default_bg_color
+    set -q tide_report_github_icon            || set -U tide_report_github_icon ""
     set -q tide_report_github_icon_stars      || set -U tide_report_github_icon_stars "★"
     set -q tide_report_github_icon_forks      || set -U tide_report_github_icon_forks "⑂"
-    set -q tide_report_github_icon_watchers   || set -U tide_report_github_icon_watchers "👁"
+    set -q tide_report_github_icon_watchers   || set -U tide_report_github_icon_watchers "" #"👁"
     set -q tide_report_github_icon_issues     || set -U tide_report_github_icon_issues "!"
     set -q tide_report_github_icon_prs        || set -U tide_report_github_icon_prs "PR"
     set -q tide_report_github_color_stars     || set -U tide_report_github_color_stars yellow
@@ -87,7 +88,7 @@ function _tide_report_update --on-event tide_report_update
 end
 
 function _tide_report_uninstall --on-event tide_report_uninstall
-    echo (set_color white)"Removing Tide Report Configuration..."(set_color normal)
+    echo (set_color white)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
     # Delete vars
     set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
@@ -108,6 +109,7 @@ function _tide_report_uninstall --on-event tide_report_uninstall
         set -U tide_left_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_left_prompt_items)
     end
 
+    # Remove cache
     command rm -rf ~/.cache/tide-report
 
     tide reload
