@@ -26,6 +26,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
     # --- Weather Module ---
+    # Humidity:💧 Sunrise:🌅,🌄,󰖜, Sunset:🌇,🌆,󰖚,󰖛, UV:☀️,😎,🕶️,🕶,󰓠 Temp:🌡️,󰔅,󰔄, Feels:🧖,🧖‍♂️,🥵,🤒,,
+    # set -U tide_report_weather_format "%c 🌡️%t (%f) %d%w 💧%h ☀️%u 󰖜%S 󰖚%s"
     set -q tide_weather_color                      || set -U tide_weather_color $default_color
     set -q tide_weather_bg_color                   || set -U tide_weather_bg_color $default_bg_color
     set -q tide_report_weather_symbol_color        || set -U tide_report_weather_symbol_color white

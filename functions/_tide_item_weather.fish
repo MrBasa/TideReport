@@ -11,8 +11,7 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
     set -l unavailable_color $tide_report_weather_unavailable_color
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
 
-    # Call the shared async JSON handler
-    # It returns 0 if cache is valid, 1 if not (and prints unavailable text)
+    # 0 if cache is valid, 1 if not
     if _tide_report_handle_async_wttr \
         $item_name \
         $cache_file \
@@ -84,8 +83,7 @@ function __tide_report_parse_weather --argument-names cache_file
     set -l feels_like_val (math "floor($feels_like + 0.5)")
     set -l feels_like_str (printf "%+d°" $feels_like_val)
     # %d: Wind Direction Arrow (e.g., ⬆)
-    set -l wind_arrow_symbol (__tide_report_get_wind_arrow "$wind_dir")
-    set -l wind_arrow (set_color $tide_report_weather_symbol_color)$wind_arrow_symbol(set_color $tide_weather_color)
+    set -l wind_arrow (__tide_report_get_wind_arrow "$wind_dir")
     # %u: UV Index (e.g., 2)
     set -l uv_str $uv_index
     # %S: Sunrise time (e.g., 07:24 AM)
@@ -97,7 +95,7 @@ function __tide_report_parse_weather --argument-names cache_file
     # %s: Sunset time
     set -l sunset_str (__tide_report_format_wttr_time "$sunset" $tide_time_format)
 
-    # Build the final output string
+    # --- Build the final output string ---
     set -l output $tide_report_weather_format
     set output (string replace -a '%t' $temp_str -- $output)
     set output (string replace -a '%C' $cond_text -- $output)
@@ -109,6 +107,33 @@ function __tide_report_parse_weather --argument-names cache_file
     set output (string replace -a '%u' $uv_str -- $output)
     set output (string replace -a '%S' $sunrise_str -- $output)
     set output (string replace -a '%s' $sunset_str -- $output)
+
+    # Symbol coloring
+    # List of single-color text symbols (Nerd Font, Unicode)
+    set -l colorable_symbols \
+        # Sunrise/Sunset
+         󰖚 󰖛 󰖜  \
+        # Wind Direction
+        ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
+        # Simple Arrows
+        ↑ ↓ → ← ▴ ▾     \
+        # Temperature
+             🌡 󰔅 󰔄 \
+        # Humidity
+         󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
+        # UV
+        🕶 󰓠    󰖙  󰖨 \
+        # Wind
+           󱪈 󱪉 󰖝 󱗺 \
+        # Feel like
+         
+
+    # Apply symbol color
+    set -l symbol_color (set_color $tide_report_weather_symbol_color)
+    set -l text_color (set_color $tide_weather_color)
+    for sym in $colorable_symbols
+        set output (string replace -a -- $sym "$symbol_color$sym$text_color" $output)
+    end
 
     _tide_print_item weather $output
 end
