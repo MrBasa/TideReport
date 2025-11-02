@@ -3,8 +3,8 @@
 function _tide_report_install --on-event tide_report_install
     # --- Check for Dev Branch Install ---
     if contains mrbasa/tidereport (string lower $_fisher_plugins)
-        echo (set_color bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
-        echo "  fisher install MrBasa/TideReport@v1"
+        echo (set_color brred)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
+        echo "  fisher install MrBasa/TideReport"(set_color cyan)"@v1"(set_color normal)
         sleep 3
     end
 
