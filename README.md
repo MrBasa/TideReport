@@ -31,10 +31,10 @@ This plugin provides prompt items that display useful information (weather, moon
 Install with [Fisher][]:
 
 ```fish
-fisher install MrBasa/TideReport@v1.1.0
+fisher install MrBasa/TideReport@v1
 ```
 
-Or add `MrBasa/TideReportv.1.1.0` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
+Or add `MrBasa/TideReportv1` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
 ## 🚀 Available Prompt Sections
