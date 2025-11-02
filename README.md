@@ -12,8 +12,10 @@ This plugin provides prompt items that display useful information (weather, moon
 * **Configurable**: Easily customize formats, units, location, and refresh rates.
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
 
-![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
-![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
+## Examples
+* ![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
+* ![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
+* ![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
 
 ## 🔗 Dependencies
 
@@ -29,10 +31,10 @@ This plugin provides prompt items that display useful information (weather, moon
 Install with [Fisher][]:
 
 ```fish
-fisher install MrBasa/TideReport
+fisher install MrBasa/TideReport@v1.1.0
 ```
 
-Or add `MrBasa/TideReport` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
+Or add `MrBasa/TideReportv.1.1.0` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
 ## 🚀 Available Prompt Sections
