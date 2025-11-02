@@ -14,6 +14,7 @@ This plugin provides prompt items that display useful information (weather, moon
 
 ![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
 ![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
+![Screenshot](https://github.com/user-attachments/assets/c1413081-1f78-4eec-afdd-e2b520443377)
 
 ## 🔗 Dependencies
 
