@@ -1,54 +1,74 @@
-# TideReport :: Private Helper Functions for WTTR data
+# TideReport :: Private Helper Functions for WTTR JSON data
 
-function _tide_report_handle_async_wttr --argument-names item_name cache_file url refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
-    set -l now (date +%s)
-    set -l output
+# This is the main async handler. It checks the cache and triggers a fetch if needed.
+function _tide_report_handle_async_wttr --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
+    set -l now (command date +%s)
     set -l trigger_fetch false
+    set -l cache_valid false
 
     # Check cache status
     if test -f "$cache_file"
-        set -l mod_time (date -r "$cache_file" +%s 2>/dev/null; or echo 0)
+        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
         set -l cache_age (math $now - $mod_time)
         if test $cache_age -le $expire_seconds
-            set output (cat "$cache_file")
+            # Cache is valid and not expired.
+            set cache_valid true
+            # Check if it's stale and needs a refresh.
             test $cache_age -gt $refresh_seconds && set trigger_fetch true
         else
-            set output (set_color $unavailable_color)$unavailable_text
+            # Cache is expired.
             set trigger_fetch true
         end
     else
-        set output (set_color $unavailable_color)$unavailable_text
+        # No cache file.
         set trigger_fetch true
     end
 
     # Trigger background fetch if needed
     if $trigger_fetch
-        set -l lock_var "_tide_report_$item_name_lock"
+        set -l lock_var "_tide_report_wttr_lock"
         set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
-        test (math $now - $lock_time) -gt 120 && set -U $lock_var $now && __tide_report_fetch_and_cache $item_name $url $cache_file $timeout_sec $lock_var &
+
+        # Check 120s cooldown (lock fail-safe)
+        if test (math $now - $lock_time) -gt 120
+            set -U $lock_var $now
+            # Construct the JSON URL
+            set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
+            # Fetch in background
+            __tide_report_fetch_wttr_json "$url" "$cache_file" "$timeout_sec" "$lock_var" &
+        end
     end
 
-    # Clean and output
-    set output (string replace -a '\t' ' ' -- $output | string replace -ra ' {2,}' ' ')
-    _tide_print_item $item_name $output
+    # Return status: 0 if cache is valid, 1 if not.
+    if $cache_valid
+        return 0
+    else
+        # If cache is not valid, print unavailable text and return failure.
+        _tide_print_item $item_name (set_color $unavailable_color)$unavailable_text
+        return 1
+    end
 end
 
 # --- Fetch, Validate & Cache ---
-function __tide_report_fetch_and_cache --argument data_type url cache_file timeout_sec lock_var
+function __tide_report_fetch_wttr_json --argument-names url cache_file timeout_sec lock_var
     # Auto-cleanup lock on exit
     function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
 
-    # Fetch with timeout
-    set -l fetched_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$url" | string collect)
-    echo $fetched_data > ~/tmp.log
-    # Validate and cache
-    if test $status -eq 0 && test -n "$fetched_data" && test (string length -- "$fetched_data") -le 200 && test (count (string split \n -- "$fetched_data")) -eq 1 \
-        && not string match -q -r "(Unknown|Follow|invalid|Sorry|Error)" -- (string lower -- "$fetched_data")
+    # Fetch with timeout, requesting JSON
+    set -l fetched_data (curl -s -A "tide-report/1.1" --max-time $timeout_sec "$url")
+    set -l curl_status $status
 
+    if test $curl_status -ne 0; or test -z "$fetched_data"
+        return # Curl failed
+    end
+
+    # Validate JSON with jq
+    if printf "%s" "$fetched_data" | jq -e '.current_condition | length > 0' >/dev/null 2>&1
+        # Cache is valid, write it
         mkdir -p (dirname "$cache_file")
         set -l temp_file "$cache_file.$fish_pid.tmp"
-        echo "$fetched_data" > "$temp_file" && command mv -f "$temp_file" "$cache_file"
+        printf "%s" "$fetched_data" > "$temp_file" && command mv -f "$temp_file" "$cache_file"
     end
 end
