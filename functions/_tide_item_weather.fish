@@ -29,21 +29,15 @@ end
 
 # --- Parser Function ---
 function __tide_report_parse_weather --argument-names cache_file
-    # Set default format if user variable isn't set
-    set -l format_string $tide_report_weather_format
-    if test -z "$format_string"
-        set format_string "%t %c"
-    end
-
     # Get unit-specific fields
     set -l temp_field "temp_C"
-    set -l feels_like_field "FeelsLikeC" # ADDED
+    set -l feels_like_field "FeelsLikeC"
     set -l wind_field "windspeedKmph"
     set -l wind_unit "km/h"
     # Use universal units variable
     if test "$tide_report_units" = "u" # USCS
         set temp_field "temp_F"
-        set feels_like_field "FeelsLikeF" # ADDED
+        set feels_like_field "FeelsLikeF"
         set wind_field "windspeedMiles"
         set wind_unit "mph"
     end
@@ -56,11 +50,17 @@ function __tide_report_parse_weather --argument-names cache_file
         .current_condition[0].weatherCode,
         .current_condition[0].$wind_field,
         .current_condition[0].winddir16Point,
-        .current_condition[0].humidity
-    ] | @tsv"
+        .current_condition[0].humidity,
+        .current_condition[0].uvIndex,
+        .weather[0].astronomy[0].sunrise,
+        .weather[0].astronomy[0].sunset
+    ] | join(\";\")" # Use semicolon as delimiter for the read
 
-    # Use `read` to assign vars, suppressing errors if cache is mid-write
-    jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l temp feels_like cond_text code wind wind_dir humidity
+    jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l -d \; temp feels_like cond_text code wind wind_dir humidity uv_index sunrise sunset
+
+    echo $jq_query > ~/tmp.log
+    echo $temp >> ~/tmp.log
+
     if test $status -ne 0; or test -z "$temp"
         # Fallback if jq fails (e.g., empty file)
         _tide_print_item weather (set_color $tide_report_weather_unavailable_color)$tide_report_weather_unavailable_text
@@ -71,30 +71,34 @@ function __tide_report_parse_weather --argument-names cache_file
     # %t: Temperature (e.g., +10°)
     set -l temp_val (math "floor($temp + 0.5)")
     set -l temp_str (printf "%+d°" $temp_val)
-
     # %C: Condition Text (e.g., Clear)
     set cond_text (string replace -a '\t' ' ' -- $cond_text | string replace -ra ' {2,}' ' ')
-
     # %c: Condition Emoji (e.g., ☀️)
     set -l cond_emoji (__tide_report_get_weather_emoji "$code")
-
     # %w: Wind (e.g., 15mph)
     set -l wind_val (math "floor($wind + 0.5)")
     set -l wind_str "$wind_val$wind_unit"
-
     # %h: Humidity (e.g., 80%)
     set -l humidity_str "$humidity%"
-
     # %f: "Feels Like" Temperature (e.g., +8°)
     set -l feels_like_val (math "floor($feels_like + 0.5)")
     set -l feels_like_str (printf "%+d°" $feels_like_val)
-
     # %d: Wind Direction Arrow (e.g., ⬆)
     set -l wind_arrow_symbol (__tide_report_get_wind_arrow "$wind_dir")
     set -l wind_arrow (set_color $tide_report_weather_symbol_color)$wind_arrow_symbol(set_color $tide_weather_color)
+    # %u: UV Index (e.g., 2)
+    set -l uv_str $uv_index
+    # %S: Sunrise time (e.g., 07:24 AM)
+    set -l sunrise_str (string trim -- $sunrise)
+    # %s: Sunset time (e.g., 05:45 PM)
+    set -l sunset_str (string trim -- $sunset)
+    # %S: Sunrise time
+    set -l sunrise_str (__tide_report_format_wttr_time "$sunrise" $tide_time_format)
+    # %s: Sunset time
+    set -l sunset_str (__tide_report_format_wttr_time "$sunset" $tide_time_format)
 
     # Build the final output string
-    set -l output $format_string
+    set -l output $tide_report_weather_format
     set output (string replace -a '%t' $temp_str -- $output)
     set output (string replace -a '%C' $cond_text -- $output)
     set output (string replace -a '%c' $cond_emoji -- $output)
@@ -102,6 +106,9 @@ function __tide_report_parse_weather --argument-names cache_file
     set output (string replace -a '%h' $humidity_str -- $output)
     set output (string replace -a '%f' $feels_like_str -- $output)
     set output (string replace -a '%d' $wind_arrow -- $output)
+    set output (string replace -a '%u' $uv_str -- $output)
+    set output (string replace -a '%S' $sunrise_str -- $output)
+    set output (string replace -a '%s' $sunset_str -- $output)
 
     _tide_print_item weather $output
 end
@@ -122,7 +129,7 @@ function __tide_report_get_weather_emoji --argument-names code
     end
 end
 
-# --- Helper to map wttr.in wind direction to an arrow ---
+# --- Map wttr.in wind direction to an arrow ---
 function __tide_report_get_wind_arrow --argument-names direction
     switch "$direction"
         case "N"; echo "⬆"
@@ -135,5 +142,52 @@ function __tide_report_get_wind_arrow --argument-names direction
         case "WNW" "NW"; echo "⬉"
         case "NNW"; echo "⬉"
         case "*"; echo "" # Default
+    end
+end
+
+# --- Re-format wttr.in time strings ---
+function __tide_report_format_wttr_time --argument-names time_str time_format
+    if test -z "$time_str"
+        echo ""
+        return
+    end
+
+    set -l gnu_date_cmd
+    if command -q gdate
+        set gnu_date_cmd gdate
+    else if command date --version >/dev/null 2>&1
+        set gnu_date_cmd date
+    end
+
+    # Strip leading/trailing whitespace
+    set -l clean_time (string trim -- $time_str)
+    set -l epoch_time
+
+    # 1. Parse time string to epoch
+    if test -n "$gnu_date_cmd"
+        # GNU date is easy
+        set epoch_time ($gnu_date_cmd -d "$clean_time" +%s 2>/dev/null)
+    else
+        # BSD date needs a specific format
+        set epoch_time (command date -j -f "%I:%M %p" "$clean_time" +%s 2>/dev/null)
+    end
+
+    if test $status -ne 0; or test -z "$epoch_time"
+        echo "$clean_time" # Fallback: return original string on error
+        return
+    end
+
+    # 2. Re-format epoch to desired format
+    set -l formatted_time
+    if test -n "$gnu_date_cmd"
+        set formatted_time ($gnu_date_cmd -d @$epoch_time +$time_format 2>/dev/null)
+    else
+        set formatted_time (command date -r $epoch_time +$time_format 2>/dev/null)
+    end
+
+    if test $status -eq 0; and test -n "$formatted_time"
+        echo "$formatted_time"
+    else
+        echo "$clean_time" # Fallback
     end
 end

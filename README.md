@@ -13,9 +13,9 @@ This plugin provides prompt items that display useful information (weather, moon
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
 
 ## Examples
-* ![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
-* ![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
-* ![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
+![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
+![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
+![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
 
 ## 🔗 Dependencies
 
@@ -84,11 +84,12 @@ The `github` module's caching is simpler and based on Fish's universal variables
 
 These settings apply to all modules in this plugin.
 
-| Variable                             | Description                                          | Default            |
-| ------------------------------------ | ---------------------------------------------------- | ------------------ |
-| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.       | `3000`             |
-| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.        | `https://wttr.in`  |
-| `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS) | `m`                |
+| Variable                             | Description                                                | Default            |
+| ------------------------------------ | ---------------------------------------------------------- | ------------------ |
+| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.             | `3000`             |
+| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.              | `https://wttr.in`  |
+| `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS)       | `m`                |
+| `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%H:%M"`). | From Tide         |
 
 ### 🤖 GitHub Module (`github`)
 
@@ -137,6 +138,9 @@ The weather format is a string with custom specifiers.
 | `%d`      | Wind direction arrow                          | `⬆`         |
 | `%h`      | Humidity                                      | `80%`       |
 | `%f`      | 'Feels like' temperature                      | `Overcast`  |
+| `%u`      | UV Index                                      | `42`        |
+| `%S`      | Sunrise time                                  | `06:37`     |
+| `%s`      | Sunset time                                   | `19:46`     |
 
 | Variable                                | Description                                                             | Default           |
 | --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
@@ -182,7 +186,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊`                |
 | `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
 | `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
-| `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%I:%M %p"`).   | `"%H:%M"`          |
+
 
 
 ## Acknowledgements

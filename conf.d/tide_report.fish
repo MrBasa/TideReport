@@ -23,6 +23,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 3000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
     set -q tide_report_units                  || set -U tide_report_units "m" # 'm' (Metric), 'u' (USCS)
+    set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
     # --- Weather Module ---
     set -q tide_weather_color                      || set -U tide_weather_color $default_color
@@ -56,7 +57,6 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color red
     set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
-    set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
     # --- GitHub Module ---
     set -q tide_github_color                  || set -U tide_github_color white
