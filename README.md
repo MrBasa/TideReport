@@ -101,7 +101,7 @@ The module displays stats for the current repository, with icons you can customi
 | --------------------------------------- | -------------------- |
 | `★` (Stars)                             | Total stargazer count|
 | `⑂` (Forks)                             | Total fork count     |
-| `👁` (Watchers)                          | Total watcher count  |
+| `` (Watchers)                          | Total watcher count  |
 | `!` (Issues)                            | Open issue count     |
 | `PR` (Pull Requests)                    | Open PR count        |
 | `!auth` (Error)                         | `gh` CLI is not authenticated |
