@@ -1,8 +1,7 @@
-# Tide Report Plugin
+# Tide Report Fish Shell Plugin
 
 A collection of simple, asynchronous, and configurable prompt sections for the [Tide][] Fish prompt.
-
-This plugin provides prompt items that display useful information (weather, moon phase, ocean tides, and GitHub repo stats) without slowing down your shell.
+This plugin provides prompt items that display **Weather**, **Moon Phase**, **Ocean Tides**, and **GitHub** data without slowing down your shell.
 
 ## ✨ Key Features
 
