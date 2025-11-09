@@ -57,9 +57,6 @@ function __tide_report_parse_weather --argument-names cache_file
 
     jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l -d \; temp feels_like cond_text code wind wind_dir humidity uv_index sunrise sunset
 
-    echo $jq_query > ~/tmp.log
-    echo $temp >> ~/tmp.log
-
     if test $status -ne 0; or test -z "$temp"
         # Fallback if jq fails (e.g., empty file)
         _tide_print_item weather (set_color $tide_report_weather_unavailable_color)$tide_report_weather_unavailable_text
@@ -97,16 +94,16 @@ function __tide_report_parse_weather --argument-names cache_file
 
     # --- Build the final output string ---
     set -l output $tide_report_weather_format
-    set output (string replace -a '%t' $temp_str -- $output)
-    set output (string replace -a '%C' $cond_text -- $output)
-    set output (string replace -a '%c' $cond_emoji -- $output)
-    set output (string replace -a '%w' $wind_str -- $output)
-    set output (string replace -a '%h' $humidity_str -- $output)
-    set output (string replace -a '%f' $feels_like_str -- $output)
-    set output (string replace -a '%d' $wind_arrow -- $output)
-    set output (string replace -a '%u' $uv_str -- $output)
-    set output (string replace -a '%S' $sunrise_str -- $output)
-    set output (string replace -a '%s' $sunset_str -- $output)
+    set output (string replace -a -- '%t' $temp_str $output)
+    set output (string replace -a -- '%C' $cond_text $output)
+    set output (string replace -a -- '%c' $cond_emoji $output)
+    set output (string replace -a -- '%w' $wind_str $output)
+    set output (string replace -a -- '%h' $humidity_str $output)
+    set output (string replace -a -- '%f' $feels_like_str $output)
+    set output (string replace -a -- '%d' $wind_arrow $output)
+    set output (string replace -a -- '%u' $uv_str $output)
+    set output (string replace -a -- '%S' $sunrise_str $output)
+    set output (string replace -a -- '%s' $sunset_str $output)
 
     # Symbol coloring
     # List of single-color text symbols (Nerd Font, Unicode)
@@ -188,12 +185,12 @@ function __tide_report_format_wttr_time --argument-names time_str time_format
     set -l clean_time (string trim -- $time_str)
     set -l epoch_time
 
-    # 1. Parse time string to epoch
+    # Parse time string to epoch
     if test -n "$gnu_date_cmd"
-        # GNU date is easy
+        # GNU date
         set epoch_time ($gnu_date_cmd -d "$clean_time" +%s 2>/dev/null)
     else
-        # BSD date needs a specific format
+        # BSD date
         set epoch_time (command date -j -f "%I:%M %p" "$clean_time" +%s 2>/dev/null)
     end
 
@@ -202,7 +199,7 @@ function __tide_report_format_wttr_time --argument-names time_str time_format
         return
     end
 
-    # 2. Re-format epoch to desired format
+    # Re-format epoch to desired format
     set -l formatted_time
     if test -n "$gnu_date_cmd"
         set formatted_time ($gnu_date_cmd -d @$epoch_time +$time_format 2>/dev/null)

@@ -112,7 +112,7 @@ The module displays stats for the current repository, with icons you can customi
 | `tide_report_weather_symbol_color`   | Color for symbols in weather ouput                              | `white`           |
 | `tide_report_github_icon_stars`      | Icon for stars.                                                 | `★`               |
 | `tide_report_github_icon_forks`      | Icon for forks.                                                 | `⑂`               |
-| `tide_report_github_icon_watchers`   | Icon for watchers.                                              | `👁`               |
+| `tide_report_github_icon_watchers`   | Icon for watchers.                                              | ``               |
 | `tide_report_github_icon_issues`     | Icon for open issues.                                           | `!`               |
 | `tide_report_github_icon_prs`        | Icon for open pull requests.                                    | `PR`              |
 | `tide_report_github_color_stars`     | Color for stargazers.                                           | `yellow`          |
