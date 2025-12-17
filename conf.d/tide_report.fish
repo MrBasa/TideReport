@@ -43,7 +43,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_refresh_seconds     || set -U tide_report_weather_refresh_seconds 300 # 5 minutes
     set -q tide_report_weather_expire_seconds      || set -U tide_report_weather_expire_seconds 600 # 10 minutes
     set -q tide_report_weather_language            || set -U tide_report_weather_language "en"
-    set -q tide_report_weather_unavailable_text    || set -U tide_report_weather_unavailable_text ""
+    set -q tide_report_weather_unavailable_text    || set -U tide_report_weather_unavailable_text "..."
     set -q tide_report_weather_unavailable_color   || set -U tide_report_weather_unavailable_color red
 
     # --- Moon Module ---
@@ -51,7 +51,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_moon_bg_color                 || set -U tide_moon_bg_color $default_bg_color
     set -q tide_report_moon_refresh_seconds   || set -U tide_report_moon_refresh_seconds 14400 # 4 hours
     set -q tide_report_moon_expire_seconds    || set -U tide_report_moon_expire_seconds 28800 # 8 hours
-    set -q tide_report_moon_unavailable_text  || set -U tide_report_moon_unavailable_text ""
+    set -q tide_report_moon_unavailable_text  || set -U tide_report_moon_unavailable_text "..."
     set -q tide_report_moon_unavailable_color || set -U tide_report_moon_unavailable_color red
 
     # --- Tide Module ---
@@ -63,25 +63,27 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_tide_symbol_high       || set -U tide_report_tide_symbol_high "⇞" # Arrow for next high tide
     set -q tide_report_tide_symbol_low        || set -U tide_report_tide_symbol_low "⇟" # Arrow for next low tide
     set -q tide_report_tide_symbol_color      || set -U tide_report_tide_symbol_color white
-    set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊"
+    set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊..."
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color red
     set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
 
     # --- GitHub Module ---
-    set -q tide_github_color                  || set -U tide_github_color white
-    set -q tide_github_bg_color               || set -U tide_github_bg_color $default_bg_color
-    set -q tide_report_github_icon            || set -U tide_report_github_icon ""
-    set -q tide_report_github_icon_stars      || set -U tide_report_github_icon_stars "★"
-    set -q tide_report_github_icon_forks      || set -U tide_report_github_icon_forks "⑂"
-    set -q tide_report_github_icon_watchers   || set -U tide_report_github_icon_watchers "" #"👁"
-    set -q tide_report_github_icon_issues     || set -U tide_report_github_icon_issues "!"
-    set -q tide_report_github_icon_prs        || set -U tide_report_github_icon_prs "PR"
-    set -q tide_report_github_color_stars     || set -U tide_report_github_color_stars yellow
-    set -q tide_report_github_color_forks     || set -U tide_report_github_color_forks $tide_report_github_color_stars
-    set -q tide_report_github_color_watchers  || set -U tide_report_github_color_watchers $tide_report_github_color_stars
-    set -q tide_report_github_color_issues    || set -U tide_report_github_color_issues $tide_report_github_color_stars
-    set -q tide_report_github_color_prs       || set -U tide_report_github_color_prs $tide_report_github_color_stars
-    set -q tide_report_github_refresh_seconds || set -U tide_report_github_refresh_seconds 30
+    set -q tide_github_color                       || set -U tide_github_color white
+    set -q tide_github_bg_color                    || set -U tide_github_bg_color $default_bg_color
+    set -q tide_report_github_icon                 || set -U tide_report_github_icon ""
+    set -q tide_report_github_icon_stars           || set -U tide_report_github_icon_stars "★"
+    set -q tide_report_github_icon_forks           || set -U tide_report_github_icon_forks "⑂"
+    set -q tide_report_github_icon_watchers        || set -U tide_report_github_icon_watchers "" #"👁"
+    set -q tide_report_github_icon_issues          || set -U tide_report_github_icon_issues "!"
+    set -q tide_report_github_icon_prs             || set -U tide_report_github_icon_prs "PR"
+    set -q tide_report_github_color_stars          || set -U tide_report_github_color_stars yellow
+    set -q tide_report_github_color_forks          || set -U tide_report_github_color_forks $tide_report_github_color_stars
+    set -q tide_report_github_color_watchers       || set -U tide_report_github_color_watchers $tide_report_github_color_stars
+    set -q tide_report_github_color_issues         || set -U tide_report_github_color_issues $tide_report_github_color_stars
+    set -q tide_report_github_color_prs            || set -U tide_report_github_color_prs $tide_report_github_color_stars
+    set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "..."
+    set -q tide_report_github_unavailable_color    || set -U tide_report_github_unavailable_color red
+    set -q tide_report_github_refresh_seconds      || set -U tide_report_github_refresh_seconds 30
 
     # Clean up old variables
     set -q tide_report_weather_units && set -U -e tide_report_weather_units
