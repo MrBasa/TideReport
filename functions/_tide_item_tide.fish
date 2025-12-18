@@ -75,75 +75,62 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
     if not test -f "$cache_file"
         return 1
     end
-    if not jq -e '.predictions | length > 0' "$cache_file" >/dev/null 2>&1
-        return 1
-    end
 
     set -l time_format %H:%M
     if set -q tide_time_format; and test -n "$tide_time_format"
         set time_format $tide_time_format
     end
 
-    set -l predictions (jq -r '.predictions[] | "\(.t) \(.type) \(.v)"' "$cache_file" 2>/dev/null)
-    if test $status -ne 0; or test -z "$predictions"
+    # NOAA returns "YYYY-MM-DD HH:MM" in GMT.
+    set -l current_time_str (command date -u +"%Y-%m-%d %H:%M")
+
+    # Select the first entry where the time '.t' is greater than our current time string. Date format is YYYY-MM-DD HH:MM.
+    set -l next_tide (jq -r --arg now_str "$current_time_str" '
+        .predictions[] 
+        | select(.t > $now_str)             # Must be in the future
+        | select(.v != null and .v != "")   # Must have a valid value
+        | "\(.t);\(.type);\(.v)"
+        ' "$cache_file" 2>/dev/null | head -n 1)
+
+    if test -z "$next_tide"
         return 1
     end
 
-    for line in $predictions
-        set -l parts (string split " " -- $line)
-        if test -z "$parts[4]"
-            continue
-        end
+    # Parse the single result: "2025-10-22 00:18;H;9.398"
+    echo "$next_tide" | read --delimiter ";" -l date_str tide_type tide_value_metric
 
-        set -l date_str "$parts[1] $parts[2]"
-        set -l tide_type $parts[3]
-        set -l tide_value_metric $parts[4]
-        set -l tide_timestamp
-
-        if test -n "$gnu_date_cmd"
-            set tide_timestamp ($gnu_date_cmd -d "$date_str UTC" +%s 2>&1)
-        else
-            set tide_timestamp (TZ=UTC command date -j -f "%Y-%m-%d %H:%M" "$date_str" +%s 2>&1)
-        end
-
-        if test $status -ne 0; or test -z "$tide_timestamp"
-            continue
-        end
-
-        if test $tide_timestamp -gt $now
-            set -l tide_time
-            if test -n "$gnu_date_cmd"
-                set tide_time ($gnu_date_cmd -d @$tide_timestamp +$time_format 2>&1)
-            else
-                set tide_time (command date -r $tide_timestamp +$time_format 2>&1)
-            end
-
-            if test -n "$tide_time"; and test $status -eq 0
-                set -l arrow_symbol
-                test "$tide_type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
-
-                set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
-                set -l output_string "$arrow$tide_time"
-
-                if set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" = "true"
-                    set -l level_value $tide_value_metric
-                    set -l unit_suffix "m"
-                    if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
-                        set level_value "$tide_value_metric * 3.28084"
-                        set unit_suffix "ft"
-                    end
-                    set -l level (math --scale=1 $level_value)
-
-                    if test $status -eq 0; and test -n "$level"
-                        set output_string "$output_string $level$unit_suffix"
-                    end
-                end
-                echo $output_string
-                return 0 # Success
-            end
-        end
+    # Format the display time
+    set -l tide_time
+    if test -n "$gnu_date_cmd"
+        set tide_time ($gnu_date_cmd -d "$date_str UTC" +$time_format 2>&1)
+    else
+        set tide_time (command date -j -f "%Y-%m-%d %H:%M" "$date_str" +$time_format 2>&1)
     end
-    return 1 # Failure
+
+    if test $status -eq 0; and test -n "$tide_time"
+        set -l arrow_symbol
+        test "$tide_type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
+
+        set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
+        set -l output_string "$arrow$tide_time"
+
+        if set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" = "true"
+            set -l level_value $tide_value_metric
+            set -l unit_suffix "m"
+            if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
+                set level_value "$tide_value_metric * 3.28084"
+                set unit_suffix "ft"
+            end
+            set -l level (math --scale=1 $level_value)
+
+            if test $status -eq 0; and test -n "$level"
+                set output_string "$output_string $level$unit_suffix"
+            end
+        end
+        echo $output_string
+        return 0
+    end
+    return 1
 end
 
 # --- Fetch Tide Data ---

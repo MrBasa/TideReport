@@ -81,7 +81,7 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_github_color_watchers       || set -U tide_report_github_color_watchers $tide_report_github_color_stars
     set -q tide_report_github_color_issues         || set -U tide_report_github_color_issues $tide_report_github_color_stars
     set -q tide_report_github_color_prs            || set -U tide_report_github_color_prs $tide_report_github_color_stars
-    set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "..."
+    set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "..."
     set -q tide_report_github_unavailable_color    || set -U tide_report_github_unavailable_color red
     set -q tide_report_github_refresh_seconds      || set -U tide_report_github_refresh_seconds 30
 

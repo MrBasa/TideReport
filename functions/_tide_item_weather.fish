@@ -128,9 +128,11 @@ function __tide_report_parse_weather --argument-names cache_file
     # Apply symbol color
     set -l symbol_color (set_color $tide_report_weather_symbol_color)
     set -l text_color (set_color $tide_weather_color)
-    for sym in $colorable_symbols
-        set output (string replace -a -- $sym "$symbol_color$sym$text_color" $output)
-    end
+    # for sym in $colorable_symbols
+    #     set output (string replace -a -- $sym "$symbol_color$sym$text_color" $output)
+    # end
+    set -l pattern (string join '|' -- $colorable_symbols)
+    set output (string replace -a -r "($pattern)" "$symbol_color\$1$text_color" "$output")
 
     _tide_print_item weather $output
 end
