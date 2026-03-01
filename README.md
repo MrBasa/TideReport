@@ -108,9 +108,8 @@ The module displays stats for the current repository, with icons you can customi
 
 | Variable                             | Description                                                     | Default           |
 | ------------------------------------ | --------------------------------------------------------------- | ----------------- |
-| `tide_github_color`                  | Prompt item color                                               | `(theme default)` |
+| `tide_github_color`                  | Prompt item color                                               | `white`           |
 | `tide_github_bg_color`               | Prompt item background color                                    | `(theme default)` |
-| `tide_report_weather_symbol_color`   | Color for symbols in weather ouput                              | `white`           |
 | `tide_report_github_icon_stars`      | Icon for stars.                                                 | `★`               |
 | `tide_report_github_icon_forks`      | Icon for forks.                                                 | `⑂`               |
 | `tide_report_github_icon_watchers`   | Icon for watchers.                                              | ``               |
@@ -122,6 +121,8 @@ The module displays stats for the current repository, with icons you can customi
 | `tide_report_github_color_issues`    | Color for issues (defaults to `..._color_stars`).               | `yellow`          |
 | `tide_report_github_color_prs`       | Color for PRs (defaults to `..._color_stars`).                  | `yellow`          |
 | `tide_report_github_refresh_seconds` | GitHub data cache time for a given repository.                  | `30`              |
+| `tide_report_github_unavailable_text`  | Text to display when GitHub data is not available.            | `...`            |
+| `tide_report_github_unavailable_color` | Color for the unavailable text.                               | `red`             |
 
 ### ☔ Weather Module (`weather`)
 
@@ -147,12 +148,31 @@ The weather format is a string with custom specifiers.
 | `tide_weather_color`                    | Prompt item color                                                       | `(theme default)` |
 | `tide_weather_bg_color`                 | Prompt item background color                                            | `(theme default)` |
 | `tide_report_weather_format`            | Format string (see table above).                                        | `"%c %t %d%w"`    |
-| `tide_report_weather_location`          | Location (e.g., `Paris`, `90210`). **Required for Open-Meteo** (no IP). | `""` (IP for wttr)|
+| `tide_report_weather_symbol_color`      | Color for symbols in weather output.                                    | `white`           |
+| `tide_report_weather_location`          | Location for weather. See [Weather location](#weather-location) below.  | `""`              |
 | `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300`             |
-| `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `600`             |
+| `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `900`             |
 | `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`              |
-| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | ``               |
+| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | `...`            |
 | `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `red`             |
+
+#### Weather location
+
+`tide_report_weather_location` controls where weather is fetched for. Valid values depend on the weather provider (`tide_report_weather_provider`).
+
+**When provider is `wttr` (default):**
+
+- **Empty string `""`** (default): wttr.in uses your IP address to guess your location. No need to set anything for IP-based weather.
+- **City or place name:** Use a single word or hyphenated name (e.g. `Paris`, `Saint-Petersburg`, `New-York`). Unicode is supported (e.g. `Москва`). For spaces use hyphens or `+` (e.g. `Eiffel+tower`).
+- **3-letter airport code:** e.g. `muc`, `lhr`, `jfk`.
+- **Postal or area code:** e.g. `90210`, `94107`.
+- **GPS coordinates:** Latitude and longitude as `latitude,longitude` (e.g. `-78.46,106.79`). No spaces.
+- **Domain name:** Prefix with `@` (e.g. `@stackoverflow.com`) for location derived from the domain.
+
+**When provider is `openmeteo`:**
+
+- **Empty string is invalid.** Open-Meteo has no IP-based lookup; you must set a location.
+- **Place name or postal code:** The value is sent to the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api). Use a city name, region, or postal code (e.g. `Berlin`, `London`, `90210`). At least three characters are recommended for fuzzy matching; two characters match only exact results.
 
 ### 🌕 Moon Module (`moon`)
 
@@ -164,7 +184,7 @@ The weather format is a string with custom specifiers.
 | `tide_moon_bg_color`                  | Prompt item background color                                    | `(theme default)` |
 | `tide_report_moon_refresh_seconds`    | How old data can be before a background refresh is triggered.   | `14400`           |
 | `tide_report_moon_expire_seconds`     | How old data can be before it's considered invalid.             | `28800`           |
-| `tide_report_moon_unavailable_text`   | Text to display when moon data is not available.                | ``               |
+| `tide_report_moon_unavailable_text`   | Text to display when moon data is not available.                | `...`            |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `red`             |
 
 ### 🌊 Tide Module (`tide`)
@@ -183,7 +203,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_tide_symbol_high`       | Symbol to show for an upcoming high tide.                       | `⇞`                |
 | `tide_report_tide_symbol_low`        | Symbol to show for an upcoming low tide.                        | `⇟`                |
 | `tide_report_tide_symbol_color`      | Color for the high/low tide symbol.                             | `white`            |
-| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊`                |
+| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊...`            |
 | `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
 | `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
 
