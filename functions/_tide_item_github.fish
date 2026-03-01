@@ -5,7 +5,7 @@
 function _tide_item_github --description "Displays GitHub stats"
     # --- Quick Checks ---
     # Verify we are in a git repo
-    if not git rev-parse --is-inside-work-tree >/dev/null 2>&1
+    if not git rev-parse --is-inside-work-tree >/dev/null ^/dev/null
         return 0 # Not git dir
     end
 
@@ -21,7 +21,7 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l owner (string trim -- $repo_parts[1])
     set -l repo (string trim -- $repo_parts[2])
 
-    if test -z "$owner" -o -z "$repo"
+    if test -z "$owner"; or test -z "$repo"
         return 0 # Could not parse owner/repo
     end
 
@@ -36,11 +36,11 @@ function _tide_item_github --description "Displays GitHub stats"
     # --- Async Logic ---
     set -l trigger_fetch false
     set -l output_valid false
-    set -l now (date +%s)
+    set -l now (command date +%s)
 
     # Check cache status
     if test -f "$cache_file"
-        set -l mod_time (date -r "$cache_file" +%s 2>/dev/null; or echo 0)
+        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
         set -l age (math $now - $mod_time)
 
         # Check if cache is stale
@@ -85,6 +85,7 @@ end
 
 # --- Parser Function ---
 function __tide_report_parse_github --argument cache_file
+    # Pipeline: $status is from read; rely on content check (empty = jq failed).
     jq -r '[
         .stargazerCount, 
         .forkCount, 
@@ -93,7 +94,7 @@ function __tide_report_parse_github --argument cache_file
         .pullRequests.totalCount
     ] | join(" ")' "$cache_file" 2>/dev/null | read -l stars forks watchers issues prs
 
-    if test $status -ne 0
+    if test -z "$stars"
         return
     end
 
@@ -123,7 +124,7 @@ function __tide_report_fetch_github --argument-names api_slug cache_file timeout
     set -l json_data (gh repo view "$api_slug" --json 'nameWithOwner,stargazerCount,forkCount,issues,pullRequests,watchers' 2>/dev/null)
 
     # Check if fetch was successful
-    if test $status -eq 0 -a -n "$json_data"
+    if test $status -eq 0; and test -n "$json_data"
         echo "$json_data" >"$temp_file"
         command mv -f "$temp_file" "$cache_file"
     end

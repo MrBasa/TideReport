@@ -15,14 +15,14 @@ function _tide_report_install --on-event tide_report_install
     set -l default_bg_color $tide_time_bg_color
 
     # --- Check dependencies ---
-    if ! command -v "gh" >/dev/null 2>&1
+    if ! command -v "gh" >/dev/null ^/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
     end
-    if ! command -v "jq" >/dev/null 2>&1
+    if ! command -v "jq" >/dev/null ^/dev/null
         # jq is now required for weather and moon as well
         echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
     end
-    if ! command -v "curl" >/dev/null 2>&1
+    if ! command -v "curl" >/dev/null ^/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
     end
 

@@ -55,9 +55,10 @@ function __tide_report_parse_weather --argument-names cache_file
         .weather[0].astronomy[0].sunset
     ] | join(\";\")" # Use semicolon as delimiter for the read
 
+    # Pipeline: $status is from read; we rely on content check (empty = jq failed).
     jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l -d \; temp feels_like cond_text code wind wind_dir humidity uv_index sunrise sunset
 
-    if test $status -ne 0; or test -z "$temp"
+    if test -z "$temp"
         # Fallback if jq fails (e.g., empty file)
         _tide_print_item weather (set_color $tide_report_weather_unavailable_color)$tide_report_weather_unavailable_text
         return
@@ -83,27 +84,17 @@ function __tide_report_parse_weather --argument-names cache_file
     set -l wind_arrow (__tide_report_get_wind_arrow "$wind_dir")
     # %u: UV Index (e.g., 2)
     set -l uv_str $uv_index
-    # %S: Sunrise time (e.g., 07:24 AM)
-    set -l sunrise_str (string trim -- $sunrise)
-    # %s: Sunset time (e.g., 05:45 PM)
-    set -l sunset_str (string trim -- $sunset)
-    # %S: Sunrise time
+    # %S / %s: Sunrise and sunset (formatted)
     set -l sunrise_str (__tide_report_format_wttr_time "$sunrise" $tide_time_format)
-    # %s: Sunset time
     set -l sunset_str (__tide_report_format_wttr_time "$sunset" $tide_time_format)
 
     # --- Build the final output string ---
     set -l output $tide_report_weather_format
-    set output (string replace -a -- '%t' $temp_str $output)
-    set output (string replace -a -- '%C' $cond_text $output)
-    set output (string replace -a -- '%c' $cond_emoji $output)
-    set output (string replace -a -- '%w' $wind_str $output)
-    set output (string replace -a -- '%h' $humidity_str $output)
-    set output (string replace -a -- '%f' $feels_like_str $output)
-    set output (string replace -a -- '%d' $wind_arrow $output)
-    set output (string replace -a -- '%u' $uv_str $output)
-    set output (string replace -a -- '%S' $sunrise_str $output)
-    set output (string replace -a -- '%s' $sunset_str $output)
+    set -l pairs '%t' $temp_str '%C' $cond_text '%c' $cond_emoji '%w' $wind_str '%h' $humidity_str '%f' $feels_like_str '%d' $wind_arrow '%u' $uv_str '%S' $sunrise_str '%s' $sunset_str
+    set -l n (count $pairs)
+    for i in (seq 1 2 $n)
+        set output (string replace -a -- $pairs[$i] $pairs[$i+1] $output)
+    end
 
     # Symbol coloring
     # List of single-color text symbols (Nerd Font, Unicode)
@@ -169,6 +160,15 @@ function __tide_report_get_wind_arrow --argument-names direction
     end
 end
 
+# --- Return GNU date command name (gdate or date) or empty for BSD ---
+function __tide_report_gnu_date_cmd
+    if command -q gdate
+        echo gdate
+    else if command date --version >/dev/null ^/dev/null
+        echo date
+    end
+end
+
 # --- Re-format wttr.in time strings ---
 function __tide_report_format_wttr_time --argument-names time_str time_format
     if test -z "$time_str"
@@ -176,12 +176,7 @@ function __tide_report_format_wttr_time --argument-names time_str time_format
         return
     end
 
-    set -l gnu_date_cmd
-    if command -q gdate
-        set gnu_date_cmd gdate
-    else if command date --version >/dev/null 2>&1
-        set gnu_date_cmd date
-    end
+    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
 
     # Strip leading/trailing whitespace
     set -l clean_time (string trim -- $time_str)

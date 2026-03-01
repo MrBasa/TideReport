@@ -64,7 +64,7 @@ function __tide_report_fetch_wttr --argument-names url cache_file timeout_sec lo
     end
 
     # Validate that the JSON is good before writing it
-    if printf "%s" "$fetched_data" | jq -e '.current_condition | length > 0' >/dev/null 2>&1
+    if printf "%s" "$fetched_data" | jq -e '.current_condition | length > 0' >/dev/null ^/dev/null
         mkdir -p (dirname "$cache_file")
         set -l temp_file "$cache_file.$fish_pid.tmp"
         printf "%s" "$fetched_data" > "$temp_file" && command mv -f "$temp_file" "$cache_file"

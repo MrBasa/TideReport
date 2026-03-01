@@ -22,13 +22,7 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
     # Get current date for URL (cross-platform)
     set -l current_date (command date +%Y%m%d)
 
-    # Determine GNU/BSD date command for the parser
-    set -l gnu_date_cmd
-    if command -q gdate
-        set gnu_date_cmd gdate
-    else if command date --version >/dev/null 2>&1
-        set gnu_date_cmd date
-    end
+    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
 
     set -l cache_file ~/.cache/tide-report/tide.json
     set -l output
@@ -90,11 +84,11 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
 
     # Select the first entry where the time '.t' is greater than our current time string. Date format is YYYY-MM-DD HH:MM.
     set -l next_tide (jq -r --arg now_str "$current_time_str" '
-        .predictions[] 
-        | select(.t > $now_str)             # Must be in the future
-        | select(.v != null and .v != "")   # Must have a valid value
-        | "\(.t);\(.type);\(.v)"
-        ' "$cache_file" 2>/dev/null | head -n 1)
+        ([.predictions[]
+        | select(.t > $now_str)
+        | select(.v != null and .v != "")
+        | "\(.t);\(.type);\(.v)"] | first // empty)
+        ' "$cache_file" 2>/dev/null)
 
     if test -z "$next_tide"
         return 1
@@ -147,7 +141,7 @@ function __tide_report_fetch_tide --argument url cache_file lock_var
     if test $curl_status -ne 0; or test -z "$tide_data"
         return
     end
-    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' >/dev/null 2>&1
+    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' >/dev/null ^/dev/null
         mkdir -p (dirname "$cache_file"); and printf "%s" "$tide_data" > "$cache_file"
     end
 end
