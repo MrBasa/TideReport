@@ -25,7 +25,7 @@ set -q tide_time_format                   || set -g tide_time_format "%H:%M"
 set -q tide_weather_color                 || set -g tide_weather_color white
 set -q tide_report_weather_symbol_color   || set -g tide_report_weather_symbol_color white
 set -q tide_report_weather_format         || set -g tide_report_weather_format "%c %t %d%w"
-set -q tide_report_weather_refresh_seconds    || set -g tide_report_weather_refresh_seconds 300
+set -q tide_report_weather_refresh_seconds    || set -g tide_report_weather_refresh_seconds 900
 set -q tide_report_weather_expire_seconds     || set -g tide_report_weather_expire_seconds 600
 set -q tide_report_weather_unavailable_text   || set -g tide_report_weather_unavailable_text "..."
 set -q tide_report_weather_unavailable_color  || set -g tide_report_weather_unavailable_color red
