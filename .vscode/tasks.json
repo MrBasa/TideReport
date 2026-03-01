@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Deploy (development)",
+      "type": "shell",
+      "command": "fish",
+      "args": ["-c", "fisher install ${workspaceFolder}"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "echo": true
+      }
+    }
+  ]
+}
