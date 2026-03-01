@@ -57,7 +57,7 @@ Set any of the following variables universally or add them to your `config.fish`
 
 ## ⚡ Caching Behavior
 
-To keep your prompt fast, this plugin fetches data in the background and relies on cached data. This is done to prevent slow network requests from blocking your shell.
+To keep your prompt fast, this plugin fetches data in the background and relies on cached data. This is done to prevent slow network requests from blocking your shell. Background fetch jobs are disowned so the shell does not wait for them when drawing the prompt (avoiding a 3–6 second delay on new shells when cache is empty or expired).
 
 All file-based caches are stored in `~/.cache/tide-report/`.
 

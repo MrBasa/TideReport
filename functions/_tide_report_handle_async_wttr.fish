@@ -35,6 +35,7 @@ function _tide_report_handle_async_wttr --argument-names item_name cache_file re
             # Construct the single URL
             set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
             __tide_report_fetch_wttr "$url" "$cache_file" "$timeout_sec" "$lock_var" &
+            disown  # Prevent shell from waiting for this job when prompt subshell exits (avoids 3–6s delay)
         end
     end
 

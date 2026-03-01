@@ -70,6 +70,7 @@ function _tide_item_github --description "Displays GitHub stats"
             mkdir -p "$cache_dir"
             # Pass BOTH the API Slug and the Cache File path
             __tide_report_fetch_github "$api_slug" "$cache_file" "$timeout_sec" "$lock_var" &
+            disown  # Avoid prompt delay from shell waiting for fetch job
         end
     end
 
