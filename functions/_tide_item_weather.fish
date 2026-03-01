@@ -144,18 +144,19 @@ function __tide_report_get_weather_emoji --argument-names code
     end
 end
 
-# --- Map wttr.in wind direction to an arrow ---
+# --- Map wttr.in wind direction to an arrow (direction wind is blowing TO) ---
+# wttr.in gives wind FROM (meteorological); we show arrow where wind is blowing TO,
+# to match wttr.in's one-line format (e.g. format=2) and most weather UIs.
 function __tide_report_get_wind_arrow --argument-names direction
     switch "$direction"
-        case "N"; echo "⬆"
-        case "NNE" "NE"; echo "⬈"
-        case "ENE" "E"; echo "➡"
-        case "ESE" "SE"; echo "⬊"
-        case "SSE" "S"; echo "⬇"
-        case "SSW" "SW"; echo "⬋"
-        case "WSW" "W"; echo "⬅"
-        case "WNW" "NW"; echo "⬉"
-        case "NNW"; echo "⬉"
+        case "N"; echo "⬇"   # from N → to S
+        case "NNE" "NE"; echo "⬋"   # from NE → to SW
+        case "ENE" "E"; echo "⬅"   # from E → to W
+        case "ESE" "SE"; echo "⬉"   # from SE → to NW
+        case "SSE" "S"; echo "⬆"   # from S → to N
+        case "SSW" "SW"; echo "⬈"   # from SW → to NE
+        case "WSW" "W"; echo "➡"   # from W → to E
+        case "WNW" "NW" "NNW"; echo "⬊"   # from NW/NNW → to SE
         case "*"; echo "" # Default
     end
 end

@@ -134,7 +134,7 @@ The weather format is a string with custom specifiers.
 | `%C`      | Condition text                                | `Clear`     |
 | `%c`      | Condition emoji                               | `☀️`        |
 | `%w`      | Wind speed and unit                           | `15km/h`    |
-| `%d`      | Wind direction arrow                          | `⬆`         |
+| `%d`      | Wind direction arrow (direction wind is blowing *to*; matches wttr.in) | `⬇` etc.   |
 | `%h`      | Humidity                                      | `80%`       |
 | `%f`      | 'Feels like' temperature                      | `Overcast`  |
 | `%u`      | UV Index                                      | `42`        |
