@@ -26,3 +26,8 @@ source "$root/_tide_item_weather.fish"
 # format_wttr_time: with "07:30 AM" and %H:%M we expect something (formatted or fallback)
 @test "format_wttr_time returns something for valid input" -n (__tide_report_format_wttr_time "07:30 AM" "%H:%M")
 @test "format_wttr_time returns empty for empty input" -z (__tide_report_format_wttr_time "" "%H:%M")
+
+# format_unix_time: Unix timestamp to display format
+@test "format_unix_time returns something for valid epoch" -n (__tide_report_format_unix_time "1727692200" "%H:%M")
+@test "format_unix_time returns empty for empty input" -z (__tide_report_format_unix_time "" "%H:%M")
+@test "format_unix_time returns empty for null input" -z (__tide_report_format_unix_time "null" "%H:%M")

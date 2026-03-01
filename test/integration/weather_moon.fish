@@ -6,7 +6,8 @@ set -g _test_home (mktemp -d)
 set -g _saved_home $HOME
 set -g HOME $_test_home
 mkdir -p $HOME/.cache/tide-report
-cp "$REPO_ROOT/test/fixtures/wttr.json" $HOME/.cache/tide-report/wttr.json
+cp "$REPO_ROOT/test/fixtures/weather.json" $HOME/.cache/tide-report/weather.json
+cp "$REPO_ROOT/test/fixtures/moon.json" $HOME/.cache/tide-report/moon.json
 
 # Cache is valid (recent file); use long refresh/expire so we don't trigger fetch
 set -g tide_report_weather_refresh_seconds 99999

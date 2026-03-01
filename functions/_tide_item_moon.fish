@@ -1,19 +1,22 @@
 # TideReport :: Moon Prompt Item
 #
-# This function handles all logic for displaying the moon phase module.
+# Owns moon data and moon.json cache. When stale: if weather provider is wttr,
+# triggers same wttr provider (one request fills weather + moon); else moon-only fetch.
+# Handler is in _tide_report_handle_async_wttr.fish (shared with weather).
+if not functions -q _tide_report_handle_async_moon
+    source (status filename | path dirname)/_tide_report_handle_async_wttr.fish
+end
 
 function _tide_item_moon --description "Displays moon phase, fetches asynchronously from JSON"
     set -l item_name "moon"
-    set -l cache_file "$HOME/.cache/tide-report/wttr.json" # --- SHARED CACHE ---
+    set -l cache_file "$HOME/.cache/tide-report/moon.json"
     set -l refresh_seconds $tide_report_moon_refresh_seconds
     set -l expire_seconds $tide_report_moon_expire_seconds
     set -l unavailable_text $tide_report_moon_unavailable_text
     set -l unavailable_color $tide_report_moon_unavailable_color
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
 
-    # Call the shared async JSON handler
-    # It returns 0 if cache is valid, 1 if not (and prints unavailable text)
-    if _tide_report_handle_async_wttr \
+    if _tide_report_handle_async_moon \
         $item_name \
         $cache_file \
         $refresh_seconds \
@@ -22,17 +25,15 @@ function _tide_item_moon --description "Displays moon phase, fetches asynchronou
         $unavailable_color \
         $timeout_sec
 
-        # Cache is valid, parse and print
         __tide_report_parse_moon "$cache_file"
     end
 end
 
-# --- Parser Function ---
+# --- Parser Function (reads normalized moon.json) ---
 function __tide_report_parse_moon --argument-names cache_file
-    set -l moon_phase_text (jq -r '.weather[0].astronomy[0].moon_phase' "$cache_file" 2>/dev/null)
+    set -l moon_phase_text (jq -r '.phase // ""' "$cache_file" 2>/dev/null)
 
     if test $status -ne 0; or test -z "$moon_phase_text"
-        # Fallback if jq fails (e.g., empty file)
         _tide_print_item moon (set_color $tide_report_moon_unavailable_color)$tide_report_moon_unavailable_text
         return
     end
@@ -41,7 +42,7 @@ function __tide_report_parse_moon --argument-names cache_file
     _tide_print_item moon $moon_emoji
 end
 
-# --- Map wttr.in moon phase text to emoji ---
+# --- Map moon phase text to emoji ---
 function __tide_report_get_moon_emoji --argument-names phase_text
     switch "$phase_text"
         case "New Moon"; echo "🌑"
@@ -52,6 +53,6 @@ function __tide_report_get_moon_emoji --argument-names phase_text
         case "Waning Gibbous"; echo "🌖"
         case "Last Quarter"; echo "🌗"
         case "Waning Crescent"; echo "🌘"
-        case "*"; echo "❔" # Default
+        case "*"; echo "❔"
     end
 end

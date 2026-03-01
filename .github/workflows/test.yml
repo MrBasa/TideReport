@@ -1,0 +1,35 @@
+# Run tests on Linux (GNU date) and macOS (BSD date) for compatibility.
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            date_variant: GNU
+          - os: macos-latest
+            date_variant: BSD
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Fish shell
+        uses: fish-shop/install-fish-shell@v2
+
+      - name: Install Fishtape
+        run: |
+          fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fishtape"
+
+      - name: Run tests (${{ matrix.date_variant }} date)
+        run: fish -c "fishtape test/unit/*.fish test/integration/*.fish"

@@ -19,6 +19,7 @@ source "$root/_tide_item_tide.fish"
 
 # Parser universals (process-local defaults so tests don't rely on user universals).
 set -q tide_report_service_timeout_millis || set -g tide_report_service_timeout_millis 6000
+set -q tide_report_weather_provider      || set -g tide_report_weather_provider "wttr"
 set -q tide_report_units                  || set -g tide_report_units "m"
 set -q tide_time_format                   || set -g tide_time_format "%H:%M"
 set -q tide_weather_color                 || set -g tide_weather_color white

@@ -6,7 +6,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## ✨ Key Features
 
 * **Asynchronous**: Fetches data in the background to keep your prompt fast.
-* **Efficient**: Makes a single API call for both weather and moon data.
+* **Efficient**: With the default weather provider (wttr.in), a single API call fills both weather and moon data.
 * **Modular**: Provides independent prompt items. Use only the ones you want.
 * **Configurable**: Easily customize formats, units, location, and refresh rates.
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
@@ -39,8 +39,8 @@ See the [Fisher][] and [Tide][] documentation for more details on installing plu
 ## 🚀 Available Prompt Sections
 
 * `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.
-* `weather`: Displays the current weather from `wttr.in`.
-* `moon`: Displays the current moon phase from `wttr.in`.
+* `weather`: Displays the current weather (from wttr.in or Open-Meteo).
+* `moon`: Displays the current moon phase (from wttr.in).
 * `tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
@@ -85,8 +85,9 @@ These settings apply to all modules in this plugin.
 
 | Variable                             | Description                                                | Default            |
 | ------------------------------------ | ---------------------------------------------------------- | ------------------ |
-| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.             | `3000`             |
-| `tide_report_wttr_url`               | URL for [wttr.in][], for self-hosted options.              | `https://wttr.in`  |
+| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.             | `6000`             |
+| `tide_report_wttr_url`               | URL for [wttr.in][], used for weather (wttr) and moon.     | `https://wttr.in`  |
+| `tide_report_weather_provider`       | Weather backend: `wttr` or `openmeteo`.                    | `wttr`             |
 | `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS)       | `m`                |
 | `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%H:%M"`). | From Tide         |
 
@@ -136,7 +137,7 @@ The weather format is a string with custom specifiers.
 | `%w`      | Wind speed and unit                           | `15km/h`    |
 | `%d`      | Wind direction arrow (direction wind is blowing *to*; matches wttr.in) | `⬇` etc.   |
 | `%h`      | Humidity                                      | `80%`       |
-| `%f`      | 'Feels like' temperature                      | `Overcast`  |
+| `%f`      | 'Feels like' temperature                      | `+8°`       |
 | `%u`      | UV Index                                      | `42`        |
 | `%S`      | Sunrise time                                  | `06:37`     |
 | `%s`      | Sunset time                                   | `19:46`     |
@@ -145,8 +146,8 @@ The weather format is a string with custom specifiers.
 | --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
 | `tide_weather_color`                    | Prompt item color                                                       | `(theme default)` |
 | `tide_weather_bg_color`                 | Prompt item background color                                            | `(theme default)` |
-| `tide_report_weather_format`            | Format string (see table above).                                        | `"%t %c"`         |
-| `tide_report_weather_location`          | Any location `wttr.in` accepts (e.g., `Paris`, `90210`).                | `""` (IP-based)   |
+| `tide_report_weather_format`            | Format string (see table above).                                        | `"%c %t %d%w"`    |
+| `tide_report_weather_location`          | Location (e.g., `Paris`, `90210`). **Required for Open-Meteo** (no IP). | `""` (IP for wttr)|
 | `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300`             |
 | `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `600`             |
 | `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`              |
@@ -155,7 +156,7 @@ The weather format is a string with custom specifiers.
 
 ### 🌕 Moon Module (`moon`)
 
-**This module requires `jq` and shares a cache with the `weather` module.** It simply displays the moon phase emoji provided by `wttr.in`.
+**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). When the weather provider is **wttr**, one wttr.in request fills both weather and moon; when the provider is **openmeteo**, the moon item fetches moon data separately from wttr.in. It displays the moon phase emoji.
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |
@@ -189,6 +190,8 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 ## Testing
 
 The project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for unit and integration tests. Install it with Fisher:
+
+**CI:** GitHub Actions runs the test suite on **Ubuntu** (GNU `date`) and **macOS** (BSD `date`) on every push and PR so that date-formatting and cache logic stay compatible with both.
 
 ```fish
 fisher install jorgebucaran/fishtape

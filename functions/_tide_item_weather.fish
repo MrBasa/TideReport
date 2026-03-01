@@ -4,7 +4,7 @@
 
 function _tide_item_weather --description "Displays weather, fetches asynchronously from JSON"
     set -l item_name "weather"
-    set -l cache_file "$HOME/.cache/tide-report/wttr.json"
+    set -l cache_file "$HOME/.cache/tide-report/weather.json"
     set -l refresh_seconds $tide_report_weather_refresh_seconds
     set -l expire_seconds $tide_report_weather_expire_seconds
     set -l unavailable_text $tide_report_weather_unavailable_text
@@ -26,67 +26,41 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
     end
 end
 
-# --- Parser Function ---
+# --- Parser Function (reads normalized weather.json) ---
 function __tide_report_parse_weather --argument-names cache_file
-    # Get unit-specific fields
-    set -l temp_field "temp_C"
-    set -l feels_like_field "FeelsLikeC"
-    set -l wind_field "windspeedKmph"
+    set -l temp_field "temp_c"
+    set -l feels_like_field "feels_like_c"
+    set -l wind_field "wind_speed_kmh"
     set -l wind_unit "km/h"
-    # Use universal units variable
     if test "$tide_report_units" = "u" # USCS
-        set temp_field "temp_F"
-        set feels_like_field "FeelsLikeF"
-        set wind_field "windspeedMiles"
+        set temp_field "temp_f"
+        set feels_like_field "feels_like_f"
+        set wind_field "wind_speed_mph"
         set wind_unit "mph"
     end
 
-    # Read all data from JSON cache in one `jq` call
-    set -l jq_query "[
-        .current_condition[0].$temp_field,
-        .current_condition[0].$feels_like_field,
-        .current_condition[0].weatherDesc[0].value,
-        .current_condition[0].weatherCode,
-        .current_condition[0].$wind_field,
-        .current_condition[0].winddir16Point,
-        .current_condition[0].humidity,
-        .current_condition[0].uvIndex,
-        .weather[0].astronomy[0].sunrise,
-        .weather[0].astronomy[0].sunset
-    ] | join(\";\")" # Use semicolon as delimiter for the read
-
-    # Pipeline: $status is from read; we rely on content check (empty = jq failed).
-    jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l -d \; temp feels_like cond_text code wind wind_dir humidity uv_index sunrise sunset
+    set -l jq_query "[.$temp_field, .$feels_like_field, .condition_text, .condition_code, .$wind_field, .wind_dir_16, .humidity, .uv_index, .sunrise_utc, .sunset_utc] | join(\";\")"
+    jq -r "$jq_query" "$cache_file" 2>/dev/null | read -l -d \; temp feels_like cond_text code wind wind_dir humidity uv_index sunrise_utc sunset_utc
 
     if test -z "$temp"
-        # Fallback if jq fails (e.g., empty file)
         _tide_print_item weather (set_color $tide_report_weather_unavailable_color)$tide_report_weather_unavailable_text
         return
     end
 
     # --- Format String Replacements ---
-    # %t: Temperature (e.g., +10°)
     set -l temp_val (math "floor($temp + 0.5)")
     set -l temp_str (printf "%+d°" $temp_val)
-    # %C: Condition Text (e.g., Clear)
     set cond_text (string replace -a '\t' ' ' -- $cond_text | string replace -ra ' {2,}' ' ')
-    # %c: Condition Emoji (e.g., ☀️)
     set -l cond_emoji (__tide_report_get_weather_emoji "$code")
-    # %w: Wind (e.g., 15mph)
     set -l wind_val (math "floor($wind + 0.5)")
     set -l wind_str "$wind_val$wind_unit"
-    # %h: Humidity (e.g., 80%)
     set -l humidity_str "$humidity%"
-    # %f: "Feels Like" Temperature (e.g., +8°)
     set -l feels_like_val (math "floor($feels_like + 0.5)")
     set -l feels_like_str (printf "%+d°" $feels_like_val)
-    # %d: Wind Direction Arrow (e.g., ⬆)
     set -l wind_arrow (__tide_report_get_wind_arrow "$wind_dir")
-    # %u: UV Index (e.g., 2)
     set -l uv_str $uv_index
-    # %S / %s: Sunrise and sunset (formatted)
-    set -l sunrise_str (__tide_report_format_wttr_time "$sunrise" $tide_time_format)
-    set -l sunset_str (__tide_report_format_wttr_time "$sunset" $tide_time_format)
+    set -l sunrise_str (__tide_report_format_unix_time "$sunrise_utc" $tide_time_format)
+    set -l sunset_str (__tide_report_format_unix_time "$sunset_utc" $tide_time_format)
 
     # --- Build the final output string ---
     set -l output $tide_report_weather_format
@@ -161,6 +135,22 @@ function __tide_report_get_wind_arrow --argument-names direction
     end
 end
 
+# --- Parse "07:30 AM" (today local) to Unix timestamp ---
+function __tide_report_time_string_to_unix --argument-names time_str
+    if test -z "$time_str"
+        echo ""
+        return
+    end
+    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
+    set -l clean_time (string trim -- $time_str)
+    if test -n "$gnu_date_cmd"
+        $gnu_date_cmd -d "today $clean_time" +%s 2>/dev/null
+    else
+        set -l today (command date +%Y-%m-%d)
+        command date -j -f "%Y-%m-%d %I:%M %p" "$today $clean_time" +%s 2>/dev/null
+    end
+end
+
 # --- Return GNU date command name (gdate or date) or empty for BSD ---
 function __tide_report_gnu_date_cmd
     if command -q gdate
@@ -170,7 +160,27 @@ function __tide_report_gnu_date_cmd
     end
 end
 
-# --- Re-format wttr.in time strings ---
+# --- Format Unix timestamp for display ---
+function __tide_report_format_unix_time --argument-names epoch_str time_format
+    if test -z "$epoch_str"; or test "$epoch_str" = "null"
+        echo ""
+        return
+    end
+    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
+    set -l formatted_time
+    if test -n "$gnu_date_cmd"
+        set formatted_time ($gnu_date_cmd -d @$epoch_str +$time_format 2>/dev/null)
+    else
+        set formatted_time (command date -r $epoch_str +$time_format 2>/dev/null)
+    end
+    if test -n "$formatted_time"
+        echo "$formatted_time"
+    else
+        echo ""
+    end
+end
+
+# --- Re-format wttr.in time strings (legacy; used only if needed) ---
 function __tide_report_format_wttr_time --argument-names time_str time_format
     if test -z "$time_str"
         echo ""

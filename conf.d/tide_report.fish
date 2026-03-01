@@ -29,6 +29,7 @@ function _tide_report_install --on-event tide_report_install
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
+    set -q tide_report_weather_provider       || set -U tide_report_weather_provider "wttr" # 'wttr' | 'openmeteo'
     set -q tide_report_units                  || set -U tide_report_units "m" # 'm' (Metric), 'u' (USCS)
     set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
