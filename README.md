@@ -186,7 +186,28 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
 | `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
 
+## Testing
 
+The project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for unit and integration tests. Install it with Fisher:
+
+```fish
+fisher install jorgebucaran/fishtape
+```
+
+From the repo root, run all tests:
+
+```fish
+fishtape test/unit/*.fish test/integration/*.fish
+```
+
+Run only unit tests or only integration tests:
+
+```fish
+fishtape test/unit/*.fish
+fishtape test/integration/*.fish
+```
+
+Tests use fixture data under `test/fixtures/` and do not require network access or Tide to be installed.
 
 ## Acknowledgements
 * [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].
