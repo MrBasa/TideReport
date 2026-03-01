@@ -1,0 +1,49 @@
+---
+description: When releasing, repoint the v1 tag to the latest release
+alwaysApply: true
+---
+
+# Release: Repoint v1 Tag
+
+**Current latest release:** `v1.2.2` (GitHub: "Version 1.2.2 - Fix for negative temp values"). Update this line whenever a new release is published.
+
+---
+
+When you make a new release available, **repoint the `v1` tag** to the latest release commit so that:
+
+- `fisher install MrBasa/TideReport@v1` always installs the current stable release.
+- README and docs that reference `@v1` stay correct without editing.
+
+## When the user asks to release / publish / push the new version
+
+Handle the full release flow:
+
+1. **Pre-check:** Ensure working tree is clean (`git status`). If not, stop and ask the user to commit or stash.
+2. **Version:** Determine the next version (e.g. after v1.2.2 → v1.2.3 or v1.3.0). If unclear, ask the user.
+3. **Tag and push:**
+   - Create the version tag on the current commit: `git tag <version>` (e.g. `v1.2.3`).
+   - Push the branch and the new tag: `git push origin <branch> && git push origin <version>`.
+4. **GitHub release:** Generate release notes from the related check-ins (commits since the previous release). Use:
+   ```bash
+   gh release create <version> --generate-notes --notes-start-tag <previous_version>
+   ```
+   Use the "Current latest release" version from this rule as `<previous_version>` (e.g. `v1.2.2` when releasing v1.2.3). GitHub will generate title and notes from commits/PRs since that tag. To use a custom title instead of the auto-generated one, add `--title "Version X.Y.Z - <short description>"`.
+5. **Repoint v1:** Move the `v1` tag to the new release and force-push:
+   ```bash
+   git tag -f v1 <version>
+   git push origin v1 --force
+   ```
+6. **Update this rule:** Set "Current latest release" above to the new version (and title if you used one).
+
+Use `gh` for GitHub (releases, push); use `git` for tagging and branch push. Request `network` and `git_write` as needed when running these steps.
+
+## One-off repoint of v1 only
+
+If only the `v1` tag needs to be moved to the existing latest release:
+
+```bash
+git tag -f v1 <commit-or-version-tag>
+git push origin v1 --force
+```
+
+Example: `git tag -f v1 v1.2.2 && git push origin v1 --force`
