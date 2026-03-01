@@ -5,7 +5,7 @@
       "label": "Deploy (development)",
       "type": "shell",
       "command": "fish",
-      "args": ["-c", "fisher install ${workspaceFolder}"],
+      "args": ["-c", "fisher remove MrBasa/TideReport 2>/dev/null; fisher remove \"${workspaceFolder}\" 2>/dev/null; fisher install \"${workspaceFolder}\""],
       "group": {
         "kind": "build",
         "isDefault": true
