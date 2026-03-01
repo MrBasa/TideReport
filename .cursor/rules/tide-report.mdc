@@ -1,0 +1,61 @@
+---
+description: TideReport Fish plugin — prompt items, Fish style, no prompt delay, README sync
+alwaysApply: true
+---
+
+# TideReport Project Rules
+
+This project is a **Fish shell** plugin for [Tide][] that adds configurable prompt items (weather, moon, tide, GitHub). All work assumes **Fish** and **TideReport**; no Bash or other shells.
+
+## Never Delay the Prompt
+
+**Critical:** Prompt items must **never** block or delay the prompt. Prefer showing no data or stale data over any delay.
+
+- Fetch data in the **background** (e.g. `&` at end of fetch command). Never await network or slow I/O on the main prompt path.
+- Use **file-based or variable-based cache**. On prompt run: read cache only; if cache is missing or expired, show the configured "unavailable" text and trigger a background refresh.
+- Two timers: **refresh** (show stale data, refresh in background) and **expire** (show unavailable, refresh in background). Never block while fetching.
+
+## Fish Shell Only — No Bashisms
+
+- Use Fish syntax and builtins only. No `[[ ]]`, `$(( ))`, `&>/dev/null`, or Bash-specific constructs.
+- Prefer: `test` / `string` / `math` / `command`; `set -l` for locals; `set -q var || set -U var value` for optional universal defaults; `^/dev/null` or redirects like `2>/dev/null` where needed.
+- Give functions a `--description` for help. Use `--argument-names` for explicit arguments where it helps clarity.
+
+## Naming Conventions
+
+Follow existing TideReport and Tide patterns:
+
+| Kind | Pattern | Example |
+|------|---------|--------|
+| Tide prompt item (entry point) | `_tide_item_<name>` | `_tide_item_weather`, `_tide_item_moon` |
+| Shared / public helper | `_tide_report_<name>` | `_tide_report_handle_async_wttr` |
+| Private / parser helper | `__tide_report_<name>` | `__tide_report_parse_weather`, `__tide_report_get_moon_emoji` |
+| Config (plugin) | `tide_report_<module>_<option>` | `tide_report_weather_format`, `tide_report_moon_expire_seconds` |
+| Config (Tide item colors) | `tide_<item>_color`, `tide_<item>_bg_color` | `tide_weather_color`, `tide_moon_bg_color` |
+
+When adding a new prompt item, register it in `conf.d/tide_report.fish` (defaults, install/uninstall item lists) and in README (Available Prompt Sections, Usage, and any new config tables).
+
+## New Prompt Items
+
+New items should be consistent with the current approach:
+
+- Add `functions/_tide_item_<name>.fish` that Tide will autoload.
+- Entry point: `_tide_item_<name>` that sets locals (cache path, refresh/expire, unavailable text/color), calls a cache/async helper if applicable, then a parser that uses `_tide_print_item <name> ...` for output.
+- Reuse shared async behavior where possible (e.g. `_tide_report_handle_async_wttr` for wttr.in-based items). For other APIs, follow the same pattern: read cache → if invalid show unavailable + background fetch; if valid parse and print.
+- Add defaults in `conf.d/tide_report.fish` with `set -q var || set -U var value`. Include the new item name in the uninstall logic that strips items from `tide_left_prompt_items` / `tide_right_prompt_items`.
+
+## Dependencies
+
+- **jq** and **curl** are in use; adding them is acceptable when needed for new features.
+- Be **reluctant to add new dependencies**. Prefer Fish builtins and existing tools. Justify any new dependency.
+
+## Documentation and Configuration
+
+- **README.md** must stay in sync with code: every config variable must be documented (name, description, default). Update the relevant module section and tables when adding or changing options.
+- Instructions are for **layman users** on a public GitHub repo: clear, step-by-step, and descriptive. Assume Fisher + Tide are installed per their docs.
+
+## Testing
+
+- There is **no automated test suite** yet. Testing is manual in the developer’s shell. Do not assume or introduce a test framework unless the user asks. When tests are added later, rules can be updated.
+
+[Tide]: https://github.com/IlanCosman/tide

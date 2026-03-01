@@ -15,19 +15,19 @@ function _tide_report_install --on-event tide_report_install
     set -l default_bg_color $tide_time_bg_color
 
     # --- Check dependencies ---
-    if ! command -v "gh" &> /dev/null
+    if ! command -v "gh" >/dev/null 2>&1
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
     end
-    if ! command -v "jq" &> /dev/null
+    if ! command -v "jq" >/dev/null 2>&1
         # jq is now required for weather and moon as well
         echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
     end
-    if ! command -v "curl" &> /dev/null
+    if ! command -v "curl" >/dev/null 2>&1
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
     end
 
     # --- Universal Settings ---
-    set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 3000
+    set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
     set -q tide_report_units                  || set -U tide_report_units "m" # 'm' (Metric), 'u' (USCS)
     set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide

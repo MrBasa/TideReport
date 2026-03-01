@@ -5,7 +5,7 @@
 function _tide_item_github --description "Displays GitHub stats"
     # --- Quick Checks ---
     # Verify we are in a git repo
-    if not git rev-parse --is-inside-work-tree &>/dev/null
+    if not git rev-parse --is-inside-work-tree >/dev/null 2>&1
         return 0 # Not git dir
     end
 
