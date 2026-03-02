@@ -131,6 +131,7 @@ function _tide_report_install --on-event tide_report_install
         set -U tide_right_prompt_items $new_right
     end
 
+    echo (set_color brwhite)"New prompt items will show in this shell after reload. In other open terminals, run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session."(set_color normal)
     tide reload
 end
 
@@ -142,24 +143,25 @@ end
 function _tide_report_uninstall --on-event tide_report_uninstall
     echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
-    # Delete vars
-    set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
-
-    if test (count $vars_to_erase) -gt 0
-        set -U -e $vars_to_erase
-    end
-
-    # Delete funcs
-    builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
-
-    # Remove Tide Report items from left and right prompts
+    # Remove our items from prompt lists first (while vars still exist), then erase universals.
+    # We do not remove tide_time_format (shared with Tide's time item; we only set it when unset).
     if set -q tide_right_prompt_items
         set -U tide_right_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_right_prompt_items)
     end
-
     if set -q tide_left_prompt_items
         set -U tide_left_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_left_prompt_items)
     end
+
+    # Erase all universal variables we create: tide_report_*, tide_github_*, tide_weather_*,
+    # tide_moon_*, tide_tide_*, and any _tide_report_* (e.g. lock vars). Intentionally leave
+    # tide_time_format (Tide core variable).
+    set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
+    for v in $vars_to_erase
+        set -U -e $v
+    end
+
+    # Erase our functions (item entry points and helpers)
+    builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
 
     # Remove cache
     command rm -rf ~/.cache/tide-report
