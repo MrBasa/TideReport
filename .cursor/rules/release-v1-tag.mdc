@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Release: Repoint v1 Tag
 
-**Current latest release:** `v1.2.2` (GitHub: "Version 1.2.2 - Fix for negative temp values"). Update this line whenever a new release is published.
+**Current latest release:** `v1.3.0` (GitHub: "Version 1.3.0 - Open-Meteo default, async GitHub, Fish-friendly fixes"). Update this line whenever a new release is published.
 
 ---
 
