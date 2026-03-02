@@ -12,7 +12,7 @@ end
 
 # Source plugin functions (order: shared helper then items that use it).
 set -l root $REPO_ROOT/functions
-source "$root/_tide_report_handle_async_wttr.fish"
+source "$root/_tide_report_handle_async_weather.fish"
 source "$root/_tide_item_weather.fish"
 source "$root/_tide_item_moon.fish"
 source "$root/_tide_item_github.fish"
@@ -30,6 +30,8 @@ set -q tide_report_weather_refresh_seconds    || set -g tide_report_weather_refr
 set -q tide_report_weather_expire_seconds     || set -g tide_report_weather_expire_seconds 600
 set -q tide_report_weather_unavailable_text   || set -g tide_report_weather_unavailable_text "..."
 set -q tide_report_weather_unavailable_color  || set -g tide_report_weather_unavailable_color red
+set -q tide_report_moon_provider          || set -g tide_report_moon_provider "potmt"
+set -q tide_report_moon_potmt_url        || set -g tide_report_moon_potmt_url "https://api.phaseofthemoontoday.com/v1/current"
 set -q tide_report_moon_refresh_seconds   || set -g tide_report_moon_refresh_seconds 14400
 set -q tide_report_moon_expire_seconds    || set -g tide_report_moon_expire_seconds 28800
 set -q tide_report_moon_unavailable_text  || set -g tide_report_moon_unavailable_text "..."

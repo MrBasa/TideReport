@@ -28,7 +28,7 @@ Follow existing TideReport and Tide patterns:
 | Kind | Pattern | Example |
 |------|---------|--------|
 | Tide prompt item (entry point) | `_tide_item_<name>` | `_tide_item_weather`, `_tide_item_moon` |
-| Shared / public helper | `_tide_report_<name>` | `_tide_report_handle_async_wttr` |
+| Shared / public helper | `_tide_report_<name>` | `_tide_report_handle_async_weather` |
 | Private / parser helper | `__tide_report_<name>` | `__tide_report_parse_weather`, `__tide_report_get_moon_emoji` |
 | Config (plugin) | `tide_report_<module>_<option>` | `tide_report_weather_format`, `tide_report_moon_expire_seconds` |
 | Config (Tide item colors) | `tide_<item>_color`, `tide_<item>_bg_color` | `tide_weather_color`, `tide_moon_bg_color` |
@@ -41,7 +41,7 @@ New items should be consistent with the current approach:
 
 - Add `functions/_tide_item_<name>.fish` that Tide will autoload.
 - Entry point: `_tide_item_<name>` that sets locals (cache path, refresh/expire, unavailable text/color), calls a cache/async helper if applicable, then a parser that uses `_tide_print_item <name> ...` for output.
-- Reuse shared async behavior where possible (e.g. `_tide_report_handle_async_wttr` for wttr.in-based items). For other APIs, follow the same pattern: read cache → if invalid show unavailable + background fetch; if valid parse and print.
+- Reuse shared async behavior where possible (e.g. `_tide_report_handle_async_weather` for weather, `_tide_report_handle_async_moon` for moon). For other APIs, follow the same pattern: read cache → if invalid show unavailable + background fetch; if valid parse and print.
 - Add defaults in `conf.d/tide_report.fish` with `set -q var || set -U var value`. Include the new item name in the uninstall logic that strips items from `tide_left_prompt_items` / `tide_right_prompt_items`.
 
 ## Dependencies

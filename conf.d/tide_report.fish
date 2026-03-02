@@ -50,6 +50,8 @@ function _tide_report_install --on-event tide_report_install
     # --- Moon Module ---
     set -q tide_moon_color                    || set -U tide_moon_color $default_color
     set -q tide_moon_bg_color                 || set -U tide_moon_bg_color $default_bg_color
+    set -q tide_report_moon_provider          || set -U tide_report_moon_provider "potmt" # 'potmt' | 'wttr'
+    set -q tide_report_moon_potmt_url         || set -U tide_report_moon_potmt_url "https://api.phaseofthemoontoday.com/v1/current"
     set -q tide_report_moon_refresh_seconds   || set -U tide_report_moon_refresh_seconds 14400 # 4 hours
     set -q tide_report_moon_expire_seconds    || set -U tide_report_moon_expire_seconds 28800 # 8 hours
     set -q tide_report_moon_unavailable_text  || set -U tide_report_moon_unavailable_text "..."

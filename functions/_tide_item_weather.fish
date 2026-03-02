@@ -12,7 +12,7 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
 
     # 0 if cache is valid, 1 if not
-    if _tide_report_handle_async_wttr \
+    if _tide_report_handle_async_weather \
         $item_name \
         $cache_file \
         $refresh_seconds \

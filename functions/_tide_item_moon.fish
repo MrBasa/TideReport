@@ -1,10 +1,9 @@
 # TideReport :: Moon Prompt Item
 #
-# Owns moon data and moon.json cache. When stale: if weather provider is wttr,
-# triggers same wttr provider (one request fills weather + moon); else moon-only fetch.
-# Handler is in _tide_report_handle_async_wttr.fish (shared with weather).
+# Owns moon data and moon.json cache. Dispatches by tide_report_moon_provider (potmt | wttr).
+# When moon=wttr and weather=wttr, one request fills both. Handler in _tide_report_handle_async_moon.fish.
 if not functions -q _tide_report_handle_async_moon
-    source (status filename | path dirname)/_tide_report_handle_async_wttr.fish
+    source (status filename | path dirname)/_tide_report_handle_async_moon.fish
 end
 
 function _tide_item_moon --description "Displays moon phase, fetches asynchronously from JSON"

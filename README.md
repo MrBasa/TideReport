@@ -47,7 +47,7 @@ See the [Fisher][] and [Tide][] documentation for more details on installing plu
 
 * `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.
 * `weather`: Displays the current weather (from Open-Meteo or wttr.in).
-* `moon`: Displays the current moon phase (from wttr.in; when weather provider is wttr, one request fills both).
+* `moon`: Displays the current moon phase (from PhaseOfTheMoonToday by default, or wttr.in when moon provider is wttr).
 * `tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
@@ -76,7 +76,7 @@ These modules use an asynchronous, file-based caching system with two timers:
 
 This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
 
-With the **wttr** weather provider, one API call fills both weather and moon (cache file `~/.cache/tide-report/wttr.json`). With **Open-Meteo** (the default), weather and moon use separate requests and caches.
+With the **wttr** weather provider, one API call fills both weather and moon. With **Open-Meteo** (the default), weather and moon use separate requests. The moon item uses **PhaseOfTheMoonToday** (potmt) by default, or **wttr.in** when `tide_report_moon_provider` is set to `wttr`.
 
 ### GitHub Module
 
@@ -184,16 +184,20 @@ The weather format is a string with custom specifiers.
 
 ### 🌕 Moon Module (`moon`)
 
-**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). When the weather provider is **wttr**, one wttr.in request fills both weather and moon; when the provider is **openmeteo** (default), the moon item fetches moon data separately from wttr.in. It displays the moon phase emoji.
+**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). Moon phase is fetched from **PhaseOfTheMoonToday** (potmt) by default, or from **wttr.in** when `tide_report_moon_provider` is `wttr`. When both moon and weather use wttr, one request fills both caches. It displays the moon phase emoji.
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |
 | `tide_moon_color`                     | Prompt item color                                               | `(theme default)` |
 | `tide_moon_bg_color`                  | Prompt item background color                                    | `(theme default)` |
-| `tide_report_moon_refresh_seconds`    | How old data can be before a background refresh is triggered.   | `14400`           |
-| `tide_report_moon_expire_seconds`     | How old data can be before it's considered invalid.             | `28800`           |
-| `tide_report_moon_unavailable_text`   | Text to display when moon data is not available.                | `...`            |
+| `tide_report_moon_provider`          | Moon backend: `potmt` (PhaseOfTheMoonToday) or `wttr`.          | `potmt`           |
+| `tide_report_moon_potmt_url`         | URL for PhaseOfTheMoonToday API (potmt provider only).         | See below         |
+| `tide_report_moon_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`           |
+| `tide_report_moon_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`           |
+| `tide_report_moon_unavailable_text`  | Text to display when moon data is not available.                | `...`            |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `red`             |
+
+`tide_report_moon_potmt_url` defaults to `https://api.phaseofthemoontoday.com/v1/current`.
 
 ### 🌊 Tide Module (`tide`)
 

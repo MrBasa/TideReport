@@ -4,6 +4,8 @@ Audit date: 2025-03-01. Scope: all `.fish` files under `conf.d/` and `functions/
 
 **Remediation applied:** 2025-03-01. All items below were addressed in code (redirects, test style, dead code removal, shared `__tide_report_gnu_date_cmd`, pipeline comments, `command date`, string-replace loop, jq `first`).
 
+**Provider restructuring (2025):** Weather handlers split into `_tide_report_provider_weather_wttr.fish` and `_tide_report_provider_weather_openmeteo.fish`. Moon handlers split into `_tide_report_provider_moon_wttr.fish` and `_tide_report_provider_moon_potmt.fish`. Moon defaults to PhaseOfTheMoonToday (potmt); wttr remains available.
+
 ---
 
 ## 1. Bashisms and non-Fish constructs
@@ -18,7 +20,7 @@ Audit date: 2025-03-01. Scope: all `.fish` files under `conf.d/` and `functions/
 | `functions/_tide_item_github.fish` | 8 | (remediated) | Git / config checks use `2>/dev/null >/dev/null`. |
 | `functions/_tide_item_weather.fish` | 158, 182 | (remediated) | Date / jq use `2>/dev/null >/dev/null` where both streams discarded. |
 | `functions/_tide_item_tide.fish` | 144, 150 | (remediated) | Same. |
-| `functions/_tide_report_handle_async_wttr.fish` | 91, 134, 200, 236, 310 | (remediated) | Same. |
+| `functions/_tide_report_handle_async_weather.fish` | (provider files) | (remediated) | Same. |
 
 **Recommendation:** When adding new “quiet” checks that must not leak stderr (e.g. `git`, `command -v`, `jq -e`), use `cmd 2>/dev/null >/dev/null`.
 
@@ -119,7 +121,7 @@ Tide (lines 63–65) and GitHub (62–64) use:
             set lock_time $$lock_var
 ```
 
-In Fish, `$$lock_var` is indirect expansion (value of the variable whose name is in `lock_var`). That is correct. The pattern is consistent with `_tide_report_handle_async_wttr.fish` (line 30). No change needed.
+In Fish, `$$lock_var` is indirect expansion (value of the variable whose name is in `lock_var`). That is correct. The pattern is consistent with `_tide_report_handle_async_weather.fish`. No change needed.
 
 ---
 
