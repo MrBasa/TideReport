@@ -6,7 +6,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## ✨ Key Features
 
 * **Asynchronous**: Fetches data in the background to keep your prompt fast.
-* **Efficient**: With the default weather provider (wttr.in), a single API call fills both weather and moon data.
+* **Efficient**: With the default weather provider (Open-Meteo), weather is fetched in the background; moon uses a separate request when needed.
 * **Modular**: Provides independent prompt items. Use only the ones you want.
 * **Configurable**: Easily customize formats, units, location, and refresh rates.
 * **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
@@ -15,6 +15,13 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
 ![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
 ![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
+
+## Quick start
+
+1. Install the plugin: `fisher install MrBasa/TideReport@v1`
+2. On a **fresh install**, the plugin adds **weather**, **moon**, and **github** to your prompt automatically. The **tide** item is not added by default.
+3. Run `tide reload` or open a new terminal to see the prompt.
+4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
 
 ## 🔗 Dependencies
 
@@ -39,16 +46,16 @@ See the [Fisher][] and [Tide][] documentation for more details on installing plu
 ## 🚀 Available Prompt Sections
 
 * `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.
-* `weather`: Displays the current weather (from wttr.in or Open-Meteo).
-* `moon`: Displays the current moon phase (from wttr.in).
+* `weather`: Displays the current weather (from Open-Meteo or wttr.in).
+* `moon`: Displays the current moon phase (from wttr.in; when weather provider is wttr, one request fills both).
 * `tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
 
-Add any of the module items to your Tide prompt. For example:
+On a fresh install, **weather**, **moon**, and **github** are added to your prompt for you. To add **tide** or change the order of items, edit the Tide prompt lists and reload:
 
 ```fish
-set -Ua tide_right_prompt_items weather moon tide github
+set -Ua tide_right_prompt_items tide
 tide reload
 ```
 
@@ -69,7 +76,7 @@ These modules use an asynchronous, file-based caching system with two timers:
 
 This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
 
-The `weather` and `moon` modules share a single API call and a single cache file (`~/.cache/tide-report/wttr.json`).
+With the **wttr** weather provider, one API call fills both weather and moon (cache file `~/.cache/tide-report/wttr.json`). With **Open-Meteo** (the default), weather and moon use separate requests and caches.
 
 ### GitHub Module
 
@@ -87,7 +94,7 @@ These settings apply to all modules in this plugin.
 | ------------------------------------ | ---------------------------------------------------------- | ------------------ |
 | `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.             | `6000`             |
 | `tide_report_wttr_url`               | URL for [wttr.in][], used for weather (wttr) and moon.     | `https://wttr.in`  |
-| `tide_report_weather_provider`       | Weather backend: `wttr` or `openmeteo`.                    | `wttr`             |
+| `tide_report_weather_provider`       | Weather backend: `wttr` or `openmeteo`.                    | `openmeteo`        |
 | `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS)       | `m`                |
 | `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%H:%M"`). | From Tide         |
 
@@ -158,25 +165,26 @@ The weather format is a string with custom specifiers.
 
 #### Weather location
 
-`tide_report_weather_location` controls where weather is fetched for. Valid values depend on the weather provider (`tide_report_weather_provider`).
+`tide_report_weather_location` controls where weather is fetched for. Valid values depend on the weather provider (`tide_report_weather_provider`). **Both providers accept GPS coordinates** as `latitude,longitude` (e.g. `-78.46,106.79`). No spaces.
 
-**When provider is `wttr` (default):**
+**When provider is `openmeteo` (default):**
 
-- **Empty string `""`** (default): wttr.in uses your IP address to guess your location. No need to set anything for IP-based weather.
-- **City or place name:** Use a single word or hyphenated name (e.g. `Paris`, `Saint-Petersburg`, `New-York`). Unicode is supported (e.g. `Москва`). For spaces use hyphens or `+` (e.g. `Eiffel+tower`).
+- **Empty string `""`** (default): Your location is detected from your IP in the background and cached per shell session (file under `~/.cache/tide-report/`). A new terminal in a new place will detect again. No need to set anything for IP-based weather.
+- **Place name or postal code:** The value is sent to the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api). Use a city name, region, or postal code (e.g. `Berlin`, `London`, `90210`). At least three characters are recommended for fuzzy matching.
+- **GPS coordinates:** Use `latitude,longitude` to skip geocoding.
+
+**When provider is `wttr`:**
+
+- **Empty string `""`**: wttr.in uses your IP address to guess your location.
+- **City or place name:** Use a single word or hyphenated name (e.g. `Paris`, `Saint-Petersburg`, `New-York`). Unicode is supported. For spaces use hyphens or `+` (e.g. `Eiffel+tower`).
 - **3-letter airport code:** e.g. `muc`, `lhr`, `jfk`.
 - **Postal or area code:** e.g. `90210`, `94107`.
-- **GPS coordinates:** Latitude and longitude as `latitude,longitude` (e.g. `-78.46,106.79`). No spaces.
+- **GPS coordinates:** `latitude,longitude` (e.g. `-78.46,106.79`).
 - **Domain name:** Prefix with `@` (e.g. `@stackoverflow.com`) for location derived from the domain.
-
-**When provider is `openmeteo`:**
-
-- **Empty string is invalid.** Open-Meteo has no IP-based lookup; you must set a location.
-- **Place name or postal code:** The value is sent to the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api). Use a city name, region, or postal code (e.g. `Berlin`, `London`, `90210`). At least three characters are recommended for fuzzy matching; two characters match only exact results.
 
 ### 🌕 Moon Module (`moon`)
 
-**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). When the weather provider is **wttr**, one wttr.in request fills both weather and moon; when the provider is **openmeteo**, the moon item fetches moon data separately from wttr.in. It displays the moon phase emoji.
+**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). When the weather provider is **wttr**, one wttr.in request fills both weather and moon; when the provider is **openmeteo** (default), the moon item fetches moon data separately from wttr.in. It displays the moon phase emoji.
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |
@@ -231,6 +239,10 @@ fishtape test/integration/*.fish
 ```
 
 Tests use fixture data under `test/fixtures/` and do not require network access or Tide to be installed.
+
+## Troubleshooting
+
+- **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP in the background. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set [weather location](#weather-location) explicitly.
 
 ## Acknowledgements
 * [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].

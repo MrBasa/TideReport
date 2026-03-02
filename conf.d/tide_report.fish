@@ -29,7 +29,7 @@ function _tide_report_install --on-event tide_report_install
     # --- Universal Settings ---
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
-    set -q tide_report_weather_provider       || set -U tide_report_weather_provider "wttr" # 'wttr' | 'openmeteo'
+    set -q tide_report_weather_provider       || set -U tide_report_weather_provider "openmeteo" # 'wttr' | 'openmeteo'
     set -q tide_report_units                  || set -U tide_report_units "m" # 'm' (Metric), 'u' (USCS)
     set -q tide_time_format                   || set -U tide_time_format "%H:%M" # Time format for tide
 
@@ -90,6 +90,46 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_units && set -U -e tide_report_weather_units
     set -q tide_report_tide_units && set -U -e tide_report_tide_units
     set -q tide_report_github_color_error && set -U -e tide_report_github_color_error
+
+    # --- Prompt item placement (fresh install only) ---
+    set -l left
+    set -l right
+    set -q tide_left_prompt_items && set left $tide_left_prompt_items
+    set -q tide_right_prompt_items && set right $tide_right_prompt_items
+    set -l our_items github weather moon tide
+    set -l skip_placement false
+    for item in $our_items
+        if contains $item $left; or contains $item $right
+            set skip_placement true
+            break
+        end
+    end
+    if $skip_placement
+        echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+    else
+        echo (set_color brwhite)"Adding Tide Report items to your prompt: "(set_color normal)"github (left), weather and moon (right). Tide not added by default."
+        set -l new_left
+        if contains git $left
+            for i in $left
+                set -a new_left $i
+                if test "$i" = "git"
+                    set -a new_left github
+                end
+            end
+        else if contains pwd $left
+            for i in $left
+                if test "$i" = "pwd"
+                    set -a new_left github
+                end
+                set -a new_left $i
+            end
+        else
+            set new_left $left github
+        end
+        set -l new_right $right weather moon
+        set -U tide_left_prompt_items $new_left
+        set -U tide_right_prompt_items $new_right
+    end
 
     tide reload
 end

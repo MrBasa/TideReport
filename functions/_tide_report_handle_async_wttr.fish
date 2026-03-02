@@ -33,7 +33,26 @@ function _tide_report_handle_async_wttr --argument-names item_name cache_file re
         set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
         if test (math $now - $lock_time) -gt 120
             set -U $lock_var $now
-            __tide_report_fetch_weather "$cache_file" "$timeout_sec" "$lock_var" &
+            set -l resolved ""
+            if test "$tide_report_weather_provider" = "openmeteo"; and test -z "$tide_report_weather_location"
+                set -l ip_file "$HOME/.cache/tide-report/ip-location"
+                if test -f "$ip_file"
+                    set -l line (string split '|' (cat "$ip_file" 2>/dev/null; or echo ""))
+                    if test (count $line) -ge 3; and test "$line[1]" = "$fish_pid"
+                        set -l mtime (command date -r "$ip_file" +%s 2>/dev/null; or echo 0)
+                        set -l age (math $now - $mtime)
+                        if test $age -le 86400
+                            set resolved "$line[2],$line[3]"
+                        end
+                    end
+                end
+            end
+            set -l parent_pid "$fish_pid"
+            begin
+                set -gx TIDE_REPORT_PARENT_PID "$parent_pid"
+                test -n "$resolved"; and set -gx TIDE_REPORT_RESOLVED_LOCATION "$resolved"
+                __tide_report_fetch_weather "$cache_file" "$timeout_sec" "$lock_var"
+            end &
             disown
         end
     end
@@ -127,19 +146,48 @@ function __tide_report_provider_wttr --argument-names weather_cache timeout_sec 
 end
 
 # --- Open-Meteo provider ---
+# Resolved location can come from: env TIDE_REPORT_RESOLVED_LOCATION (lat,lon),
+# IP geo when location empty, lat,lon pattern in tide_report_weather_location, or geocoding API.
 function __tide_report_provider_openmeteo --argument-names weather_cache timeout_sec lock_var
-    if test -z "$tide_report_weather_location"
-        return
+    set -l lat ""
+    set -l lon ""
+    set -l tz "auto"
+
+    if set -q TIDE_REPORT_RESOLVED_LOCATION; and test -n "$TIDE_REPORT_RESOLVED_LOCATION"
+        set -l parts (string split ',' -- $TIDE_REPORT_RESOLVED_LOCATION)
+        if test (count $parts) -ge 2
+            set lat (string trim -- $parts[1])
+            set lon (string trim -- $parts[2])
+        end
+    else if test -z "$tide_report_weather_location"
+        set -l ip_data (curl -s -A "tide-report/1.0" --max-time 5 "http://ip-api.com/json/?fields=lat,lon")
+        if test $status -eq 0; and test -n "$ip_data"
+            set lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
+            set lon (printf "%s" "$ip_data" | jq -r '.lon // empty')
+            if test -n "$lat"; and test -n "$lon"
+                set -l ip_file "$HOME/.cache/tide-report/ip-location"
+                if set -q TIDE_REPORT_PARENT_PID; and test -n "$TIDE_REPORT_PARENT_PID"
+                    mkdir -p (dirname "$ip_file")
+                    printf "%s|%s|%s\n" "$TIDE_REPORT_PARENT_PID" "$lat" "$lon" > "$ip_file"
+                end
+            end
+        end
+    else if string match -qr '^-?[0-9]+\.?[0-9]*,-?[0-9]+\.?[0-9]*$' -- (string trim -- "$tide_report_weather_location")
+        set -l parts (string split ',' -- (string trim -- "$tide_report_weather_location"))
+        set lat (string trim -- $parts[1])
+        set lon (string trim -- $parts[2])
+    else
+        set -l location_escaped (string escape --style url "$tide_report_weather_location")
+        set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
+        set -l geo_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$geo_url")
+        if test $status -ne 0; or test -z "$geo_data"
+            return
+        end
+        set lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty')
+        set lon (printf "%s" "$geo_data" | jq -r '.results[0].longitude // empty')
+        set tz (printf "%s" "$geo_data" | jq -r '.results[0].timezone // "auto"')
     end
-    set -l location_escaped (string escape --style url "$tide_report_weather_location")
-    set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
-    set -l geo_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$geo_url")
-    if test $status -ne 0; or test -z "$geo_data"
-        return
-    end
-    set -l lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty')
-    set -l lon (printf "%s" "$geo_data" | jq -r '.results[0].longitude // empty')
-    set -l tz (printf "%s" "$geo_data" | jq -r '.results[0].timezone // "auto"')
+
     if test -z "$lat"; or test -z "$lon"
         return
     end
