@@ -14,7 +14,7 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
             set lon (string trim -- $parts[2])
         end
     else if test -z "$tide_report_weather_location"
-        set -l ip_data (curl -s -A "tide-report/1.0" --max-time 5 "http://ip-api.com/json/?fields=lat,lon")
+        set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time 5 "http://ip-api.com/json/?fields=lat,lon")
         if test $status -eq 0; and test -n "$ip_data"
             set lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
             set lon (printf "%s" "$ip_data" | jq -r '.lon // empty')
@@ -33,7 +33,7 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
     else
         set -l location_escaped (string escape --style url "$tide_report_weather_location")
         set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
-        set -l geo_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$geo_url")
+        set -l geo_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$geo_url")
         if test $status -ne 0; or test -z "$geo_data"
             return
         end
@@ -47,7 +47,7 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
     end
     set -l tz_escaped (string escape --style url "$tz")
     set -l forecast_url "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,apparent_temperature&daily=sunrise,sunset&timezone=$tz_escaped"
-    set -l forecast_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$forecast_url")
+    set -l forecast_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$forecast_url")
     if test $status -ne 0; or test -z "$forecast_data"
         return
     end

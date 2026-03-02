@@ -7,7 +7,7 @@ function __tide_report_provider_moon_potmt --argument-names moon_cache timeout_s
     end
 
     set -l url (set -q tide_report_moon_potmt_url; and echo $tide_report_moon_potmt_url; or echo "https://api.phaseofthemoontoday.com/v1/current")
-    set -l fetched_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$url")
+    set -l fetched_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")
     if test $status -ne 0; or test -z "$fetched_data"
         return
     end

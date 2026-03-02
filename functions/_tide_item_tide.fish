@@ -136,7 +136,7 @@ function __tide_report_fetch_tide --argument url cache_file lock_var
     function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
-    set -l tide_data (curl -s --max-time 3 "$url")
+    set -l tide_data (curl -s -A "$tide_report_user_agent" --max-time 3 "$url")
     set -l curl_status $status
     if test $curl_status -ne 0; or test -z "$tide_data"
         return

@@ -1,5 +1,8 @@
 # Tide Report :: Default Configuration
 
+# User-Agent for HTTP requests (single source of truth; bump with each release)
+set -q tide_report_user_agent || set -U tide_report_user_agent "tide-report/1.4"
+
 function _tide_report_install --on-event tide_report_install
     # --- Check for Dev Branch Install ---
     if contains mrbasa/tidereport (string lower $_fisher_plugins)
@@ -27,6 +30,7 @@ function _tide_report_install --on-event tide_report_install
     end
 
     # --- Universal Settings ---
+    set -U tide_report_user_agent "tide-report/1.4"
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
     set -q tide_report_weather_provider       || set -U tide_report_weather_provider "openmeteo" # 'wttr' | 'openmeteo'

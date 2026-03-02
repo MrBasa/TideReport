@@ -3,7 +3,7 @@
 
 function __tide_report_provider_wttr --argument-names weather_cache timeout_sec lock_var
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
-    set -l fetched_data (curl -s -A "tide-report/1.0" --max-time $timeout_sec "$url")
+    set -l fetched_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")
     if test $status -ne 0; or test -z "$fetched_data"
         return
     end
