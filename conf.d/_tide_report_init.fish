@@ -42,7 +42,8 @@ function _tide_report_ensure_prompt_items --argument-names silent
     end
 end
 
-function _tide_report_init_install --on-event _tide_report_init_install
+# Install runs when this file is sourced during `fisher install` (see end of file), so we do not rely on Fisher's emit.
+function _tide_report_init_install
     # --- Check for Dev Branch Install ---
     if contains mrbasa/tidereport (string lower $_fisher_plugins)
         echo (set_color --bold bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
@@ -203,4 +204,10 @@ end
 # User-callable: run install logic manually (e.g. after fisher install from local path when event doesn't fire).
 function tide_report_install --description "Run Tide Report install: add prompt items, set config. Use if items did not appear after fisher install."
     _tide_report_init_install
+end
+
+# Run install when this file is sourced during `fisher install` (not update), so the installer runs reliably
+# even when Fisher's conf.d emit is not triggered. Update uses --on-event _tide_report_init_update.
+if status current-command 2>/dev/null | string match -q 'fisher'
+    contains -- install $argv 2>/dev/null; and _tide_report_init_install
 end
