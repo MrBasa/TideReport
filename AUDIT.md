@@ -10,17 +10,17 @@ Audit date: 2025-03-01. Scope: all `.fish` files under `conf.d/` and `functions/
 
 ### 1.1 Redirect style (minor)
 
-**Rule:** Prefer Fish-idiomatic redirects; avoid `&>/dev/null`; use `^/dev/null` or `2>/dev/null` where needed.
+**Rule:** Prefer Fish-idiomatic redirects; avoid `&>/dev/null`. To discard both stdout and stderr, use `2>/dev/null >/dev/null` for reliable suppression (e.g. `command -v`, `git`, `jq`); `^/dev/null` is idiomatic but can fail to suppress stderr in some environments.
 
 | File | Line(s) | Current | Note |
 |------|--------|--------|------|
-| `conf.d/tide_report.fish` | 19, 22, 26 | `>/dev/null 2>&1` | Works in Fish; idiomatic Fish is `^/dev/null` to suppress both stdout and stderr. |
-| `functions/_tide_item_github.fish` | 8 | `>/dev/null 2>&1` | Same. |
-| `functions/_tide_item_weather.fish` | 182 | `>/dev/null 2>&1` | Same. |
-| `functions/_tide_item_tide.fish` | 29, 150 | `>/dev/null 2>&1` | Same. |
-| `functions/_tide_report_handle_async_wttr.fish` | 66 | `>/dev/null 2>&1` | Same. |
+| `conf.d/tide_report.fish` | 19, 22, 26 | (remediated) | Dependency checks use `2>/dev/null >/dev/null`. |
+| `functions/_tide_item_github.fish` | 8 | (remediated) | Git / config checks use `2>/dev/null >/dev/null`. |
+| `functions/_tide_item_weather.fish` | 158, 182 | (remediated) | Date / jq use `2>/dev/null >/dev/null` where both streams discarded. |
+| `functions/_tide_item_tide.fish` | 144, 150 | (remediated) | Same. |
+| `functions/_tide_report_handle_async_wttr.fish` | 91, 134, 200, 236, 310 | (remediated) | Same. |
 
-**Recommendation:** Optionally replace `cmd >/dev/null 2>&1` with `cmd ^/dev/null` for consistency with project rules. Low priority; current form is valid.
+**Recommendation:** When adding new “quiet” checks that must not leak stderr (e.g. `git`, `command -v`, `jq -e`), use `cmd 2>/dev/null >/dev/null`.
 
 ### 1.2 `test` with `-a` / `-o` (style / portability)
 

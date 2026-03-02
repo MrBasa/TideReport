@@ -141,7 +141,7 @@ function __tide_report_fetch_tide --argument url cache_file lock_var
     if test $curl_status -ne 0; or test -z "$tide_data"
         return
     end
-    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' >/dev/null ^/dev/null
+    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' 2>/dev/null >/dev/null
         mkdir -p (dirname "$cache_file"); and printf "%s" "$tide_data" > "$cache_file"
     end
 end

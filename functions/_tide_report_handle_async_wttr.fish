@@ -88,7 +88,7 @@ function __tide_report_provider_wttr --argument-names weather_cache timeout_sec 
     if test $status -ne 0; or test -z "$fetched_data"
         return
     end
-    if not printf "%s" "$fetched_data" | jq -e '.current_condition | length > 0' >/dev/null ^/dev/null
+    if not printf "%s" "$fetched_data" | jq -e '.current_condition | length > 0' 2>/dev/null >/dev/null
         return
     end
 
@@ -131,7 +131,7 @@ function __tide_report_provider_wttr --argument-names weather_cache timeout_sec 
         --arg wd "$wd" --argjson hu $hu --argjson uv $uv \
         --arg su "$su" --arg sv "$sv" \
         '{temp_c:$tc,temp_f:$tf,feels_like_c:$fc,feels_like_f:$ff,condition_code:$cc,condition_text:$ct,wind_speed_kmh:$wk,wind_speed_mph:$wm,wind_dir_16:$wd,humidity:$hu,uv_index:$uv,sunrise_utc:(if $su=="" then null else ($su|tonumber) end),sunset_utc:(if $sv=="" then null else ($sv|tonumber) end)}')
-    if test -n "$normalized"; and printf "%s" "$normalized" | jq -e '.temp_c != null' >/dev/null ^/dev/null
+    if test -n "$normalized"; and printf "%s" "$normalized" | jq -e '.temp_c != null' 2>/dev/null >/dev/null
         set -l temp_file "$weather_cache.$fish_pid.tmp"
         printf "%s" "$normalized" > "$temp_file" && command mv -f "$temp_file" "$weather_cache"
     end
@@ -197,7 +197,7 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
     if test $status -ne 0; or test -z "$forecast_data"
         return
     end
-    if not printf "%s" "$forecast_data" | jq -e '.current.temperature_2m != null' >/dev/null ^/dev/null
+    if not printf "%s" "$forecast_data" | jq -e '.current.temperature_2m != null' 2>/dev/null >/dev/null
         return
     end
     set -l tc (printf "%s" "$forecast_data" | jq -r '.current.temperature_2m')
@@ -233,7 +233,7 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
         --arg wd "$wd" --argjson hu $hu --argjson uv $uv \
         --arg su "$su" --arg sv "$sv" \
         '{temp_c:$tc,temp_f:$tf,feels_like_c:$fc,feels_like_f:$ff,condition_code:$cc,condition_text:$ct,wind_speed_kmh:$wk,wind_speed_mph:$wm,wind_dir_16:$wd,humidity:$hu,uv_index:$uv,sunrise_utc:(if $su=="" then null else ($su|tonumber) end),sunset_utc:(if $sv=="" then null else ($sv|tonumber) end)}')
-    if test -n "$normalized"; and printf "%s" "$normalized" | jq -e '.temp_c != null' >/dev/null ^/dev/null
+    if test -n "$normalized"; and printf "%s" "$normalized" | jq -e '.temp_c != null' 2>/dev/null >/dev/null
         mkdir -p (dirname "$weather_cache")
         set -l temp_file "$weather_cache.$fish_pid.tmp"
         printf "%s" "$normalized" > "$temp_file" && command mv -f "$temp_file" "$weather_cache"
@@ -307,7 +307,7 @@ function __tide_report_iso8601_to_unix --argument-names iso
     end
     if command -q gdate
         gdate -d "$iso" +%s 2>/dev/null
-    else if command date --version >/dev/null ^/dev/null
+    else if command date --version 2>/dev/null >/dev/null
         command date -d "$iso" +%s 2>/dev/null
     else
         set -l parts (string split 'T' -- $iso)

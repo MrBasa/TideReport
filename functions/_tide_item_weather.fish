@@ -155,7 +155,7 @@ end
 function __tide_report_gnu_date_cmd
     if command -q gdate
         echo gdate
-    else if command date --version >/dev/null ^/dev/null
+    else if command date --version 2>/dev/null >/dev/null
         echo date
     end
 end

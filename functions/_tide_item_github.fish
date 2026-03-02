@@ -4,13 +4,13 @@
 
 function _tide_item_github --description "Displays GitHub stats"
     # --- Quick Checks ---
-    # Verify we are in a git repo
-    if not git rev-parse --is-inside-work-tree >/dev/null ^/dev/null
+    # Verify we are in a git repo (suppress git's fatal message when not in a repo)
+    if not command git rev-parse --is-inside-work-tree 2>/dev/null >/dev/null
         return 0 # Not git dir
     end
 
     # Get the remote URL to determine the Repo Identity
-    set -l remote_url (git config --get remote.origin.url 2>/dev/null)
+    set -l remote_url (command git config --get remote.origin.url 2>/dev/null)
     if test -z "$remote_url"
         return 0 # No remote 'origin' found
     end
