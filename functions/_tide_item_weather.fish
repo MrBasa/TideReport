@@ -63,11 +63,13 @@ function __tide_report_parse_weather --argument-names cache_file
     set -l sunset_str (__tide_report_format_unix_time "$sunset_utc" $tide_time_format)
 
     # --- Build the final output string ---
-    set -l output $tide_report_weather_format
+    # Normalize to a single string so replacements always run on one value (handles format set as multiple elements).
+    set -l output (string join ' ' $tide_report_weather_format)
     set -l pairs '%t' $temp_str '%C' $cond_text '%c' $cond_emoji '%w' $wind_str '%h' $humidity_str '%f' $feels_like_str '%d' $wind_arrow '%u' $uv_str '%S' $sunrise_str '%s' $sunset_str
     set -l n (count $pairs)
     for i in (seq 1 2 $n)
-        set output (string replace -a -- $pairs[$i] $pairs[$i+1] $output)
+        set -l j (math $i + 1)
+        set output (string replace -a -- $pairs[$i] $pairs[$j] $output)
     end
 
     # Symbol coloring
