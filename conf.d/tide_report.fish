@@ -151,11 +151,24 @@ function _tide_report_uninstall --on-event tide_report_uninstall
 
     # Remove our items from prompt lists first (while vars still exist), then erase universals.
     # We do not remove tide_time_format (shared with Tide's time item; we only set it when unset).
+    set -l tide_report_items github weather moon tide
     if set -q tide_right_prompt_items
-        set -U tide_right_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_right_prompt_items)
+        set -l new_right
+        for item in $tide_right_prompt_items
+            if not contains -- $item $tide_report_items
+                set -a new_right $item
+            end
+        end
+        set -U tide_right_prompt_items $new_right
     end
     if set -q tide_left_prompt_items
-        set -U tide_left_prompt_items (string match -rv '^(github|weather|moon|tide)$' $tide_left_prompt_items)
+        set -l new_left
+        for item in $tide_left_prompt_items
+            if not contains -- $item $tide_report_items
+                set -a new_left $item
+            end
+        end
+        set -U tide_left_prompt_items $new_left
     end
 
     # Erase all universal variables we create: tide_report_*, tide_github_*, tide_weather_*,
