@@ -53,7 +53,7 @@ function _tide_report_handle_async_wttr --argument-names item_name cache_file re
                 test -n "$resolved"; and set -gx TIDE_REPORT_RESOLVED_LOCATION "$resolved"
                 __tide_report_fetch_weather "$cache_file" "$timeout_sec" "$lock_var"
             end &
-            disown
+            disown 2>/dev/null
         end
     end
 
@@ -347,7 +347,7 @@ function _tide_report_handle_async_moon --argument-names item_name cache_file re
             else
                 __tide_report_fetch_moon_only "$cache_file" "$timeout_sec" "$lock_var" &
             end
-            disown
+            disown 2>/dev/null
         end
     end
 

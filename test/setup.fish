@@ -7,6 +7,7 @@ set -g REPO_ROOT (dirname (dirname (status filename)))
 function _tide_print_item
     set -q _tide_print_item_calls || set -g _tide_print_item_calls
     set -g _tide_print_item_calls $_tide_print_item_calls (string join " " $argv)
+    set -g _tide_print_item_last_argv $argv
 end
 
 # Source plugin functions (order: shared helper then items that use it).

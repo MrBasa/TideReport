@@ -70,7 +70,7 @@ function _tide_item_github --description "Displays GitHub stats"
             mkdir -p "$cache_dir"
             # Pass BOTH the API Slug and the Cache File path
             __tide_report_fetch_github "$api_slug" "$cache_file" "$timeout_sec" "$lock_var" &
-            disown  # Avoid prompt delay from shell waiting for fetch job
+            disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
         end
     end
 
@@ -84,30 +84,66 @@ function _tide_item_github --description "Displays GitHub stats"
 end
 
 # --- Parser Function ---
-function __tide_report_parse_github --argument cache_file
-    # Pipeline: $status is from read; rely on content check (empty = jq failed).
-    jq -r '[
-        .stargazerCount, 
-        .forkCount, 
-        .watchers.totalCount, 
-        .issues.totalCount, 
-        .pullRequests.totalCount
-    ] | join(" ")' "$cache_file" 2>/dev/null | read -l stars forks watchers issues prs
+function __tide_report_parse_github
+    set -l cache_file $argv[1]
+    set -l line ""
+    if set -q argv[2]; and test -n "$argv[2]"
+        set line $argv[2]
+    else
+        set line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null)
+    end
+    set -l stars ""
+    set -l forks ""
+    set -l watchers ""
+    set -l issues ""
+    set -l prs ""
+    if test -n "$line"
+        set -l parts (string split " " "$line")
+        set stars $parts[1]
+        set forks $parts[2]
+        set watchers $parts[3]
+        set issues $parts[4]
+        set prs $parts[5]
+    end
 
     if test -z "$stars"
         return
     end
 
-    set -l output "$tide_report_github_icon"
+    # Ensure we have display values (avoid empty output when run from tests or minimal env)
+    set -q tide_report_github_icon; or set -l tide_report_github_icon ""
+    set -q tide_report_github_icon_stars; or set -l tide_report_github_icon_stars "★"
+    set -q tide_report_github_icon_forks; or set -l tide_report_github_icon_forks "⑂"
+    set -q tide_report_github_icon_watchers; or set -l tide_report_github_icon_watchers ""
+    set -q tide_report_github_icon_issues; or set -l tide_report_github_icon_issues "!"
+    set -q tide_report_github_icon_prs; or set -l tide_report_github_icon_prs "PR"
+    set -q tide_report_github_color_stars; or set -l tide_report_github_color_stars "yellow"
+    set -q tide_report_github_color_forks; or set -l tide_report_github_color_forks "yellow"
+    set -q tide_report_github_color_watchers; or set -l tide_report_github_color_watchers "yellow"
+    set -q tide_report_github_color_issues; or set -l tide_report_github_color_issues "yellow"
+    set -q tide_report_github_color_prs; or set -l tide_report_github_color_prs "yellow"
 
-    test "$stars" != 0 && set output "$output"(set_color $tide_report_github_color_stars)" $tide_report_github_icon_stars$stars"
-    test "$forks" != 0 && set output "$output"(set_color $tide_report_github_color_forks)" $tide_report_github_icon_forks$forks"
-    test "$watchers" != 0 && set output "$output"(set_color $tide_report_github_color_watchers)" $tide_report_github_icon_watchers$watchers"
-    test "$issues" != 0 && set output "$output"(set_color $tide_report_github_color_issues)" $tide_report_github_icon_issues$issues"
-    test "$prs" != 0 && set output "$output"(set_color $tide_report_github_color_prs)" $tide_report_github_icon_prs$prs"
+    set -l icon "$tide_report_github_icon"
+    test -z "$icon"; and set icon ""
+    set -l output "$icon"
+    # TIDE_REPORT_TEST: skip set_color so tests can assert on output (Fish may drop args with escape codes)
+    if not set -q TIDE_REPORT_TEST
+        test "$stars" != 0 && set output "$output"(set_color $tide_report_github_color_stars)" $tide_report_github_icon_stars$stars"
+        test "$forks" != 0 && set output "$output"(set_color $tide_report_github_color_forks)" $tide_report_github_icon_forks$forks"
+        test "$watchers" != 0 && set output "$output"(set_color $tide_report_github_color_watchers)" $tide_report_github_icon_watchers$watchers"
+        test "$issues" != 0 && set output "$output"(set_color $tide_report_github_color_issues)" $tide_report_github_icon_issues$issues"
+        test "$prs" != 0 && set output "$output"(set_color $tide_report_github_color_prs)" $tide_report_github_icon_prs$prs"
+    else
+        test "$stars" != 0 && set output "$output $tide_report_github_icon_stars$stars"
+        test "$forks" != 0 && set output "$output $tide_report_github_icon_forks$forks"
+        test "$watchers" != 0 && set output "$output $tide_report_github_icon_watchers$watchers"
+        test "$issues" != 0 && set output "$output $tide_report_github_icon_issues$issues"
+        test "$prs" != 0 && set output "$output $tide_report_github_icon_prs$prs"
+    end
 
     if test -n "$output"
-        _tide_print_item github (string trim "$output")
+        set -l out_trimmed (string trim "$output")
+        _tide_print_item github "$out_trimmed"
     end
 end
 

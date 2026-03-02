@@ -61,7 +61,7 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
         if test (math $now - $lock_time) -gt 120
             set -U $lock_var $now
             __tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
-            disown  # Avoid prompt delay from shell waiting for fetch job
+            disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
         end
     end
 
