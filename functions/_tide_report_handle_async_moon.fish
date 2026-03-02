@@ -1,19 +1,19 @@
 # TideReport :: Moon async fetch (provider-agnostic)
 #
-# Dispatches by tide_report_moon_provider (potmt | wttr). Normalized moon.json: { "phase": "..." }.
+# Dispatches by tide_report_moon_provider (local | wttr). Normalized moon.json: { "phase": "..." }.
 # When moon=wttr and weather=wttr, one weather fetch fills both caches.
 
 set -l _tr_moon_dir (status filename | path dirname)
 # Need __tide_report_fetch_weather when moon=wttr and weather=wttr
 source "$_tr_moon_dir/_tide_report_handle_async_weather.fish"
 source "$_tr_moon_dir/_tide_report_provider_moon_wttr.fish"
-source "$_tr_moon_dir/_tide_report_provider_moon_potmt.fish"
+source "$_tr_moon_dir/_tide_report_provider_moon_local.fish"
 
 function _tide_report_handle_async_moon --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
     set -l now (command date +%s)
     set -l trigger_fetch false
     set -l cache_valid false
-    set -l provider (set -q tide_report_moon_provider; and echo $tide_report_moon_provider; or echo "potmt")
+    set -l provider (set -q tide_report_moon_provider; and echo $tide_report_moon_provider; or echo "local")
 
     if test -f "$cache_file"
         set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
@@ -42,7 +42,8 @@ function _tide_report_handle_async_moon --argument-names item_name cache_file re
             else if test "$provider" = "wttr"
                 __tide_report_provider_moon_wttr "$cache_file" "$timeout_sec" "$lock_var" &
             else
-                __tide_report_provider_moon_potmt "$cache_file" "$timeout_sec" "$lock_var" &
+                # Default and fallback: local offline provider.
+                __tide_report_provider_moon_local "$cache_file" "$timeout_sec" "$lock_var" &
             end
             disown 2>/dev/null
         end

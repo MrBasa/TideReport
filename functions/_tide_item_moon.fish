@@ -1,6 +1,6 @@
 # TideReport :: Moon Prompt Item
 #
-# Owns moon data and moon.json cache. Dispatches by tide_report_moon_provider (potmt | wttr).
+# Owns moon data and moon.json cache. Dispatches by tide_report_moon_provider (local | wttr).
 # When moon=wttr and weather=wttr, one request fills both. Handler in _tide_report_handle_async_moon.fish.
 if not functions -q _tide_report_handle_async_moon
     source (status filename | path dirname)/_tide_report_handle_async_moon.fish

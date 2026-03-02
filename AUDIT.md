@@ -4,7 +4,7 @@ Audit date: 2025-03-01. Scope: all `.fish` files under `conf.d/` and `functions/
 
 **Remediation applied:** 2025-03-01. All items below were addressed in code (redirects, test style, dead code removal, shared `__tide_report_gnu_date_cmd`, pipeline comments, `command date`, string-replace loop, jq `first`).
 
-**Provider restructuring (2025):** Weather handlers split into `_tide_report_provider_weather_wttr.fish` and `_tide_report_provider_weather_openmeteo.fish`. Moon handlers split into `_tide_report_provider_moon_wttr.fish` and `_tide_report_provider_moon_potmt.fish`. Moon defaults to PhaseOfTheMoonToday (potmt); wttr remains available.
+**Provider restructuring (2025):** Weather handlers split into `_tide_report_provider_weather_wttr.fish` and `_tide_report_provider_weather_openmeteo.fish`. Moon handlers split into `_tide_report_provider_moon_wttr.fish` and (later) a local offline provider; moon now defaults to the local model, with wttr available as an alternative.
 
 ---
 
@@ -16,7 +16,7 @@ Audit date: 2025-03-01. Scope: all `.fish` files under `conf.d/` and `functions/
 
 | File | Line(s) | Current | Note |
 |------|--------|--------|------|
-| `conf.d/tide_report.fish` | 19, 22, 26 | (remediated) | Dependency checks use `2>/dev/null >/dev/null`. |
+| `conf.d/_tide_report_init.fish` | 60, 63, 66 | (remediated) | Dependency checks use `2>/dev/null >/dev/null`. |
 | `functions/_tide_item_github.fish` | 8 | (remediated) | Git / config checks use `2>/dev/null >/dev/null`. |
 | `functions/_tide_item_weather.fish` | 158, 182 | (remediated) | Date / jq use `2>/dev/null >/dev/null` where both streams discarded. |
 | `functions/_tide_item_tide.fish` | 144, 150 | (remediated) | Same. |
@@ -102,7 +102,7 @@ Elsewhere (e.g. `_tide_report_handle_async_wttr.fish`, `_tide_item_tide.fish`) t
 
 **Recommendation:** Use `command date` here too for consistency and resilience.
 
-### 3.3 Uninstall: erasing functions by pattern — `conf.d/tide_report.fish` line 112
+### 3.3 Uninstall: erasing functions by pattern — `conf.d/_tide_report_init.fish` line 195
 
 ```fish
     builtin functions --erase (builtin functions --all | string match --entire -r '^_?tide_report')
@@ -149,7 +149,7 @@ In Fish, `$$lock_var` is indirect expansion (value of the variable whose name is
 
 **Recommendation:** Use jq’s `first` (or equivalent) so the result is a single `(jq …)` subshell without `head -n 1`. Reduces one process and one pipe.
 
-### 4.4 Conf: uninstall variable list — `conf.d/tide_report.fish` line 105
+### 4.4 Conf: uninstall variable list — `conf.d/_tide_report_init.fish` line 189
 
 ```fish
     set -l vars_to_erase (set -U --names | string match -r '^_?(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')

@@ -40,6 +40,11 @@ Install with [Fisher][]:
 fisher install MrBasa/TideReport@v1
 ```
 
+If you install from a **local path** (e.g. during development) and the prompt items do not appear, run:
+```fish
+tide_report_install
+```
+
 Or add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
@@ -47,7 +52,7 @@ See the [Fisher][] and [Tide][] documentation for more details on installing plu
 
 * `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.
 * `weather`: Displays the current weather (from Open-Meteo or wttr.in).
-* `moon`: Displays the current moon phase (from PhaseOfTheMoonToday by default, or wttr.in when moon provider is wttr).
+* `moon`: Displays the current moon phase (from a local offline model by default, or wttr.in when moon provider is wttr).
 * `tide`: Displays the next high/low tide from NOAA (US-based).
 
 ## 🔧 Usage
@@ -76,7 +81,7 @@ These modules use an asynchronous, file-based caching system with two timers:
 
 This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
 
-With the **wttr** weather provider, one API call fills both weather and moon. With **Open-Meteo** (the default), weather and moon use separate requests. The moon item uses **PhaseOfTheMoonToday** (potmt) by default, or **wttr.in** when `tide_report_moon_provider` is set to `wttr`.
+With the **wttr** weather provider, one API call fills both weather and moon. With **Open-Meteo** (the default), weather and moon are independent. The moon item uses a **local, offline lunar phase model** by default, or **wttr.in** when `tide_report_moon_provider` is set to `wttr`.
 
 ### GitHub Module
 
@@ -184,20 +189,17 @@ The weather format is a string with custom specifiers.
 
 ### 🌕 Moon Module (`moon`)
 
-**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). Moon phase is fetched from **PhaseOfTheMoonToday** (potmt) by default, or from **wttr.in** when `tide_report_moon_provider` is `wttr`. When both moon and weather use wttr, one request fills both caches. It displays the moon phase emoji.
+**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). Moon phase is computed by a **local, offline astronomical model** by default (inspired by the Sun and Moon formulas from [SunCalc](https://github.com/mourner/suncalc)), or fetched from **wttr.in** when `tide_report_moon_provider` is `wttr`. When both moon and weather use wttr, one request fills both caches. It displays the moon phase emoji.
 
 | Variable                              | Description                                                     | Default           |
 | ------------------------------------- | --------------------------------------------------------------- | ----------------- |
 | `tide_moon_color`                     | Prompt item color                                               | `(theme default)` |
 | `tide_moon_bg_color`                  | Prompt item background color                                    | `(theme default)` |
-| `tide_report_moon_provider`          | Moon backend: `potmt` (PhaseOfTheMoonToday) or `wttr`.          | `potmt`           |
-| `tide_report_moon_potmt_url`         | URL for PhaseOfTheMoonToday API (potmt provider only).         | See below         |
+| `tide_report_moon_provider`          | Moon backend: `local` (offline model) or `wttr`.                | `local`           |
 | `tide_report_moon_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`           |
 | `tide_report_moon_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`           |
 | `tide_report_moon_unavailable_text`  | Text to display when moon data is not available.                | `...`            |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `red`             |
-
-`tide_report_moon_potmt_url` defaults to `https://api.phaseofthemoontoday.com/v1/current`.
 
 ### 🌊 Tide Module (`tide`)
 
@@ -253,6 +255,7 @@ Tests use fixture data under `test/fixtures/` and do not require network access 
 * [Moby Dick](https://www.gutenberg.org/ebooks/2701), the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
 * [NOAA](https://www.noaa.gov) - we'll miss them when they're gone... 🇺🇸😢
 * [Igor Chubin](https://github.com/chubin) and all the contributors/sponsors of [wttr.in][].
+* [Vladimir Agafonkin](https://github.com/mourner) for the [SunCalc](https://github.com/mourner/suncalc) library, whose public moon phase formulas inspired the local lunar model used here.
 
 ### Other Handy Fish Plugins I Use:
 * [jorgebucaran/fisher](https://github.com/jorgebucaran/fisher)
