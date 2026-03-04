@@ -227,6 +227,73 @@ function _tide_report_install --description "Install Tide Report defaults and pr
                 case 3; set -U tide_report_weather_format "%c 🌡️%t (%f) %h %d%w"
                 case "*"; set -U tide_report_weather_format "%c %t %d%w"
             end
+            ## Location step: show IP result or prompt manual input; validate and confirm.
+            set -l ip_line ""
+            if command -q curl; and command -q jq
+                set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time 5 "http://ip-api.com/json/?fields=lat,lon,city,regionName,country")
+                if test $status -eq 0; and test -n "$ip_data"
+                    set -l _lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
+                    set -l _lon (printf "%s" "$ip_data" | jq -r '.lon // empty')
+                    set -l _city (printf "%s" "$ip_data" | jq -r '.city // empty')
+                    set -l _region (printf "%s" "$ip_data" | jq -r '.regionName // empty')
+                    set -l _country (printf "%s" "$ip_data" | jq -r '.country // empty')
+                    if test -n "$_lat"; and test -n "$_lon"
+                        set -l _parts $_city $_region $_country
+                        set ip_line (string join ", " $_parts)" ($_lat, $_lon)"
+                    end
+                end
+            end
+            set -l use_ip true
+            if test -n "$ip_line"
+                read -l -P (set_color brwhite)"Detected location: $ip_line. Use this location? [Y/n]: "(set_color normal) reply
+                set -l r (string trim (string lower -- "$reply"))
+                if test "$r" = "n"; or test "$r" = "no"
+                    set use_ip false
+                end
+            else
+                set use_ip false
+            end
+            set -l first_manual_prompt true
+            set -l location_tries 0
+            set -l max_location_tries 3
+            while test "$use_ip" = false
+                set -l prompt_str (set_color brwhite)"Enter location (city, postal code, or lat,lon e.g. 52.52,13.41) or press Enter to use IP: "(set_color normal)
+                if test -z "$ip_line"; and test "$first_manual_prompt" = true
+                    set prompt_str (set_color brwhite)"Could not detect location from IP. Enter location (city, postal code, or lat,lon e.g. 52.52,13.41) or press Enter to use IP: "(set_color normal)
+                    set first_manual_prompt false
+                end
+                read -l -P "$prompt_str" reply
+                set -l manual (string trim -- "$reply")
+                if test -z "$manual"
+                    set use_ip true
+                    break
+                end
+                set -l resolved (__tide_report_validate_weather_location "$manual")
+                set -l val_status $status
+                set resolved (string trim -- $resolved)
+                if test $val_status -eq 0
+                    read -l -P (set_color brwhite)"Resolved to: $resolved. Use this location? [Y/n]: "(set_color normal) reply2
+                    set -l r2 (string trim (string lower -- "$reply2"))
+                    if test -z "$r2"; or test "$r2" = "y"; or test "$r2" = "yes"
+                        if string match -qr '^-?[0-9]+\.?[0-9]*\s*,\s*-?[0-9]+\.?[0-9]*$' -- "$manual"
+                            set -l parts (string split ',' -- "$manual")
+                            set -U tide_report_weather_location (string trim -- $parts[1])","(string trim -- $parts[2])
+                        else
+                            set -U tide_report_weather_location "$manual"
+                        end
+                        set use_ip true
+                        break
+                    end
+                else
+                    echo (set_color red)"Location not found or weather unavailable. Try another."(set_color normal)
+                    set location_tries (math $location_tries + 1)
+                    if test $location_tries -ge $max_location_tries
+                        echo (set_color bryellow)"Using IP-based location. You can set tide_report_weather_location later."(set_color normal)
+                        set use_ip true
+                        break
+                    end
+                end
+            end
         end
         set -l left_add
         set -l right_add
