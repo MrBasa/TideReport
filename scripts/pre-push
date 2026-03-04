@@ -1,0 +1,20 @@
+#!/bin/sh
+# Pre-push hook: run tests before pushing to main or master.
+# Install: cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+# See README "Pre-push hook (gated check-in)" for details.
+
+need_run=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+	case "$remote_ref" in
+		refs/heads/main|refs/heads/master) need_run=1; break ;;
+	esac
+done
+
+if test "$need_run" -eq 0; then
+	exit 0
+fi
+
+root=$(git rev-parse --show-toplevel) || exit 1
+cd "$root" || exit 1
+echo "Pre-push: running tests before push to main/master..." >&2
+exec fish -c "fishtape test/unit/*.fish test/integration/*.fish"

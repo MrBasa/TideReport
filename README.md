@@ -254,6 +254,14 @@ fishtape test/unit/*.fish
 fishtape test/integration/*.fish
 ```
 
+**Pre-push hook (gated check-in):** To run the test suite automatically before every push to `main` or `master` (and block the push if tests fail), install the pre-push hook from the repo root:
+
+```sh
+cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+```
+
+You need Fish and Fishtape available (same as running the tests manually). The hook only runs when the push updates `main` or `master`; pushes to other branches are not gated.
+
 Tests use fixture data under `test/fixtures/` and do not require network access or Tide to be installed.
 
 ## Troubleshooting
