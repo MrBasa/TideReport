@@ -62,7 +62,7 @@ If items still do not appear, run `tide_report_install` once to apply configurat
 
 ## 🚀 Available Prompt Sections
 
-* `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.
+* `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo, and optionally the latest CI run status for the current branch.
 * `weather`: Displays the current weather (from Open-Meteo or wttr.in).
 * `moon`: Displays the current moon phase (from a local offline model by default, or wttr.in when moon provider is wttr).
 * `tide`: Displays the next high/low tide from NOAA (US-based).
@@ -97,11 +97,9 @@ With the **wttr** weather provider, one API call fills both weather and moon. Wi
 
 ### GitHub Module
 
-The `github` module's caching is simpler and based on Fish's universal variables (not files).
-* It caches data per-repository.
-* Data is fetched *synchronously* if:
-    1.  You change to a new directory that is a git repository.
-    2.  You are in the same repository, but the cache is older than `tide_report_github_refresh_seconds`.
+The `github` module caches repo stats and (when CI is enabled) workflow run status in `~/.cache/tide-report/github/`. Repo data is stored per repository; CI data is stored per repository and branch (e.g. `Owner-Repo-main-ci.json`).
+* Repo and CI data are fetched in the background when the cache is missing or older than their refresh timers. The prompt is never blocked.
+* When **Show CI status** is enabled, the item shows the latest GitHub Actions workflow run for the current branch (✓ pass, ✗ fail, ⋯ pending), using `gh run list`.
 
 ### Global Settings
 
@@ -136,6 +134,7 @@ The module displays stats for the current repository, with icons you can customi
 | `` (Watchers)                          | Total watcher count  |
 | `!` (Issues)                            | Open issue count     |
 | `PR` (Pull Requests)                    | Open PR count        |
+| `✓` / `✗` / `⋯` (CI)                    | Latest workflow run: pass / fail / pending |
 | `!auth` (Error)                         | `gh` CLI is not authenticated |
 
 | Variable                             | Description                                                     | Default           |
@@ -153,6 +152,14 @@ The module displays stats for the current repository, with icons you can customi
 | `tide_report_github_color_issues`    | Color for issues (defaults to `..._color_stars`).               | `yellow`          |
 | `tide_report_github_color_prs`       | Color for PRs (defaults to `..._color_stars`).                  | `yellow`          |
 | `tide_report_github_refresh_seconds` | GitHub data cache time for a given repository.                  | `30`              |
+| `tide_report_github_show_ci`         | Whether to show CI status (latest workflow run) in the GitHub item. | `true`        |
+| `tide_report_github_icon_ci_pass`    | Icon when the latest workflow run succeeded.                   | `✓`               |
+| `tide_report_github_icon_ci_fail`     | Icon when the latest workflow run failed or was cancelled.     | `✗`               |
+| `tide_report_github_icon_ci_pending`  | Icon when the workflow is queued or in progress.               | `⋯`               |
+| `tide_report_github_color_ci_pass`   | Color for the CI pass icon.                                    | `green`           |
+| `tide_report_github_color_ci_fail`   | Color for the CI fail icon.                                    | `red`             |
+| `tide_report_github_color_ci_pending`| Color for the CI pending icon.                                 | `yellow`          |
+| `tide_report_github_ci_refresh_seconds` | How long to cache CI status before refetching.               | `60`              |
 | `tide_report_github_unavailable_text`  | Text to display when GitHub data is not available.            | `...`            |
 | `tide_report_github_unavailable_color` | Color for the unavailable text.                               | `red`             |
 

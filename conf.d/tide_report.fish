@@ -27,8 +27,14 @@ function _tide_report_install_show_preview --description "Echo labeled sample ou
 
     set -l star_color yellow
     set -q tide_report_github_color_stars && set star_color $tide_report_github_color_stars
-
-    echo (set_color brwhite)"[1] github:   "(set_color normal)(set_color $tide_github_color)"$tide_report_github_icon "(set_color $star_color)"$tide_report_github_icon_stars 42 $tide_report_github_icon_forks 3"(set_color normal)
+    set -q tide_report_github_show_ci || set -l tide_report_github_show_ci true
+    set -q tide_report_github_icon_ci_pass || set -l tide_report_github_icon_ci_pass "✓"
+    set -q tide_report_github_color_ci_pass || set -l tide_report_github_color_ci_pass green
+    set -l github_preview (set_color $tide_github_color)"$tide_report_github_icon "(set_color $star_color)"$tide_report_github_icon_stars 42 $tide_report_github_icon_forks 3"
+    if test "$tide_report_github_show_ci" = true
+        set github_preview "$github_preview "(set_color $tide_report_github_color_ci_pass)$tide_report_github_icon_ci_pass
+    end
+    echo (set_color brwhite)"[1] github:   "(set_color normal)"$github_preview"(set_color normal)
     switch "$weather_format"
         case concise
             echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️ +22°"(set_color normal)
@@ -122,6 +128,14 @@ function _tide_report_install --description "Install Tide Report defaults and pr
     set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "..."
     set -q tide_report_github_unavailable_color    || set -U tide_report_github_unavailable_color red
     set -q tide_report_github_refresh_seconds      || set -U tide_report_github_refresh_seconds 30
+    set -q tide_report_github_show_ci              || set -U tide_report_github_show_ci true
+    set -q tide_report_github_icon_ci_pass         || set -U tide_report_github_icon_ci_pass "✓"
+    set -q tide_report_github_icon_ci_fail         || set -U tide_report_github_icon_ci_fail "✗"
+    set -q tide_report_github_icon_ci_pending     || set -U tide_report_github_icon_ci_pending "⋯"
+    set -q tide_report_github_color_ci_pass        || set -U tide_report_github_color_ci_pass green
+    set -q tide_report_github_color_ci_fail        || set -U tide_report_github_color_ci_fail red
+    set -q tide_report_github_color_ci_pending     || set -U tide_report_github_color_ci_pending yellow
+    set -q tide_report_github_ci_refresh_seconds   || set -U tide_report_github_ci_refresh_seconds 60
 
     set -q tide_report_weather_units && set -U -e tide_report_weather_units
     set -q tide_report_tide_units && set -U -e tide_report_tide_units
@@ -157,6 +171,15 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         set -l r (string trim (string lower -- "$reply"))
         if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
             set add_github true
+        end
+        if $add_github
+            read -l -P (set_color brwhite)"Show CI status in GitHub item? [Y/n]: "(set_color normal) reply
+            set -l r (string trim (string lower -- "$reply"))
+            if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
+                set -U tide_report_github_show_ci true
+            else if test "$r" = "n"; or test "$r" = "no"
+                set -U tide_report_github_show_ci false
+            end
         end
 
         set -l add_weather false

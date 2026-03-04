@@ -31,10 +31,17 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l cache_dir "$HOME/.cache/tide-report/github"
     set -l cache_file "$cache_dir/$cache_key.json"
     set -l refresh_seconds $tide_report_github_refresh_seconds
+    set -l ci_refresh_seconds $tide_report_github_ci_refresh_seconds
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
+
+    set -l branch (command git branch --show-current 2>/dev/null; or echo "")
+    set -l branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
+    test -z "$branch_safe" && set branch_safe "detached"
+    set -l ci_cache_file "$cache_dir/$cache_key-$branch_safe-ci.json"
 
     ## --- Async Logic ---
     set -l trigger_fetch false
+    set -l trigger_ci_fetch false
     set -l output_valid false
     set -l now (command date +%s)
 
@@ -53,10 +60,21 @@ function _tide_item_github --description "Displays GitHub stats"
         set trigger_fetch true
     end
 
+    # Check CI cache when show_ci is enabled
+    if test "$tide_report_github_show_ci" = true
+        if test -f "$ci_cache_file"
+            set -l ci_mod (command date -r "$ci_cache_file" +%s 2>/dev/null; or echo 0)
+            if test (math $now - $ci_mod) -gt $ci_refresh_seconds
+                set trigger_ci_fetch true
+            end
+        else
+            set trigger_ci_fetch true
+        end
+    end
+
     # Trigger background fetch if needed
+    set -l clean_key (string replace -a -r '[^a-zA-Z0-9_]' '_' "$cache_key")
     if test "$trigger_fetch" = true
-        # Generate a safe universal variable name for the lock
-        set -l clean_key (string replace -a -r '[^a-zA-Z0-9_]' '_' "$cache_key")
         set -l lock_var "_tide_report_gh_lock_$clean_key"
 
         set -l lock_time 0
@@ -68,15 +86,33 @@ function _tide_item_github --description "Displays GitHub stats"
         if test (math $now - $lock_time) -gt 120
             set -U $lock_var $now
             mkdir -p "$cache_dir"
-            # Pass BOTH the API Slug and the Cache File path
             __tide_report_fetch_github "$api_slug" "$cache_file" "$timeout_sec" "$lock_var" &
             disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
         end
     end
 
+    # Trigger CI fetch if needed (skip when branch is empty, e.g. detached HEAD)
+    if test "$trigger_ci_fetch" = true; and test -n "$branch"
+        set -l ci_lock_var "_tide_report_gh_ci_lock_"$clean_key"_"(string replace -a -r '[^a-zA-Z0-9_]' '_' "$branch_safe")
+        set -l ci_lock_time 0
+        if set -q $ci_lock_var
+            set ci_lock_time $$ci_lock_var
+        end
+        if test (math $now - $ci_lock_time) -gt 120
+            set -U $ci_lock_var $now
+            mkdir -p "$cache_dir"
+            __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$ci_lock_var" &
+            disown 2>/dev/null
+        end
+    end
+
     if test "$output_valid" = true
         # Cache is valid (or stale but usable), parse and print
-        __tide_report_parse_github "$cache_file"
+        if test "$tide_report_github_show_ci" = true
+            __tide_report_parse_github "$cache_file" "" "$ci_cache_file"
+        else
+            __tide_report_parse_github "$cache_file"
+        end
     else
         # Data is missing, display loading message
         _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
@@ -92,6 +128,8 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
     else
         set line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null)
     end
+    set -l ci_cache_file ""
+    set -q argv[3]; and test -n "$argv[3]"; and set ci_cache_file "$argv[3]"
     set -l stars ""
     set -l forks ""
     set -l watchers ""
@@ -142,6 +180,56 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
         test "$prs" != 0 && set output "$output $tide_report_github_icon_prs$prs"
     end
 
+    # Append CI status when show_ci is enabled and repo has at least one workflow run
+    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"
+        set -l has_ci_run false
+        set -l ci_state "pending"
+        if test -f "$ci_cache_file"
+            # Empty array (no workflows) yields no output; do not show any CI icon
+            set -l first (command jq -r 'if length > 0 then (.[0] | "\(.status) \(.conclusion)") else "" end' "$ci_cache_file" 2>/dev/null)
+            if test -n "$first"; and test "$first" != "null null"
+                set has_ci_run true
+                set -l parts (string split " " "$first")
+                set -l status "$parts[1]"
+                set -l conclusion "$parts[2]"
+                if test "$status" = "completed"
+                    if test "$conclusion" = "success"
+                        set ci_state "pass"
+                    else
+                        set ci_state "fail"
+                    end
+                end
+            end
+        end
+        if test "$has_ci_run" = true
+            set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✓"
+            set -q tide_report_github_icon_ci_fail; or set -l tide_report_github_icon_ci_fail "✗"
+            set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⋯"
+            set -q tide_report_github_color_ci_pass; or set -l tide_report_github_color_ci_pass "green"
+            set -q tide_report_github_color_ci_fail; or set -l tide_report_github_color_ci_fail "red"
+            set -q tide_report_github_color_ci_pending; or set -l tide_report_github_color_ci_pending "yellow"
+            if not set -q TIDE_REPORT_TEST
+                switch "$ci_state"
+                    case pass
+                        set output "$output "(set_color $tide_report_github_color_ci_pass)$tide_report_github_icon_ci_pass
+                    case fail
+                        set output "$output "(set_color $tide_report_github_color_ci_fail)$tide_report_github_icon_ci_fail
+                    case "*"
+                        set output "$output "(set_color $tide_report_github_color_ci_pending)$tide_report_github_icon_ci_pending
+                end
+            else
+                switch "$ci_state"
+                    case pass
+                        set output "$output $tide_report_github_icon_ci_pass"
+                    case fail
+                        set output "$output $tide_report_github_icon_ci_fail"
+                    case "*"
+                        set output "$output $tide_report_github_icon_ci_pending"
+                end
+            end
+        end
+    end
+
     if test -n "$output"
         set -l out_trimmed (string trim "$output")
         _tide_print_item github "$out_trimmed"
@@ -166,5 +254,20 @@ function __tide_report_fetch_github --description "Fetch GitHub repo stats with 
         command mv -f "$temp_file" "$cache_file"
     else
         functions -q __tide_report_log_expected && __tide_report_log_expected github "fetch failed (check gh auth and network)"
+    end
+end
+
+## --- Fetch GitHub CI status (Background Worker) ---
+function __tide_report_fetch_github_ci --description "Fetch latest workflow run for branch and write CI cache JSON" --argument-names api_slug branch ci_cache_file lock_var
+    function _remove_ci_lock --description "Clear GitHub CI fetch lock when background worker exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
+        set -U -e $lock_var
+    end
+
+    set -l temp_file "$ci_cache_file.$fish_pid.tmp"
+    set -l json_data (gh run list -R "$api_slug" -b "$branch" -L 1 --json status,conclusion,name 2>/dev/null)
+
+    if test $status -eq 0; and test -n "$json_data"
+        echo "$json_data" >"$temp_file"
+        command mv -f "$temp_file" "$ci_cache_file"
     end
 end
