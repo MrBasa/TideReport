@@ -13,6 +13,20 @@ set -q __tide_report_moon_J1970        || set -g __tide_report_moon_J1970 244058
 set -q __tide_report_moon_J2000        || set -g __tide_report_moon_J2000 2451545
 set -q __tide_report_moon_obliquity    || set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
 
+## If user has prompt item lists set globally (e.g. in config.fish), inform them and show copy-paste lines.
+## Arguments: left_list and right_list as space-separated strings (the lists we just wrote). Either may be empty.
+function _tide_report_warn_global_prompt_items --description "Warn when a global shadows; show session fix and config.fish line" --argument-names left_list right_list
+    set -q left_list || set left_list ""
+    set -q right_list || set right_list ""
+    set -q -g tide_left_prompt_items; or set -q -g tide_right_prompt_items; or return 0
+    echo (set_color bryellow)"You have tide_left_prompt_items and/or tide_right_prompt_items set globally (e.g. in config.fish), which overrides the list we just updated."(set_color normal)
+    echo (set_color brwhite)"To see the change in this session, run:"(set_color normal)
+    echo (set_color cyan)"  set -e -g tide_left_prompt_items ; set -e -g tide_right_prompt_items ; tide reload"(set_color normal)
+    echo (set_color brwhite)"To make it permanent, update the corresponding line(s) in your config.fish. Example:"(set_color normal)
+    test -n "$left_list" && echo (set_color cyan)"  set -g tide_left_prompt_items $left_list"(set_color normal)
+    test -n "$right_list" && echo (set_color cyan)"  set -g tide_right_prompt_items $right_list"(set_color normal)
+end
+
 ## Show sample render of each Tide Report prompt item (for install wizard). Optional weather_format: concise, medium, or detailed.
 function _tide_report_install_show_preview --description "Echo labeled sample output for github, weather, moon, tide" --argument-names weather_format
     set -q tide_github_color || set -l tide_github_color white
@@ -155,7 +169,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
 
     if not set -q tide_left_prompt_items; or not set -q tide_right_prompt_items
         _tide_report_ensure_prompt_items 1
-        command -q tide && tide reload
+        tide reload 2>/dev/null; or true
         return 0
     end
     set -l left $tide_left_prompt_items
@@ -171,10 +185,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
 
     if $any_present
         echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
-        command -q tide && tide reload
+        tide reload 2>/dev/null; or true
     else if not status is-interactive
         _tide_report_ensure_prompt_items 1
-        command -q tide && tide reload
+        tide reload 2>/dev/null; or true
         echo (set_color brwhite)"Tide Report: added github (left), weather, moon (right). Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
     else
         echo (set_color brwhite)"Choose which Tide Report items to add to your prompt."(set_color normal)
@@ -321,7 +335,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
             echo (set_color brwhite)"$msg."(set_color normal)
         end
-        command -q tide && tide reload
+        tide reload 2>/dev/null; or true
         echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     end
 end
@@ -336,12 +350,10 @@ end
 function _tide_report_uninstall --description "Handle fisher uninstall: remove Tide Report items, vars, functions, and cache" --on-event tide_report_uninstall
     echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
-    # Remove our items from prompt lists first (while vars still exist), then erase universals.
-    # Strip exact matches (weather, moon, etc.) and any compound element that contains our names
-    # (e.g. "weather moon" as a single list entry), so Tide never sees _tide_item_weather moon.
     set -l tide_report_items github weather moon tide
+    set -l new_right
+    set -l new_left
     if set -q tide_right_prompt_items
-        set -l new_right
         for item in $tide_right_prompt_items
             set -l keep true
             if contains -- $item $tide_report_items
@@ -361,7 +373,6 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
         set -U tide_right_prompt_items $new_right
     end
     if set -q tide_left_prompt_items
-        set -l new_left
         for item in $tide_left_prompt_items
             set -l keep true
             if contains -- $item $tide_report_items
@@ -380,6 +391,7 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
         end
         set -U tide_left_prompt_items $new_left
     end
+    _tide_report_warn_global_prompt_items (string join " " $new_left) (string join " " $new_right)
 
     # Erase all universal variables we create. Intentionally leave tide_time_format (Tide core).
     set -l vars_to_erase (set -U --names | string match -r '^_*(tide_report|tide_github|tide_weather|tide_moon|tide_tide).*')
@@ -393,12 +405,8 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     # Remove cache
     command rm -rf ~/.cache/tide-report
 
-    if command -q tide
-        tide reload
-        echo (set_color brwhite)"Prompt refreshed."(set_color normal)
-    else
-        echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to refresh your prompt."(set_color normal)
-    end
+    tide reload 2>/dev/null; or true
+    echo (set_color brwhite)"Prompt refreshed. Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session if items still appear."(set_color normal)
 end
 
 ## Apply chosen Tide Report items to Tide prompt lists (insertion rules: github after git/pwd, right items appended).
@@ -450,6 +458,7 @@ function _tide_report_apply_prompt_items --description "Add selected Tide Report
 
     set -U tide_left_prompt_items $new_left
     set -U tide_right_prompt_items $new_right
+    _tide_report_warn_global_prompt_items (string join " " $new_left) (string join " " $new_right)
 end
 
 ## Add default Tide Report items when none are present (used when not interactive or when wizard is skipped).

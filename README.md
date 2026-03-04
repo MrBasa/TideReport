@@ -76,6 +76,8 @@ set -Ua tide_right_prompt_items tide
 tide reload
 ```
 
+If you manage these in `config.fish` with `set -g`, install and uninstall will show a message with the updated list so you can sync; you can keep using either universal or global.
+
 ## ⚙️ Configuration
 Set any of the following variables universally or add them to your `config.fish` to override defaults.
 
