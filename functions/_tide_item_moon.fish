@@ -1,7 +1,7 @@
-# TideReport :: Moon Prompt Item
-#
-# Owns moon data and moon.json cache. Dispatches by tide_report_moon_provider (local | wttr).
-# When moon=wttr and weather=wttr, one request fills both. Handler in _tide_report_handle_async_moon.fish.
+## TideReport :: Moon Prompt Item
+##
+## Owns moon data and moon.json cache. Dispatches by tide_report_moon_provider (local | wttr).
+## When moon=wttr and weather=wttr, one request fills both. Handler in _tide_report_handle_async_moon.fish.
 if not functions -q _tide_report_handle_async_moon
     source (status filename | path dirname)/_tide_report_handle_async_moon.fish
 end
@@ -28,8 +28,8 @@ function _tide_item_moon --description "Displays moon phase, fetches asynchronou
     end
 end
 
-# --- Parser Function (reads normalized moon.json) ---
-function __tide_report_parse_moon --argument-names cache_file
+## --- Parser Function (reads normalized moon.json) ---
+function __tide_report_parse_moon --description "Parse moon.json and print the corresponding moon emoji" --argument-names cache_file
     set -l moon_phase_text (jq -r '.phase // ""' "$cache_file" 2>/dev/null)
 
     if test $status -ne 0; or test -z "$moon_phase_text"
@@ -41,8 +41,8 @@ function __tide_report_parse_moon --argument-names cache_file
     _tide_print_item moon $moon_emoji
 end
 
-# --- Map moon phase text to emoji ---
-function __tide_report_get_moon_emoji --argument-names phase_text
+## --- Map moon phase text to emoji ---
+function __tide_report_get_moon_emoji --description "Map a moon phase name to its emoji representation" --argument-names phase_text
     switch "$phase_text"
         case "New Moon"; echo "🌑"
         case "Waxing Crescent"; echo "🌒"

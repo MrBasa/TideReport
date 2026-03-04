@@ -1,4 +1,4 @@
-# Integration test: tide item with fixture cache and temp HOME.
+## Integration test: tide item with fixture cache and temp HOME.
 
 source (dirname (dirname (status filename)))/setup.fish
 

@@ -1,4 +1,4 @@
-# Unit tests for GitHub owner/repo URL parsing (same logic as plugin).
+## Unit tests for GitHub owner/repo URL parsing (same logic as plugin).
 
 @test "https URL: owner and repo extracted" (
     echo "https://github.com/Owner/Repo.git" | string replace -r '^.*[:/]([^/]+)/([^/]+?)(\.git)?$' '$1\n$2' | string trim | string collect

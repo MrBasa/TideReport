@@ -1,8 +1,9 @@
-# Unit tests for tide parser (with fixture; uses real date so fixture uses future dates).
+## Unit tests for tide parser (with fixture; uses real date so fixture uses future dates).
 
 set -l root (dirname (dirname (dirname (status filename))))/functions
 set -l fixtures (dirname (dirname (status filename)))/fixtures
-function _tide_print_item
+## Stub _tide_print_item so tide parser tests can load plugin code without Tide.
+function _tide_print_item --description "Stub Tide's _tide_print_item for tide unit tests"
 end
 source "$root/_tide_item_weather.fish"
 source "$root/_tide_item_tide.fish"

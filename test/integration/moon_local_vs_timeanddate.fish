@@ -1,13 +1,13 @@
-#! Optional validation test: compare local moon model against timeanddate.com
-#! for major phases in a given year. This is intended as an external sanity
-#! check and is skipped unless TIDE_REPORT_ENABLE_TIMEANDDATE_TESTS is set.
-#!
-#! We display 8 phases (New Moon, Waxing Crescent, First Quarter, Waxing
-#! Gibbous, Full Moon, Waning Gibbous, Third Quarter, Waning Crescent), but
-#! timeanddate.com only publishes exact dates for the 4 primary events (New
-#! Moon, First Quarter, Full Moon, Third Quarter). The other four are
-#! intervals between those and have no single "event" date on that site, so
-#! this test validates the four primary phases only.
+## Optional validation test: compare local moon model against timeanddate.com
+## for major phases in a given year. This is intended as an external sanity
+## check and is skipped unless TIDE_REPORT_ENABLE_TIMEANDDATE_TESTS is set.
+##
+## We display 8 phases (New Moon, Waxing Crescent, First Quarter, Waxing
+## Gibbous, Full Moon, Waning Gibbous, Third Quarter, Waning Crescent), but
+## timeanddate.com only publishes exact dates for the 4 primary events (New
+## Moon, First Quarter, Full Moon, Third Quarter). The other four are
+## intervals between those and have no single "event" date on that site, so
+## this test validates the four primary phases only.
 
 if not set -q TIDE_REPORT_ENABLE_TIMEANDDATE_TESTS
     exit 0
@@ -19,7 +19,8 @@ source "$REPO_ROOT/test/setup.fish"
 source "$REPO_ROOT/functions/_tide_report_moon_math.fish"
 source "$REPO_ROOT/functions/_tide_report_provider_weather_openmeteo.fish"
 
-function __tide_report_month_name_to_number --argument-names name
+## Map an English month name (January, February, ...) to a zero-padded month number.
+function __tide_report_month_name_to_number --description "Map English month name to zero-padded month number" --argument-names name
     switch $name
         case January; echo 01
         case February; echo 02
@@ -37,7 +38,8 @@ function __tide_report_month_name_to_number --argument-names name
     end
 end
 
-function __tide_report_moon_timeanddate_check --argument-names year
+## Fetch timeanddate.com moon phase table for a year and compare dates with the local model.
+function __tide_report_moon_timeanddate_check --description "Validate local moon model against timeanddate.com for a given year" --argument-names year
     set -l url "https://www.timeanddate.com/moon/phases/?year=$year"
     set -l html (curl -s "$url")
     if test $status -ne 0; or test -z "$html"

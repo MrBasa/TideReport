@@ -1,4 +1,4 @@
-# Tide Report :: Default Configuration
+## Tide Report :: Default Configuration
 
 # Moon phase math constants (used by __tide_report_moon_* helpers, session-scoped globals)
 set -q __tide_report_moon_PI           || set -g __tide_report_moon_PI (math "acos(-1)")
@@ -8,10 +8,11 @@ set -q __tide_report_moon_J1970        || set -g __tide_report_moon_J1970 244058
 set -q __tide_report_moon_J2000        || set -g __tide_report_moon_J2000 2451545
 set -q __tide_report_moon_obliquity    || set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
 
-function _tide_report_install --on-event tide_report_install
+## Install Tide Report defaults and register prompt items on Fisher install event.
+function _tide_report_install --description "Install Tide Report defaults and prompt items on fisher event" --on-event tide_report_install
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
-    # --- Check for Dev Branch Install ---
+    ## --- Check for Dev Branch Install ---
     if set -q _fisher_plugins; and contains mrbasa/tidereport (string lower $_fisher_plugins)
         echo (set_color --bold bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
         echo "  fisher install MrBasa/TideReport"(set_color cyan --bold)"@v1"(set_color normal)
@@ -20,7 +21,7 @@ function _tide_report_install --on-event tide_report_install
 
     echo (set_color --bold brwhite)"Installing Tide Report Configuration..."(set_color normal)
 
-    # --- Check dependencies ---
+    ## --- Check dependencies ---
     if ! command -v "gh" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
     end
@@ -92,7 +93,7 @@ function _tide_report_install --on-event tide_report_install
 
     _tide_report_ensure_prompt_items 1
 
-    # --- Prompt item placement message (full install only) ---
+    ## --- Prompt item placement message (full install only) ---
     if set -q tide_left_prompt_items; and set -q tide_right_prompt_items
         set -l left $tide_left_prompt_items
         set -l right $tide_right_prompt_items
@@ -114,12 +115,14 @@ function _tide_report_install --on-event tide_report_install
     echo (set_color brwhite)"New prompt items will show in this shell after reload. In other open terminals, run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session."(set_color normal)
 end
 
-function _tide_report_update --on-event tide_report_update
+## Handle Fisher update event: clear cache and re-run install logic.
+function _tide_report_update --description "Handle fisher update: clear Tide Report cache and re-run install" --on-event tide_report_update
     command rm -rf ~/.cache/tide-report
     _tide_report_install
 end
 
-function _tide_report_uninstall --on-event tide_report_uninstall
+## Uninstall Tide Report: remove prompt items, variables, functions, and cache on Fisher uninstall.
+function _tide_report_uninstall --description "Handle fisher uninstall: remove Tide Report items, vars, functions, and cache" --on-event tide_report_uninstall
     echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
     # Remove our items from prompt lists first (while vars still exist), then erase universals.
@@ -158,8 +161,8 @@ function _tide_report_uninstall --on-event tide_report_uninstall
     echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to refresh your prompt."(set_color normal)
 end
 
-# Add our prompt items to Tide if none are present (helper used by install).
-function _tide_report_ensure_prompt_items --argument-names silent
+## Add Tide Report items to Tide prompt lists when none are present (helper used by install).
+function _tide_report_ensure_prompt_items --description "Ensure Tide Report items exist in Tide prompt lists" --argument-names silent
     set -q tide_left_prompt_items || return 0
     set -q tide_right_prompt_items || return 0
     set -l left $tide_left_prompt_items
@@ -196,7 +199,7 @@ function _tide_report_ensure_prompt_items --argument-names silent
     end
 end
 
-# User-callable: run install logic manually (e.g. after fisher install when event doesn't fire).
-function tide_report_install --description "Run Tide Report install: add prompt items, set config. Use if items did not appear after fisher install."
+## User-callable helper to run install logic manually (e.g. when Fisher event does not fire).
+function tide_report_install --description "Run Tide Report install manually: add prompt items and set config"
     _tide_report_install
 end

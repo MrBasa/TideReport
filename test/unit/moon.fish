@@ -1,7 +1,8 @@
-#! Unit tests for moon helpers (emoji mapping and local phase model).
+## Unit tests for moon helpers (emoji mapping and local phase model).
 
 set -l root (dirname (dirname (dirname (status filename))))/functions
-function _tide_print_item
+## Stub _tide_print_item so moon tests can load plugin code without Tide.
+function _tide_print_item --description "Stub Tide's _tide_print_item for moon unit tests"
 end
 source "$root/_tide_item_moon.fish"
 source "$root/_tide_report_provider_moon_local.fish"

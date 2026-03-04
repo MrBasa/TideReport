@@ -1,4 +1,4 @@
-# Integration tests: weather and moon items with fixture cache and temp HOME.
+## Integration tests: weather and moon items with fixture cache and temp HOME.
 
 source (dirname (dirname (status filename)))/setup.fish
 

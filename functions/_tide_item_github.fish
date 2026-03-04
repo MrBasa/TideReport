@@ -1,9 +1,9 @@
-# TideReport :: GitHub Prompt Item
-#
-# This is the main function that Tide calls to display GitHub data. 
+## TideReport :: GitHub Prompt Item
+##
+## This is the main function that Tide calls to display GitHub data. 
 
 function _tide_item_github --description "Displays GitHub stats"
-    # --- Quick Checks ---
+    ## --- Quick Checks ---
     # Verify we are in a git repo (suppress git's fatal message when not in a repo)
     if not command git rev-parse --is-inside-work-tree 2>/dev/null >/dev/null
         return 0 # Not git dir
@@ -33,7 +33,7 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l refresh_seconds $tide_report_github_refresh_seconds
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
 
-    # --- Async Logic ---
+    ## --- Async Logic ---
     set -l trigger_fetch false
     set -l output_valid false
     set -l now (command date +%s)
@@ -83,8 +83,8 @@ function _tide_item_github --description "Displays GitHub stats"
     end
 end
 
-# --- Parser Function ---
-function __tide_report_parse_github
+## --- Parser Function ---
+function __tide_report_parse_github --description "Parse cached GitHub repo stats JSON and print a formatted segment"
     set -l cache_file $argv[1]
     set -l line ""
     if set -q argv[2]; and test -n "$argv[2]"
@@ -147,10 +147,10 @@ function __tide_report_parse_github
     end
 end
 
-# --- Fetch GitHub Data (Background Worker) ---
-function __tide_report_fetch_github --argument-names api_slug cache_file timeout_sec lock_var
+## --- Fetch GitHub Data (Background Worker) ---
+function __tide_report_fetch_github --description "Fetch GitHub repo stats with gh and write cache JSON" --argument-names api_slug cache_file timeout_sec lock_var
     # Auto-cleanup lock
-    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
+    function _remove_lock --description "Clear GitHub fetch lock when background worker exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -U -e $lock_var
     end
 

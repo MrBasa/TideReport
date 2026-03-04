@@ -1,9 +1,9 @@
-# Unit tests for weather helpers (emoji, wind arrow, date cmd, time format).
-# Source only the weather item so we get __tide_report_get_weather_emoji, etc.
+## Unit tests for weather helpers (emoji, wind arrow, date cmd, time format).
+## Source only the weather item so we get __tide_report_get_weather_emoji, etc.
 
 set -l root (dirname (dirname (dirname (status filename))))/functions
-# Stub so parser code doesn't fail if we ever call it
-function _tide_print_item
+## Stub _tide_print_item so weather tests can load plugin code without Tide.
+function _tide_print_item --description "Stub Tide's _tide_print_item for weather unit tests"
 end
 source "$root/_tide_item_weather.fish"
 

@@ -1,14 +1,14 @@
-# TideReport :: Tide Prompt Item
-# This function handles all logic for displaying the tide prediction module.
-#
-# --- Sample Data: ---
-# https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8443970&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=english&format=json
-# { "predictions" : [
-#    {"t":"2025-10-22 00:18", "v":"9.398", "type":"H"},
-#    {"t":"2025-10-22 06:15", "v":"1.085", "type":"L"},
-#    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
-#    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
-# ]}
+## TideReport :: Tide Prompt Item
+## This function handles all logic for displaying the tide prediction module.
+##
+## --- Sample Data: ---
+## https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8443970&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=english&format=json
+## { "predictions" : [
+##    {"t":"2025-10-22 00:18", "v":"9.398", "type":"H"},
+##    {"t":"2025-10-22 06:15", "v":"1.085", "type":"L"},
+##    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
+##    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
+## ]}
 
 function _tide_item_tide --description "Fetches and displays next high or low tide"
     if not set -q tide_report_tide_station_id
@@ -68,8 +68,8 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
     _tide_print_item tide $output
 end
 
-# --- Parse Tide Data ---
-function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
+## --- Parse Tide Data ---
+function __tide_report_parse_tide --description "Parse tide.json and compute the next tide time and level" --argument-names now cache_file gnu_date_cmd
     if not test -f "$cache_file"
         return 1
     end
@@ -131,9 +131,9 @@ function __tide_report_parse_tide --argument-names now cache_file gnu_date_cmd
     return 1
 end
 
-# --- Fetch Tide Data ---
-function __tide_report_fetch_tide --argument url cache_file lock_var
-    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
+## --- Fetch Tide Data ---
+function __tide_report_fetch_tide --description "Fetch tide predictions from NOAA and update tide.json cache" --argument url cache_file lock_var
+    function _remove_lock --description "Clear tide fetch lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
     set -l tide_data (curl -s -A "$tide_report_user_agent" --max-time 3 "$url")

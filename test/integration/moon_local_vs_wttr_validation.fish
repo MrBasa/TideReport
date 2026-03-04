@@ -1,5 +1,5 @@
-#! Optional validation test: compare local moon model against wttr.in
-#! This test is skipped unless TIDE_REPORT_ENABLE_NETWORK_TESTS is set.
+## Optional validation test: compare local moon model against wttr.in
+## This test is skipped unless TIDE_REPORT_ENABLE_NETWORK_TESTS is set.
 
 if not set -q TIDE_REPORT_ENABLE_NETWORK_TESTS
     exit 0
@@ -8,7 +8,8 @@ end
 source (dirname (dirname (status filename)))/setup.fish
 source "$REPO_ROOT/functions/_tide_report_provider_moon_local.fish"
 
-function __moon_validation_case --argument-names day_index
+## Compare local moon model against wttr.in for a given day index offset from today.
+function __moon_validation_case --description "Compare local moon phase with wttr.in for the given day offset" --argument-names day_index
     set -l now (command date +%s)
     set -l unix (math "$now + $day_index * 86400")
     set -l local_phase (__tide_report_moon_phase_from_unix $unix)

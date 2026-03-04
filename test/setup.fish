@@ -1,10 +1,10 @@
-# TideReport test setup: REPO_ROOT, stub _tide_print_item, source plugin, set parser universals.
-# Source this from integration tests (and optionally unit tests that need full plugin).
+## TideReport test setup: REPO_ROOT, stub _tide_print_item, source plugin, set parser universals.
+## Source this from integration tests (and optionally unit tests that need full plugin).
 
 set -g REPO_ROOT (dirname (dirname (status filename)))
 
-# Stub Tide's output so we can assert without Tide installed.
-function _tide_print_item
+## Stub Tide's _tide_print_item so tests can capture prompt output without Tide installed.
+function _tide_print_item --description "Capture prompt item output into global variables for tests"
     set -q _tide_print_item_calls || set -g _tide_print_item_calls
     set -g _tide_print_item_calls $_tide_print_item_calls (string join " " $argv)
     set -g _tide_print_item_last_argv $argv

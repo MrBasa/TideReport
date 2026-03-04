@@ -1,26 +1,30 @@
-#! TideReport :: Moon phase math helpers (SunCalc-style)
-#
-#! Ported in spirit from SunCalc (https://github.com/mourner/suncalc)
-#! by Vladimir Agafonkin, used under the BSD 2-Clause license.
-#! We only implement the minimal subset needed to compute a numeric
-#! lunar phase fraction in [0,1).
+## TideReport :: Moon phase math helpers (SunCalc-style)
+##
+## Ported in spirit from SunCalc (https://github.com/mourner/suncalc)
+## by Vladimir Agafonkin, used under the BSD 2-Clause license.
+## We only implement the minimal subset needed to compute a numeric
+## lunar phase fraction in [0,1).
 
-function __tide_report_moon_to_days --argument-names unix_time
+## Convert Unix time (seconds) to days since J2000 epoch.
+function __tide_report_moon_to_days --description "Convert Unix time to days since J2000 epoch" --argument-names unix_time
     set -l jd (math "$unix_time / $__tide_report_moon_day_seconds - 0.5 + $__tide_report_moon_J1970")
     math "$jd - $__tide_report_moon_J2000"
 end
 
-function __tide_report_moon_right_ascension --argument-names l b
+## Compute right ascension in radians for ecliptic coordinates l, b.
+function __tide_report_moon_right_ascension --description "Compute right ascension in radians for ecliptic lon/lat" --argument-names l b
     set -l e $__tide_report_moon_obliquity
     math "atan2(sin($l) * cos($e) - tan($b) * sin($e), cos($l))"
 end
 
-function __tide_report_moon_declination --argument-names l b
+## Compute declination in radians for ecliptic coordinates l, b.
+function __tide_report_moon_declination --description "Compute declination in radians for ecliptic lon/lat" --argument-names l b
     set -l e $__tide_report_moon_obliquity
     math "asin(sin($b) * cos($e) + cos($b) * sin($e) * sin($l))"
 end
 
-function __tide_report_moon_sun_coords --argument-names d
+## Compute Sun right ascension and declination at days offset d since J2000.
+function __tide_report_moon_sun_coords --description "Compute Sun right ascension and declination for day offset d" --argument-names d
     set -l rad $__tide_report_moon_rad
     set -l M (math "$rad * (357.5291 + 0.98560028 * $d)")
     set -l C (math "$rad * (1.9148 * sin($M) + 0.02 * sin(2 * $M) + 0.0003 * sin(3 * $M))")
@@ -31,7 +35,8 @@ function __tide_report_moon_sun_coords --argument-names d
     printf "%s\n%s\n" $ra $dec
 end
 
-function __tide_report_moon_moon_coords --argument-names d
+## Compute Moon coordinates and distance at days offset d since J2000.
+function __tide_report_moon_moon_coords --description "Compute Moon lon/lat-based coords and distance for day offset d" --argument-names d
     set -l rad $__tide_report_moon_rad
     set -l L (math "$rad * (218.316 + 13.176396 * $d)")
     set -l M (math "$rad * (134.963 + 13.064993 * $d)")
@@ -44,7 +49,8 @@ function __tide_report_moon_moon_coords --argument-names d
     printf "%s\n%s\n%s\n" $ra $dec $dt
 end
 
-function __tide_report_moon_phase_fraction_from_unix --argument-names unix_time
+## Compute normalized lunar phase fraction in [0,1) from Unix time.
+function __tide_report_moon_phase_fraction_from_unix --description "Compute normalized lunar phase fraction from Unix time" --argument-names unix_time
     set -l d (__tide_report_moon_to_days $unix_time)
     set -l sun_coords (__tide_report_moon_sun_coords $d)
     set -l s_ra $sun_coords[1]

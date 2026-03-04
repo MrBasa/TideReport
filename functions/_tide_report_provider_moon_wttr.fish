@@ -1,8 +1,8 @@
-# TideReport :: wttr.in moon provider (moon-only fetch)
-# Used when moon provider is wttr but weather provider is not wttr (so we need a separate moon request).
+## TideReport :: wttr.in moon provider (moon-only fetch)
+## Used when moon provider is wttr but weather provider is not wttr (so we need a separate moon request).
 
-function __tide_report_provider_moon_wttr --argument-names moon_cache timeout_sec lock_var
-    function _remove_lock_moon --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
+function __tide_report_provider_moon_wttr --description "Fetch moon phase from wttr.in and write normalized moon.json" --argument-names moon_cache timeout_sec lock_var
+    function _remove_lock_moon --description "Clear wttr.in moon provider lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
 

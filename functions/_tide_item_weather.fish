@@ -1,6 +1,6 @@
-# TideReport :: Weather Prompt Item
-#
-# This is the main function that Tide calls to display the weather.
+## TideReport :: Weather Prompt Item
+##
+## This is the main function that Tide calls to display the weather.
 
 function _tide_item_weather --description "Displays weather, fetches asynchronously from JSON"
     set -l item_name "weather"
@@ -26,8 +26,8 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
     end
 end
 
-# --- Parser Function (reads normalized weather.json) ---
-function __tide_report_parse_weather --argument-names cache_file
+## --- Parser Function (reads normalized weather.json) ---
+function __tide_report_parse_weather --description "Parse normalized weather.json and build formatted prompt string" --argument-names cache_file
     set -l temp_field "temp_c"
     set -l feels_like_field "feels_like_c"
     set -l wind_field "wind_speed_kmh"
@@ -47,7 +47,7 @@ function __tide_report_parse_weather --argument-names cache_file
         return
     end
 
-    # --- Format String Replacements ---
+    ## --- Format String Replacements ---
     set -l temp_val (math "floor($temp + 0.5)")
     set -l temp_str (printf "%+d°" $temp_val)
     set cond_text (string replace -a '\t' ' ' -- $cond_text | string replace -ra ' {2,}' ' ')
@@ -62,7 +62,7 @@ function __tide_report_parse_weather --argument-names cache_file
     set -l sunrise_str (__tide_report_format_unix_time "$sunrise_utc" $tide_time_format)
     set -l sunset_str (__tide_report_format_unix_time "$sunset_utc" $tide_time_format)
 
-    # --- Build the final output string ---
+    ## --- Build the final output string ---
     # Normalize to a single string so replacements always run on one value (handles format set as multiple elements).
     set -l output (string join ' ' $tide_report_weather_format)
     set -l pairs '%t' $temp_str '%C' $cond_text '%c' $cond_emoji '%w' $wind_str '%h' $humidity_str '%f' $feels_like_str '%d' $wind_arrow '%u' $uv_str '%S' $sunrise_str '%s' $sunset_str
@@ -104,8 +104,8 @@ function __tide_report_parse_weather --argument-names cache_file
     _tide_print_item weather $output
 end
 
-# --- Map wttr.in weatherCode to emoji ---
-function __tide_report_get_weather_emoji --argument-names code
+## --- Map wttr.in weatherCode to emoji ---
+function __tide_report_get_weather_emoji --description "Map wttr.in weatherCode to a weather emoji" --argument-names code
     switch "$code"
         case 113; echo "☀️"; # Sunny / Clear
         case 116; echo "🌤️"; # Partly cloudy
@@ -120,10 +120,10 @@ function __tide_report_get_weather_emoji --argument-names code
     end
 end
 
-# --- Map wttr.in wind direction to an arrow (direction wind is blowing TO) ---
+## --- Map wttr.in wind direction to an arrow (direction wind is blowing TO) ---
 # wttr.in gives wind FROM (meteorological); we show arrow where wind is blowing TO,
 # to match wttr.in's one-line format (e.g. format=2) and most weather UIs.
-function __tide_report_get_wind_arrow --argument-names direction
+function __tide_report_get_wind_arrow --description "Convert wttr.in wind direction string to an arrow glyph" --argument-names direction
     switch "$direction"
         case "N"; echo "⬇"   # from N → to S
         case "NNE" "NE"; echo "⬋"   # from NE → to SW
@@ -137,8 +137,8 @@ function __tide_report_get_wind_arrow --argument-names direction
     end
 end
 
-# --- Parse "07:30 AM" (today local) to Unix timestamp ---
-function __tide_report_time_string_to_unix --argument-names time_str
+## --- Parse "07:30 AM" (today local) to Unix timestamp ---
+function __tide_report_time_string_to_unix --description "Parse a local time string like \"07:30 AM\" to a Unix timestamp" --argument-names time_str
     if test -z "$time_str"
         echo ""
         return
@@ -153,8 +153,8 @@ function __tide_report_time_string_to_unix --argument-names time_str
     end
 end
 
-# --- Return GNU date command name (gdate or date) or empty for BSD ---
-function __tide_report_gnu_date_cmd
+## --- Return GNU date command name (gdate or date) or empty for BSD ---
+function __tide_report_gnu_date_cmd --description "Detect GNU date command name (gdate/date) or echo nothing on BSD"
     if command -q gdate
         echo gdate
     else if command date --version 2>/dev/null >/dev/null
@@ -162,8 +162,8 @@ function __tide_report_gnu_date_cmd
     end
 end
 
-# --- Format Unix timestamp for display ---
-function __tide_report_format_unix_time --argument-names epoch_str time_format
+## --- Format Unix timestamp for display ---
+function __tide_report_format_unix_time --description "Format a Unix timestamp using the given time format" --argument-names epoch_str time_format
     if test -z "$epoch_str"; or test "$epoch_str" = "null"
         echo ""
         return
@@ -182,8 +182,8 @@ function __tide_report_format_unix_time --argument-names epoch_str time_format
     end
 end
 
-# --- Re-format wttr.in time strings (legacy; used only if needed) ---
-function __tide_report_format_wttr_time --argument-names time_str time_format
+## --- Re-format wttr.in time strings (legacy; used only if needed) ---
+function __tide_report_format_wttr_time --description "Re-format wttr.in time strings using the given time format" --argument-names time_str time_format
     if test -z "$time_str"
         echo ""
         return

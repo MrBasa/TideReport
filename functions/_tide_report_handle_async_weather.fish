@@ -1,18 +1,18 @@
-# TideReport :: Weather async fetch (provider-agnostic)
-#
-# Normalized cache schemas (all weather providers produce this shape):
-#
-#   weather.json: temp_c, temp_f, feels_like_c, feels_like_f, condition_code (WWO 113=clear, ...),
-#   condition_text, wind_speed_kmh, wind_speed_mph, wind_dir_16 (N, NE, ...), humidity, uv_index,
-#   sunrise_utc, sunset_utc (Unix timestamps)
+## TideReport :: Weather async fetch (provider-agnostic)
+##
+## Normalized cache schemas (all weather providers produce this shape):
+##
+##   weather.json: temp_c, temp_f, feels_like_c, feels_like_f, condition_code (WWO 113=clear, ...),
+##   condition_text, wind_speed_kmh, wind_speed_mph, wind_dir_16 (N, NE, ...), humidity, uv_index,
+##   sunrise_utc, sunset_utc (Unix timestamps)
 
-# Source provider implementations
+## Source provider implementations
 set -l _tr_weather_dir (status filename | path dirname)
 source "$_tr_weather_dir/_tide_report_provider_weather_wttr.fish"
 source "$_tr_weather_dir/_tide_report_provider_weather_openmeteo.fish"
 
-# --- Main async handler for the weather cache (used by weather item only) ---
-function _tide_report_handle_async_weather --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
+## --- Main async handler for the weather cache (used by weather item only) ---
+function _tide_report_handle_async_weather --description "Manage weather.json cache validity and trigger provider fetches" --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
     set -l now (command date +%s)
     set -l trigger_fetch false
     set -l cache_valid false
@@ -68,9 +68,9 @@ function _tide_report_handle_async_weather --argument-names item_name cache_file
     end
 end
 
-# --- Dispatch by provider ---
-function __tide_report_fetch_weather --argument-names weather_cache timeout_sec lock_var
-    function _remove_lock --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
+## --- Dispatch by provider ---
+function __tide_report_fetch_weather --description "Dispatch to configured weather provider to refresh weather.json" --argument-names weather_cache timeout_sec lock_var
+    function _remove_lock --description "Clear weather provider lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         set -e $lock_var
     end
 

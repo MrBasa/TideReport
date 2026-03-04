@@ -1,8 +1,8 @@
-# Integration test: GitHub item.
-# 1) Full item with valid cache: must call _tide_print_item and display something.
-# 2) Parser with fixture data: exact output (★42 ⑂3 ⑀10 !2 PR1).
-# 3) Non-git dir: no git fatal on stderr.
-# 4) Stale cache: no disown error on stderr.
+## Integration test: GitHub item.
+## 1) Full item with valid cache: must call _tide_print_item and display something.
+## 2) Parser with fixture data: exact output (★42 ⑂3 ⑀10 !2 PR1).
+## 3) Non-git dir: no git fatal on stderr.
+## 4) Stale cache: no disown error on stderr.
 
 source (dirname (dirname (status filename)))/setup.fish
 # Ensure REPO_ROOT is absolute so paths are valid regardless of cwd
@@ -10,7 +10,7 @@ pushd "$REPO_ROOT" >/dev/null
 set -g REPO_ROOT (pwd)
 popd >/dev/null
 
-# --- Full item with valid cache: must display something ---
+## --- Full item with valid cache: must display something ---
 set -g _gh_home "$REPO_ROOT/test/cache/gh_home"
 set -g _gh_saved_home $HOME
 set -g HOME $_gh_home
@@ -42,7 +42,7 @@ echo "$_github_calls" > $_gh_result_file
     test $bad -eq 0; and echo 1; or echo 0
 ) -eq 0
 
-# --- Parser with fixture: exact output (run in main process so stub sees the call) ---
+## --- Parser with fixture: exact output (run in main process so stub sees the call) ---
 set -g _gh_cache_path "$REPO_ROOT/test/cache/gh_home/.cache/tide-report/github/MrBasa-TideReport.json"
 set -g _gh_jq_line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$REPO_ROOT/test/fixtures/github.json" 2>/dev/null)
 set -g _tide_print_item_calls
@@ -66,7 +66,7 @@ echo "$_parser_plain" > $_parser_result_file
     echo $status
 ) -eq 0
 
-# --- Non–git directory: item must not print git "fatal" to stderr ---
+## --- Non–git directory: item must not print git "fatal" to stderr ---
 set -g _nongit_dir "/tmp/tide_report_nongit_"(random)
 mkdir -p $_nongit_dir
 set -g _nongit_stderr "$_nongit_dir/stderr"
@@ -85,7 +85,7 @@ command rm -rf $_nongit_dir
     count (string match -r "fatal" $_github_nongit_stderr)
 ) -eq 0
 
-# --- Stale cache: full item triggers fetch + disown; must not print disown error ---
+## --- Stale cache: full item triggers fetch + disown; must not print disown error ---
 set -g _saved_home_gh $HOME
 set -g _gh_test_home (mktemp -d)
 set -g HOME $_gh_test_home

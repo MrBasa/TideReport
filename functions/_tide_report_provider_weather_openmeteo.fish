@@ -1,8 +1,8 @@
-# TideReport :: Open-Meteo weather provider
-# Resolved location can come from: env TIDE_REPORT_RESOLVED_LOCATION (lat,lon),
-# IP geo when location empty, lat,lon pattern in tide_report_weather_location, or geocoding API.
+## TideReport :: Open-Meteo weather provider
+## Resolved location can come from: env TIDE_REPORT_RESOLVED_LOCATION (lat,lon),
+## IP geo when location empty, lat,lon pattern in tide_report_weather_location, or geocoding API.
 
-function __tide_report_provider_openmeteo --argument-names weather_cache timeout_sec lock_var
+function __tide_report_provider_openmeteo --description "Fetch weather from Open-Meteo, normalize, and write weather.json" --argument-names weather_cache timeout_sec lock_var
     set -l lat ""
     set -l lon ""
     set -l tz "auto"
@@ -94,8 +94,8 @@ function __tide_report_provider_openmeteo --argument-names weather_cache timeout
     end
 end
 
-# --- WMO weather code → our condition_code (WWO 113, 116, ...) ---
-function __tide_report_wmo_to_condition_code --argument-names wmo
+## --- WMO weather code → our condition_code (WWO 113, 116, ...) ---
+function __tide_report_wmo_to_condition_code --description "Map Open-Meteo WMO code to our condition_code" --argument-names wmo
     switch "$wmo"
         case 0; echo 113
         case 1 2; echo 116
@@ -108,8 +108,8 @@ function __tide_report_wmo_to_condition_code --argument-names wmo
     end
 end
 
-# --- WMO → short condition text ---
-function __tide_report_wmo_to_condition_text --argument-names wmo
+## --- WMO → short condition text ---
+function __tide_report_wmo_to_condition_text --description "Map Open-Meteo WMO code to a short condition text" --argument-names wmo
     switch "$wmo"
         case 0; echo "Clear"
         case 1; echo "Mainly clear"
@@ -129,8 +129,8 @@ function __tide_report_wmo_to_condition_text --argument-names wmo
     end
 end
 
-# --- Wind direction degrees → 16-point compass ---
-function __tide_report_degrees_to_16point --argument-names deg
+## --- Wind direction degrees → 16-point compass ---
+function __tide_report_degrees_to_16point --description "Convert wind direction in degrees to 16-point compass value" --argument-names deg
     set -l d (math "floor($deg + 11.25) % 360 / 22.5")
     switch $d
         case 0; echo "N"
@@ -153,8 +153,8 @@ function __tide_report_degrees_to_16point --argument-names deg
     end
 end
 
-# --- ISO8601 string → Unix timestamp ---
-function __tide_report_iso8601_to_unix --argument-names iso
+## --- ISO8601 string → Unix timestamp ---
+function __tide_report_iso8601_to_unix --description "Convert ISO8601 date-time string to Unix timestamp" --argument-names iso
     if test -z "$iso"
         echo ""
         return

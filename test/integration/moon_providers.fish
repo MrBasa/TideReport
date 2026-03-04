@@ -1,9 +1,9 @@
-# Integration tests: moon item with local and wttr providers (fixture-based, no network).
-# All providers produce normalized moon.json with .phase; parser is provider-agnostic.
+## Integration tests: moon item with local and wttr providers (fixture-based, no network).
+## All providers produce normalized moon.json with .phase; parser is provider-agnostic.
 
 source (dirname (dirname (status filename)))/setup.fish
 
-# --- Test 1: local provider with valid moon.json -> moon emoji ---
+## --- Test 1: local provider with valid moon.json -> moon emoji ---
 set -g _test_home (mktemp -d)
 set -g _saved_home $HOME
 set -g HOME $_test_home
@@ -29,7 +29,7 @@ command rm -rf $_test_home
     echo $status
 ) -eq 0
 
-# --- Test 2: wttr provider with valid moon.json -> moon emoji ---
+## --- Test 2: wttr provider with valid moon.json -> moon emoji ---
 set -g _test_home (mktemp -d)
 set -g HOME $_test_home
 mkdir -p $HOME/.cache/tide-report
@@ -52,7 +52,7 @@ command rm -rf $_test_home
     echo $status
 ) -eq 0
 
-# --- Test 3: expired/missing cache -> unavailable (no hang) ---
+## --- Test 3: expired/missing cache -> unavailable (no hang) ---
 set -g _test_home (mktemp -d)
 set -g HOME $_test_home
 mkdir -p $HOME/.cache/tide-report
