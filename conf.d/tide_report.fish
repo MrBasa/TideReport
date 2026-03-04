@@ -323,8 +323,6 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         end
         command -q tide && tide reload
         echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
-    else
-        command -q tide && tide reload
     end
 end
 
@@ -339,11 +337,24 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
 
     # Remove our items from prompt lists first (while vars still exist), then erase universals.
+    # Strip exact matches (weather, moon, etc.) and any compound element that contains our names
+    # (e.g. "weather moon" as a single list entry), so Tide never sees _tide_item_weather moon.
     set -l tide_report_items github weather moon tide
     if set -q tide_right_prompt_items
         set -l new_right
         for item in $tide_right_prompt_items
-            if not contains -- $item $tide_report_items
+            set -l keep true
+            if contains -- $item $tide_report_items
+                set keep false
+            else
+                for token in (string split " " -- $item)
+                    if contains -- $token $tide_report_items
+                        set keep false
+                        break
+                    end
+                end
+            end
+            if $keep
                 set -a new_right $item
             end
         end
@@ -352,7 +363,18 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     if set -q tide_left_prompt_items
         set -l new_left
         for item in $tide_left_prompt_items
-            if not contains -- $item $tide_report_items
+            set -l keep true
+            if contains -- $item $tide_report_items
+                set keep false
+            else
+                for token in (string split " " -- $item)
+                    if contains -- $token $tide_report_items
+                        set keep false
+                        break
+                    end
+                end
+            end
+            if $keep
                 set -a new_left $item
             end
         end
