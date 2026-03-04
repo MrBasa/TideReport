@@ -31,7 +31,7 @@ function _tide_report_install --on-event tide_report_install
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
     end
 
-    set -U tide_report_user_agent "tide-report/1.4"
+    set -U tide_report_user_agent "tide-report/1.5"
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
     set -q tide_report_weather_provider       || set -U tide_report_weather_provider "openmeteo"
@@ -46,8 +46,8 @@ function _tide_report_install --on-event tide_report_install
     set -q tide_report_weather_refresh_seconds     || set -U tide_report_weather_refresh_seconds 300
     set -q tide_report_weather_expire_seconds      || set -U tide_report_weather_expire_seconds 900
     set -q tide_report_weather_language            || set -U tide_report_weather_language "en"
-    set -q tide_report_weather_unavailable_text   || set -U tide_report_weather_unavailable_text "..."
-    set -q tide_report_weather_unavailable_color  || set -U tide_report_weather_unavailable_color red
+    set -q tide_report_weather_unavailable_text    || set -U tide_report_weather_unavailable_text "..."
+    set -q tide_report_weather_unavailable_color   || set -U tide_report_weather_unavailable_color red
 
     set -q tide_moon_color                    || set -U tide_moon_color $default_color
     set -q tide_moon_bg_color                 || set -U tide_moon_bg_color $default_bg_color

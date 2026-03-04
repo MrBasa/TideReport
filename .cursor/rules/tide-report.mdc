@@ -61,6 +61,12 @@ New items should be consistent with the current approach:
 - **README.md** must stay in sync with code: every config variable must be documented (name, description, default). Update the relevant module section and tables when adding or changing options.
 - Instructions are for **layman users** on a public GitHub repo: clear, step-by-step, and descriptive. Assume Fisher + Tide are installed per their docs.
 
+## Versioned User Agent
+
+- The `tide_report_user_agent` set in `conf.d/tide_report.fish` must **always match the latest released version**.
+- When cutting a new release (e.g. `v1.5`), update the user agent to `tide-report/1.5` (matching the tag) as part of the release prep.
+- Do not ship a new release without bumping this value; it is used for external service telemetry/debugging.
+
 ## Testing
 
 - There is **no automated test suite** yet. Testing is manual in the developer’s shell. Do not assume or introduce a test framework unless the user asks. When tests are added later, rules can be updated.
