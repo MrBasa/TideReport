@@ -22,6 +22,8 @@ function __tide_report_log_expected --description "Append one line (timestamp, v
     end
     set -q ver[1]; or set ver "?"
 
-    mkdir -p "$log_dir"
-    printf "%s\t%s\t%s\t%s\n" "$ts" "$ver" "$category" "$message" >> "$log_file"
+    mkdir -p "$log_dir" 2>/dev/null
+    if test -d "$log_dir"; and test -w "$log_dir"
+        printf "%s\t%s\t%s\t%s\n" "$ts" "$ver" "$category" "$message" >> "$log_file" 2>/dev/null
+    end
 end

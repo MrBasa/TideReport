@@ -52,7 +52,19 @@ function _tide_report_install --description "Install Tide Report defaults and pr
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
     ## --- Check for Dev Branch Install ---
-    if set -q _fisher_plugins; and contains mrbasa/tidereport (string lower $_fisher_plugins)
+    ## Dev = TideReport entry has no @version (e.g. local path or MrBasa/TideReport without @v1).
+    set -l _is_dev_install false
+    if set -q _fisher_plugins
+        for _p in $_fisher_plugins
+            if string match -q '*tidereport*' (string lower -- "$_p")
+                if not string match -q '*@*' "$_p"
+                    set _is_dev_install true
+                    break
+                end
+            end
+        end
+    end
+    if test "$_is_dev_install" = true
         echo (set_color --bold bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
         echo "  fisher install MrBasa/TideReport"(set_color cyan --bold)"@v1"(set_color normal)
         sleep 3
@@ -295,9 +307,12 @@ function _tide_report_apply_prompt_items --description "Add selected Tide Report
     set -q tide_right_prompt_items || return 0
     set -l left $tide_left_prompt_items
     set -l right $tide_right_prompt_items
+    set -l left_items (string split " " -- (string trim -- "$left_add"))
+    set -l right_items (string split " " -- (string trim -- "$right_add"))
 
     set -l new_left $left
-    for item in $left_add
+    for item in $left_items
+        test -z "$item" && continue
         if not contains -- $item $new_left
             if test "$item" = "github"
                 if contains -- git $left
@@ -326,7 +341,8 @@ function _tide_report_apply_prompt_items --description "Add selected Tide Report
     end
 
     set -l new_right $right
-    for item in $right_add
+    for item in $right_items
+        test -z "$item" && continue
         if not contains -- $item $new_right
             set new_right $new_right $item
         end
