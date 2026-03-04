@@ -155,6 +155,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
 
     if not set -q tide_left_prompt_items; or not set -q tide_right_prompt_items
         _tide_report_ensure_prompt_items 1
+        command -q tide && tide reload
         return 0
     end
     set -l left $tide_left_prompt_items
@@ -170,8 +171,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
 
     if $any_present
         echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+        command -q tide && tide reload
     else if not status is-interactive
         _tide_report_ensure_prompt_items 1
+        command -q tide && tide reload
         echo (set_color brwhite)"Tide Report: added github (left), weather, moon (right). Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
     else
         echo (set_color brwhite)"Choose which Tide Report items to add to your prompt."(set_color normal)
@@ -318,7 +321,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
             echo (set_color brwhite)"$msg."(set_color normal)
         end
+        command -q tide && tide reload
         echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
+    else
+        command -q tide && tide reload
     end
 end
 
@@ -365,7 +371,12 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     # Remove cache
     command rm -rf ~/.cache/tide-report
 
-    echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to refresh your prompt."(set_color normal)
+    if command -q tide
+        tide reload
+        echo (set_color brwhite)"Prompt refreshed."(set_color normal)
+    else
+        echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to refresh your prompt."(set_color normal)
+    end
 end
 
 ## Apply chosen Tide Report items to Tide prompt lists (insertion rules: github after git/pwd, right items appended).
