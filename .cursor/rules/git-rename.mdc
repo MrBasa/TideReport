@@ -1,0 +1,17 @@
+---
+description: Use git rename for file renames to preserve history; never rename by creating a new file
+alwaysApply: true
+---
+
+# File Renaming — Preserve History
+
+When renaming a file, **do not** create a new file and write content into it. That breaks git history (blame, log, and follow renames).
+
+**Always use git rename** so the file is tracked as a rename and history is preserved.
+
+## How to rename
+
+- **Preferred:** `git mv <old> <new>` then commit.
+- **Alternative:** Rename/move the file on disk, then `git add <new>` and `git rm <old>`. Git detects renames when the content is sufficiently similar.
+
+Never: create `<new>`, paste or generate content, then delete `<old>`.

@@ -33,7 +33,7 @@ Follow existing TideReport and Tide patterns:
 | Config (plugin) | `tide_report_<module>_<option>` | `tide_report_weather_format`, `tide_report_moon_expire_seconds` |
 | Config (Tide item colors) | `tide_<item>_color`, `tide_<item>_bg_color` | `tide_weather_color`, `tide_moon_bg_color` |
 
-When adding a new prompt item, register it in `conf.d/_tide_report_init.fish` (defaults, install/uninstall item lists) and in README (Available Prompt Sections, Usage, and any new config tables).
+When adding a new prompt item, register it in `conf.d/tide_report.fish` (defaults, install/uninstall item lists) and in README (Available Prompt Sections, Usage, and any new config tables).
 
 ## New Prompt Items
 
@@ -42,12 +42,19 @@ New items should be consistent with the current approach:
 - Add `functions/_tide_item_<name>.fish` that Tide will autoload.
 - Entry point: `_tide_item_<name>` that sets locals (cache path, refresh/expire, unavailable text/color), calls a cache/async helper if applicable, then a parser that uses `_tide_print_item <name> ...` for output.
 - Reuse shared async behavior where possible (e.g. `_tide_report_handle_async_weather` for weather, `_tide_report_handle_async_moon` for moon). For other APIs, follow the same pattern: read cache → if invalid show unavailable + background fetch; if valid parse and print.
-- Add defaults in `conf.d/_tide_report_init.fish` with `set -q var || set -U var value`. Include the new item name in the uninstall logic that strips items from `tide_left_prompt_items` / `tide_right_prompt_items`.
+- Add defaults in `conf.d/tide_report.fish` with `set -q var || set -U var value`. Include the new item name in the uninstall logic that strips items from `tide_left_prompt_items` / `tide_right_prompt_items`.
 
 ## Dependencies
 
 - **jq** and **curl** are in use; adding them is acceptable when needed for new features.
 - Be **reluctant to add new dependencies**. Prefer Fish builtins and existing tools. Justify any new dependency.
+
+## Fisher install event contract
+
+- The installer runs when **Fisher** emits the event after sourcing our `conf.d` file. Fisher derives the event name from the **conf.d filename** (basename without `.fish`): for `conf.d/tide_report.fish` it emits `tide_report_install` (or `tide_report_update` on update, `tide_report_uninstall` on remove). Follow the [Fisher docs](https://github.com/jorgebucaran/fisher#creating-a-plugin) pattern (e.g. flipper.fish → flipper_install).
+- Our handlers are `_tide_report_install` / `_tide_report_update` / `_tide_report_uninstall` with `--on-event tide_report_install` / `tide_report_update` / `tide_report_uninstall`. Do **not** rely on `status current-command` or `$argv` to trigger the installer.
+- If events do not run: Fish may lazy-load `--on-event` handlers (fish-shell/fish-shell#2667, #845). To see what Fisher actually emits, add a temporary `emit` wrapper in config.fish that logs to a file (e.g. `/tmp/tide_report_emit.log`) then calls `builtin emit $argv`; run `fisher install` and inspect the log. If the event name matches but the handler never runs, we may need to invoke the handler once at the end of conf.d so it is registered before Fisher’s emit.
+- If the conf.d filename is renamed, the event name changes and the handler’s `--on-event` must be updated to match.
 
 ## Documentation and Configuration
 

@@ -48,6 +48,16 @@ tide_report_install
 Or add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
+### Clean reinstall
+
+If the installer did not run (e.g. prompt items never appeared after install) or you see odd behavior after repeated installs/uninstalls, do a clean reinstall:
+
+1. Remove the plugin: `fisher remove MrBasa/TideReport` (or the path you used, e.g. `fisher remove /path/to/TideReport`).
+2. Optionally start a new Fish session so universals are reloaded.
+3. Install again: `fisher install MrBasa/TideReport@v1` (or your path).
+
+If items still do not appear, run `tide_report_install` once to apply configuration and add prompt items, then `tide reload`.
+
 ## 🚀 Available Prompt Sections
 
 * `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo.

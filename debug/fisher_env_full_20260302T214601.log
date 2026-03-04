@@ -1,0 +1,757 @@
+__ABBR_TIPS_KEYS=cm cma cmap cmea cmu cmd g ga gaa gau gapa gap gb gba gban gbd gbD ggsup gbl gbs gbsb gbsg gbsr gbss gc gc! gcn! gca gca! gcan! gcv gcav gcav! gcm gcam gcs gscam gcfx gcf gcl gclean gclean! gclean!! gcount gcp gcpa gcpc gd gdca gds gdsc gdt gdw gdwc gdto gdg gignore gf gfa gfm gfo gl ggl gll glr glg glgg glgga glo glog gloga glom glod gloo gm gma gmt gmom gp gp! gpo gpo! gpv gpv! ggp ggp! gpu gpoat ggpnp gr gra grb grba grbc grbi grbm grbmi grbmia grbom grbomi grbomia grbd grbdi grbdia grbs ggu grev grh grhh grhpa grm grmc grmv grpo grrm grs grset grss grst grup grv gsh gsd gsr gsb gss gst gsta gstd gstl gstp gsts gsu gsur gsuri gts gtv gsw gswc gunignore gup gupv gupa gupav gwch gco gcb gcod gcom gfb gff gfr gfh gfs gfbs gffs gfrs gfhs gfss gfbt gfft gfrt gfht gfst gfp gwt gwta gwtls gwtlo gwtmv gwtpr gwtrm gwtulo gmr gmwps a__trash
+ABBR_TIPS_PROMPT=\n💡 \e[1m{{ .abbr }}\e[0m => {{ .cmd }}
+ABBR_TIPS_REGEXES=(^(\w+\s+)+(-{1,2})\w+)(\s\S+) (^(\s?(\w-?)+){3}).* (^(\s?(\w-?)+){2}).* (^(\s?(\w-?)+){1}).*
+__ABBR_TIPS_VALUES=chezmoi chezmoi add chezmoi apply chezmoi edit --apply chezmoi update chezmoi diff git git add git add --all git add --update git add --patch git apply git branch -vv git branch -a -v git branch -a -v --no-merged git branch -d git branch -D git branch --set-upstream-to=origin/(__git.current_branch) git blame -b -w git bisect git bisect bad git bisect good git bisect reset git bisect start git commit -v git commit -v --amend git commit -v --no-edit --amend git commit -v -a git commit -v -a --amend git commit -v -a --no-edit --amend git commit -v --no-verify git commit -a -v --no-verify git commit -a -v --no-verify --amend git commit -m git commit -a -m git commit -S git commit -S -a -m git commit --fixup git config --list git clone git clean -di git clean -dfx git reset --hard; and git clean -dfx git shortlog -sn git cherry-pick git cherry-pick --abort git cherry-pick --continue git diff git diff --cached git diff --stat git diff --stat --cached git diff-tree --no-commit-id --name-only -r git diff --word-diff git diff --word-diff --cached git difftool git diff --no-ext-diff git update-index --assume-unchanged git fetch git fetch --all --prune git fetch origin (__git.default_branch) --prune; and git merge FETCH_HEAD git fetch origin git pull git pull origin (__git.current_branch) git pull origin git pull --rebase git log --stat git log --graph git log --graph --decorate --all git log --oneline --decorate --color git log --oneline --decorate --color --graph git log --oneline --decorate --color --graph --all git log --oneline --decorate --color (__git.default_branch).. git log --oneline --decorate --color develop.. "git log --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short" git merge git merge --abort git mergetool --no-prompt git merge origin/(__git.default_branch) git push git push --force-with-lease git push origin git push --force-with-lease origin git push --no-verify git push --no-verify --force-with-lease git push origin (__git.current_branch) git push origin (__git.current_branch) --force-with-lease git push origin (__git.current_branch) --set-upstream git push origin --all; and git push origin --tags git pull origin (__git.current_branch); and git push origin (__git.current_branch) git remote -vv git remote add git rebase git rebase --abort git rebase --continue git rebase --interactive git rebase (__git.default_branch) git rebase (__git.default_branch) --interactive git rebase (__git.default_branch) --interactive --autosquash git fetch origin (__git.default_branch); and git rebase FETCH_HEAD git fetch origin (__git.default_branch); and git rebase FETCH_HEAD --interactive git fetch origin (__git.default_branch); and git rebase FETCH_HEAD --interactive --autosquash git rebase develop git rebase develop --interactive git rebase develop --interactive --autosquash git rebase --skip git pull --rebase origin (__git.current_branch) git revert git reset git reset --hard git reset --patch git rm git rm --cached git remote rename git remote prune origin git remote remove git restore git remote set-url git restore --source git restore --staged git remote update git remote -v git show git svn dcommit git svn rebase git status -sb git status -s git status git stash git stash drop git stash list git stash pop git stash show --text git submodule update git submodule update --recursive git submodule update --recursive --init git tag -s git tag git switch git switch --create git update-index --no-assume-unchanged git pull --rebase git pull --rebase -v git pull --rebase --autostash git pull --rebase --autostash -v git whatchanged -p --abbrev-commit --pretty=medium git checkout git checkout -b git checkout develop git checkout (__git.default_branch) git flow bugfix git flow feature git flow release git flow hotfix git flow support git flow bugfix start git flow feature start git flow release start git flow hotfix start git flow support start git flow bugfix track git flow feature track git flow release track git flow hotfix track git flow support track git flow publish git worktree git worktree add git worktree list git worktree lock git worktree move git worktree prune git worktree remove git worktree unlock git push origin (__git.current_branch) --set-upstream -o merge_request.create git push origin (__git.current_branch) --set-upstream -o merge_request.create -o merge_request.merge_when_pipeline_succeeds trash-put
+BROWSER=opera
+COLORFGBG=15;0
+COLORTERM=truecolor
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+DEBUGINFOD_URLS=https://debuginfod.archlinux.org 
+DESKTOP_SESSION=plasma
+DISPLAY=:1
+EDITOR=micro
+__GL_SHADER_DISK_CACHE_SIZE=10000000000
+__GL_SHADER_DISK_CACHE_SKIP_CLEANUP=1
+GTK2_RC_FILES=/etc/gtk-2.0/gtkrc:/home/mrbasa/.gtkrc-2.0:/home/mrbasa/.config/gtkrc-2.0
+GTK_RC_FILES=/etc/gtk/gtkrc:/home/mrbasa/.gtkrc:/home/mrbasa/.config/gtkrc
+HOME=/home/mrbasa
+ICEAUTHORITY=/run/user/1000/iceauth_dSXDXo
+INVOCATION_ID=5945745e939d47e2b4ccaa30bfc75355
+_JAVA_AWT_WM_NONREPARENTING=1
+JOURNAL_STREAM=9:22616
+KDE_APPLICATIONS_AS_SCOPE=1
+KDE_FULL_SESSION=true
+KDE_SESSION_UID=1000
+KDE_SESSION_VERSION=6
+KONSOLE_DBUS_ACTIVATION_COOKIE=c4VfCh1ED8iWrhxldIfoAlLxZ0X10vMvVCMpBkc30yI=
+KONSOLE_DBUS_SERVICE=:1.1123
+KONSOLE_DBUS_SESSION=/Sessions/6
+KONSOLE_DBUS_WINDOW=/Windows/1
+KONSOLE_VERSION=251202
+LANG=en_US.UTF-8
+LANGUAGE=
+LC_ADDRESS=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_MONETARY=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_NUMERIC=en_US.UTF-8
+LC_PAPER=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_TIME=en_US.UTF-8
+LOGNAME=mrbasa
+LS_COLORS=*~=0;38;2;122;112;112:bd=0;38;2;102;217;239;48;2;51;51;51:ca=0:cd=0;38;2;249;38;114;48;2;51;51;51:di=0;38;2;102;217;239:do=0;38;2;0;0;0;48;2;249;38;114:ex=1;38;2;249;38;114:fi=0:ln=0;38;2;249;38;114:mh=0:mi=0;38;2;0;0;0;48;2;255;74;68:no=0:or=0;38;2;0;0;0;48;2;255;74;68:ow=0:pi=0;38;2;0;0;0;48;2;102;217;239:rs=0:sg=0:so=0;38;2;0;0;0;48;2;249;38;114:st=0:su=0:tw=0:*.1=0;38;2;226;209;57:*.a=1;38;2;249;38;114:*.c=0;38;2;0;255;135:*.d=0;38;2;0;255;135:*.h=0;38;2;0;255;135:*.m=0;38;2;0;255;135:*.o=0;38;2;122;112;112:*.p=0;38;2;0;255;135:*.r=0;38;2;0;255;135:*.t=0;38;2;0;255;135:*.v=0;38;2;0;255;135:*.z=4;38;2;249;38;114:*.7z=4;38;2;249;38;114:*.ai=0;38;2;253;151;31:*.as=0;38;2;0;255;135:*.bc=0;38;2;122;112;112:*.bz=4;38;2;249;38;114:*.cc=0;38;2;0;255;135:*.cp=0;38;2;0;255;135:*.cr=0;38;2;0;255;135:*.cs=0;38;2;0;255;135:*.db=4;38;2;249;38;114:*.di=0;38;2;0;255;135:*.el=0;38;2;0;255;135:*.ex=0;38;2;0;255;135:*.fs=0;38;2;0;255;135:*.go=0;38;2;0;255;135:*.gv=0;38;2;0;255;135:*.gz=4;38;2;249;38;114:*.ha=0;38;2;0;255;135:*.hh=0;38;2;0;255;135:*.hi=0;38;2;122;112;112:*.hs=0;38;2;0;255;135:*.jl=0;38;2;0;255;135:*.js=0;38;2;0;255;135:*.ko=1;38;2;249;38;114:*.kt=0;38;2;0;255;135:*.la=0;38;2;122;112;112:*.ll=0;38;2;0;255;135:*.lo=0;38;2;122;112;112:*.ma=0;38;2;253;151;31:*.mb=0;38;2;253;151;31:*.md=0;38;2;226;209;57:*.mk=0;38;2;166;226;46:*.ml=0;38;2;0;255;135:*.mn=0;38;2;0;255;135:*.nb=0;38;2;0;255;135:*.nu=0;38;2;0;255;135:*.pl=0;38;2;0;255;135:*.pm=0;38;2;0;255;135:*.pp=0;38;2;0;255;135:*.ps=0;38;2;230;219;116:*.py=0;38;2;0;255;135:*.rb=0;38;2;0;255;135:*.rm=0;38;2;253;151;31:*.rs=0;38;2;0;255;135:*.sh=0;38;2;0;255;135:*.so=1;38;2;249;38;114:*.td=0;38;2;0;255;135:*.ts=0;38;2;0;255;135:*.ui=0;38;2;166;226;46:*.vb=0;38;2;0;255;135:*.wv=0;38;2;253;151;31:*.xz=4;38;2;249;38;114:*FAQ=0;38;2;0;0;0;48;2;230;219;116:*.3ds=0;38;2;253;151;31:*.3fr=0;38;2;253;151;31:*.3mf=0;38;2;253;151;31:*.adb=0;38;2;0;255;135:*.ads=0;38;2;0;255;135:*.aif=0;38;2;253;151;31:*.amf=0;38;2;253;151;31:*.ape=0;38;2;253;151;31:*.apk=4;38;2;249;38;114:*.ari=0;38;2;253;151;31:*.arj=4;38;2;249;38;114:*.arw=0;38;2;253;151;31:*.asa=0;38;2;0;255;135:*.asm=0;38;2;0;255;135:*.aux=0;38;2;122;112;112:*.avi=0;38;2;253;151;31:*.awk=0;38;2;0;255;135:*.bag=4;38;2;249;38;114:*.bak=0;38;2;122;112;112:*.bat=1;38;2;249;38;114:*.bay=0;38;2;253;151;31:*.bbl=0;38;2;122;112;112:*.bcf=0;38;2;122;112;112:*.bib=0;38;2;166;226;46:*.bin=4;38;2;249;38;114:*.blg=0;38;2;122;112;112:*.bmp=0;38;2;253;151;31:*.bsh=0;38;2;0;255;135:*.bst=0;38;2;166;226;46:*.bz2=4;38;2;249;38;114:*.c++=0;38;2;0;255;135:*.cap=0;38;2;253;151;31:*.cfg=0;38;2;166;226;46:*.cgi=0;38;2;0;255;135:*.clj=0;38;2;0;255;135:*.com=1;38;2;249;38;114:*.cpp=0;38;2;0;255;135:*.cr2=0;38;2;253;151;31:*.cr3=0;38;2;253;151;31:*.crw=0;38;2;253;151;31:*.css=0;38;2;0;255;135:*.csv=0;38;2;226;209;57:*.csx=0;38;2;0;255;135:*.cxx=0;38;2;0;255;135:*.dae=0;38;2;253;151;31:*.dcr=0;38;2;253;151;31:*.dcs=0;38;2;253;151;31:*.deb=4;38;2;249;38;114:*.def=0;38;2;0;255;135:*.dll=1;38;2;249;38;114:*.dmg=4;38;2;249;38;114:*.dng=0;38;2;253;151;31:*.doc=0;38;2;230;219;116:*.dot=0;38;2;0;255;135:*.dox=0;38;2;166;226;46:*.dpr=0;38;2;0;255;135:*.drf=0;38;2;253;151;31:*.dxf=0;38;2;253;151;31:*.eip=0;38;2;253;151;31:*.elc=0;38;2;0;255;135:*.elm=0;38;2;0;255;135:*.epp=0;38;2;0;255;135:*.eps=0;38;2;253;151;31:*.erf=0;38;2;253;151;31:*.erl=0;38;2;0;255;135:*.exe=1;38;2;249;38;114:*.exr=0;38;2;253;151;31:*.exs=0;38;2;0;255;135:*.fbx=0;38;2;253;151;31:*.fff=0;38;2;253;151;31:*.fls=0;38;2;122;112;112:*.flv=0;38;2;253;151;31:*.fnt=0;38;2;253;151;31:*.fon=0;38;2;253;151;31:*.fsi=0;38;2;0;255;135:*.fsx=0;38;2;0;255;135:*.gif=0;38;2;253;151;31:*.git=0;38;2;122;112;112:*.gpr=0;38;2;253;151;31:*.gvy=0;38;2;0;255;135:*.h++=0;38;2;0;255;135:*.hda=0;38;2;253;151;31:*.hip=0;38;2;253;151;31:*.hpp=0;38;2;0;255;135:*.htc=0;38;2;0;255;135:*.htm=0;38;2;226;209;57:*.hxx=0;38;2;0;255;135:*.ico=0;38;2;253;151;31:*.ics=0;38;2;230;219;116:*.idx=0;38;2;122;112;112:*.igs=0;38;2;253;151;31:*.iiq=0;38;2;253;151;31:*.ilg=0;38;2;122;112;112:*.img=4;38;2;249;38;114:*.inc=0;38;2;0;255;135:*.ind=0;38;2;122;112;112:*.ini=0;38;2;166;226;46:*.inl=0;38;2;0;255;135:*.ino=0;38;2;0;255;135:*.ipp=0;38;2;0;255;135:*.iso=4;38;2;249;38;114:*.jar=4;38;2;249;38;114:*.jpg=0;38;2;253;151;31:*.jsx=0;38;2;0;255;135:*.jxl=0;38;2;253;151;31:*.k25=0;38;2;253;151;31:*.kdc=0;38;2;253;151;31:*.kex=0;38;2;230;219;116:*.kra=0;38;2;253;151;31:*.kts=0;38;2;0;255;135:*.log=0;38;2;122;112;112:*.ltx=0;38;2;0;255;135:*.lua=0;38;2;0;255;135:*.m3u=0;38;2;253;151;31:*.m4a=0;38;2;253;151;31:*.m4v=0;38;2;253;151;31:*.mdc=0;38;2;253;151;31:*.mef=0;38;2;253;151;31:*.mid=0;38;2;253;151;31:*.mir=0;38;2;0;255;135:*.mkv=0;38;2;253;151;31:*.mli=0;38;2;0;255;135:*.mos=0;38;2;253;151;31:*.mov=0;38;2;253;151;31:*.mp3=0;38;2;253;151;31:*.mp4=0;38;2;253;151;31:*.mpg=0;38;2;253;151;31:*.mrw=0;38;2;253;151;31:*.msi=4;38;2;249;38;114:*.mtl=0;38;2;253;151;31:*.nef=0;38;2;253;151;31:*.nim=0;38;2;0;255;135:*.nix=0;38;2;166;226;46:*.nrw=0;38;2;253;151;31:*.obj=0;38;2;253;151;31:*.obm=0;38;2;253;151;31:*.odp=0;38;2;230;219;116:*.ods=0;38;2;230;219;116:*.odt=0;38;2;230;219;116:*.ogg=0;38;2;253;151;31:*.ogv=0;38;2;253;151;31:*.orf=0;38;2;253;151;31:*.org=0;38;2;226;209;57:*.otf=0;38;2;253;151;31:*.otl=0;38;2;253;151;31:*.out=0;38;2;122;112;112:*.pas=0;38;2;0;255;135:*.pbm=0;38;2;253;151;31:*.pcx=0;38;2;253;151;31:*.pdf=0;38;2;230;219;116:*.pef=0;38;2;253;151;31:*.pgm=0;38;2;253;151;31:*.php=0;38;2;0;255;135:*.pid=0;38;2;122;112;112:*.pkg=4;38;2;249;38;114:*.png=0;38;2;253;151;31:*.pod=0;38;2;0;255;135:*.ppm=0;38;2;253;151;31:*.pps=0;38;2;230;219;116:*.ppt=0;38;2;230;219;116:*.pro=0;38;2;166;226;46:*.ps1=0;38;2;0;255;135:*.psd=0;38;2;253;151;31:*.ptx=0;38;2;253;151;31:*.pxn=0;38;2;253;151;31:*.pyc=0;38;2;122;112;112:*.pyd=0;38;2;122;112;112:*.pyo=0;38;2;122;112;112:*.qoi=0;38;2;253;151;31:*.r3d=0;38;2;253;151;31:*.raf=0;38;2;253;151;31:*.rar=4;38;2;249;38;114:*.raw=0;38;2;253;151;31:*.rpm=4;38;2;249;38;114:*.rst=0;38;2;226;209;57:*.rtf=0;38;2;230;219;116:*.rw2=0;38;2;253;151;31:*.rwl=0;38;2;253;151;31:*.rwz=0;38;2;253;151;31:*.sbt=0;38;2;0;255;135:*.sql=0;38;2;0;255;135:*.sr2=0;38;2;253;151;31:*.srf=0;38;2;253;151;31:*.srw=0;38;2;253;151;31:*.stl=0;38;2;253;151;31:*.stp=0;38;2;253;151;31:*.sty=0;38;2;122;112;112:*.svg=0;38;2;253;151;31:*.swf=0;38;2;253;151;31:*.swp=0;38;2;122;112;112:*.sxi=0;38;2;230;219;116:*.sxw=0;38;2;230;219;116:*.tar=4;38;2;249;38;114:*.tbz=4;38;2;249;38;114:*.tcl=0;38;2;0;255;135:*.tex=0;38;2;0;255;135:*.tga=0;38;2;253;151;31:*.tgz=4;38;2;249;38;114:*.tif=0;38;2;253;151;31:*.tml=0;38;2;166;226;46:*.tmp=0;38;2;122;112;112:*.toc=0;38;2;122;112;112:*.tsx=0;38;2;0;255;135:*.ttf=0;38;2;253;151;31:*.txt=0;38;2;226;209;57:*.typ=0;38;2;226;209;57:*.usd=0;38;2;253;151;31:*.vcd=4;38;2;249;38;114:*.vim=0;38;2;0;255;135:*.vob=0;38;2;253;151;31:*.vsh=0;38;2;0;255;135:*.wav=0;38;2;253;151;31:*.wma=0;38;2;253;151;31:*.wmv=0;38;2;253;151;31:*.wrl=0;38;2;253;151;31:*.x3d=0;38;2;253;151;31:*.x3f=0;38;2;253;151;31:*.xlr=0;38;2;230;219;116:*.xls=0;38;2;230;219;116:*.xml=0;38;2;226;209;57:*.xmp=0;38;2;166;226;46:*.xpm=0;38;2;253;151;31:*.xvf=0;38;2;253;151;31:*.yml=0;38;2;166;226;46:*.zig=0;38;2;0;255;135:*.zip=4;38;2;249;38;114:*.zsh=0;38;2;0;255;135:*.zst=4;38;2;249;38;114:*TODO=1:*hgrc=0;38;2;166;226;46:*.avif=0;38;2;253;151;31:*.bash=0;38;2;0;255;135:*.braw=0;38;2;253;151;31:*.conf=0;38;2;166;226;46:*.dart=0;38;2;0;255;135:*.data=0;38;2;253;151;31:*.diff=0;38;2;0;255;135:*.docx=0;38;2;230;219;116:*.epub=0;38;2;230;219;116:*.fish=0;38;2;0;255;135:*.flac=0;38;2;253;151;31:*.h264=0;38;2;253;151;31:*.hack=0;38;2;0;255;135:*.heif=0;38;2;253;151;31:*.hgrc=0;38;2;166;226;46:*.html=0;38;2;226;209;57:*.iges=0;38;2;253;151;31:*.info=0;38;2;226;209;57:*.java=0;38;2;0;255;135:*.jpeg=0;38;2;253;151;31:*.json=0;38;2;166;226;46:*.less=0;38;2;0;255;135:*.lisp=0;38;2;0;255;135:*.lock=0;38;2;122;112;112:*.make=0;38;2;166;226;46:*.mojo=0;38;2;0;255;135:*.mpeg=0;38;2;253;151;31:*.nims=0;38;2;0;255;135:*.opus=0;38;2;253;151;31:*.orig=0;38;2;122;112;112:*.pptx=0;38;2;230;219;116:*.prql=0;38;2;0;255;135:*.psd1=0;38;2;0;255;135:*.psm1=0;38;2;0;255;135:*.purs=0;38;2;0;255;135:*.raku=0;38;2;0;255;135:*.rlib=0;38;2;122;112;112:*.sass=0;38;2;0;255;135:*.scad=0;38;2;0;255;135:*.scss=0;38;2;0;255;135:*.step=0;38;2;253;151;31:*.tbz2=4;38;2;249;38;114:*.tiff=0;38;2;253;151;31:*.toml=0;38;2;166;226;46:*.usda=0;38;2;253;151;31:*.usdc=0;38;2;253;151;31:*.usdz=0;38;2;253;151;31:*.webm=0;38;2;253;151;31:*.webp=0;38;2;253;151;31:*.woff=0;38;2;253;151;31:*.xbps=4;38;2;249;38;114:*.xlsx=0;38;2;230;219;116:*.yaml=0;38;2;166;226;46:*stdin=0;38;2;122;112;112:*v.mod=0;38;2;166;226;46:*.blend=0;38;2;253;151;31:*.cabal=0;38;2;0;255;135:*.cache=0;38;2;122;112;112:*.class=0;38;2;122;112;112:*.cmake=0;38;2;166;226;46:*.ctags=0;38;2;122;112;112:*.dylib=1;38;2;249;38;114:*.dyn_o=0;38;2;122;112;112:*.gcode=0;38;2;0;255;135:*.ipynb=0;38;2;0;255;135:*.mdown=0;38;2;226;209;57:*.patch=0;38;2;0;255;135:*.rmeta=0;38;2;122;112;112:*.scala=0;38;2;0;255;135:*.shtml=0;38;2;226;209;57:*.swift=0;38;2;0;255;135:*.toast=4;38;2;249;38;114:*.woff2=0;38;2;253;151;31:*.xhtml=0;38;2;226;209;57:*Icon\r=0;38;2;122;112;112:*LEGACY=0;38;2;0;0;0;48;2;230;219;116:*NOTICE=0;38;2;0;0;0;48;2;230;219;116:*README=0;38;2;0;0;0;48;2;230;219;116:*go.mod=0;38;2;166;226;46:*go.sum=0;38;2;122;112;112:*passwd=0;38;2;166;226;46:*shadow=0;38;2;166;226;46:*stderr=0;38;2;122;112;112:*stdout=0;38;2;122;112;112:*.bashrc=0;38;2;0;255;135:*.config=0;38;2;166;226;46:*.dyn_hi=0;38;2;122;112;112:*.flake8=0;38;2;166;226;46:*.gradle=0;38;2;0;255;135:*.groovy=0;38;2;0;255;135:*.ignore=0;38;2;166;226;46:*.matlab=0;38;2;0;255;135:*.nimble=0;38;2;0;255;135:*COPYING=0;38;2;182;182;182:*INSTALL=0;38;2;0;0;0;48;2;230;219;116:*LICENCE=0;38;2;182;182;182:*LICENSE=0;38;2;182;182;182:*TODO.md=1:*VERSION=0;38;2;0;0;0;48;2;230;219;116:*.alembic=0;38;2;253;151;31:*.desktop=0;38;2;166;226;46:*.gemspec=0;38;2;166;226;46:*.mailmap=0;38;2;166;226;46:*Doxyfile=0;38;2;166;226;46:*Makefile=0;38;2;166;226;46:*TODO.txt=1:*setup.py=0;38;2;166;226;46:*.DS_Store=0;38;2;122;112;112:*.cmake.in=0;38;2;166;226;46:*.fdignore=0;38;2;166;226;46:*.kdevelop=0;38;2;166;226;46:*.markdown=0;38;2;226;209;57:*.rgignore=0;38;2;166;226;46:*.tfignore=0;38;2;166;226;46:*CHANGELOG=0;38;2;0;0;0;48;2;230;219;116:*COPYRIGHT=0;38;2;182;182;182:*README.md=0;38;2;0;0;0;48;2;230;219;116:*bun.lockb=0;38;2;122;112;112:*configure=0;38;2;166;226;46:*.gitconfig=0;38;2;166;226;46:*.gitignore=0;38;2;166;226;46:*.localized=0;38;2;122;112;112:*.scons_opt=0;38;2;122;112;112:*.timestamp=0;38;2;122;112;112:*CODEOWNERS=0;38;2;166;226;46:*Dockerfile=0;38;2;166;226;46:*INSTALL.md=0;38;2;0;0;0;48;2;230;219;116:*README.txt=0;38;2;0;0;0;48;2;230;219;116:*SConscript=0;38;2;166;226;46:*SConstruct=0;38;2;166;226;46:*.cirrus.yml=0;38;2;230;219;116:*.gitmodules=0;38;2;166;226;46:*.synctex.gz=0;38;2;122;112;112:*.travis.yml=0;38;2;230;219;116:*INSTALL.txt=0;38;2;0;0;0;48;2;230;219;116:*LICENSE-MIT=0;38;2;182;182;182:*MANIFEST.in=0;38;2;166;226;46:*Makefile.am=0;38;2;166;226;46:*Makefile.in=0;38;2;122;112;112:*.applescript=0;38;2;0;255;135:*.fdb_latexmk=0;38;2;122;112;112:*.webmanifest=0;38;2;166;226;46:*CHANGELOG.md=0;38;2;0;0;0;48;2;230;219;116:*CONTRIBUTING=0;38;2;0;0;0;48;2;230;219;116:*CONTRIBUTORS=0;38;2;0;0;0;48;2;230;219;116:*appveyor.yml=0;38;2;230;219;116:*configure.ac=0;38;2;166;226;46:*.bash_profile=0;38;2;0;255;135:*.clang-format=0;38;2;166;226;46:*.editorconfig=0;38;2;166;226;46:*CHANGELOG.txt=0;38;2;0;0;0;48;2;230;219;116:*.gitattributes=0;38;2;166;226;46:*.gitlab-ci.yml=0;38;2;230;219;116:*CMakeCache.txt=0;38;2;122;112;112:*CMakeLists.txt=0;38;2;166;226;46:*LICENSE-APACHE=0;38;2;182;182;182:*pyproject.toml=0;38;2;166;226;46:*CODE_OF_CONDUCT=0;38;2;0;0;0;48;2;230;219;116:*CONTRIBUTING.md=0;38;2;0;0;0;48;2;230;219;116:*CONTRIBUTORS.md=0;38;2;0;0;0;48;2;230;219;116:*.sconsign.dblite=0;38;2;122;112;112:*CONTRIBUTING.txt=0;38;2;0;0;0;48;2;230;219;116:*CONTRIBUTORS.txt=0;38;2;0;0;0;48;2;230;219;116:*requirements.txt=0;38;2;166;226;46:*package-lock.json=0;38;2;122;112;112:*CODE_OF_CONDUCT.md=0;38;2;0;0;0;48;2;230;219;116:*.CFUserTextEncoding=0;38;2;122;112;112:*CODE_OF_CONDUCT.txt=0;38;2;0;0;0;48;2;230;219;116:*azure-pipelines.yml=0;38;2;230;219;116
+MAIL=/var/spool/mail/mrbasa
+MANAGERPID=1381
+MANAGERPIDFDID=1382
+MANPAGER=sh -c 'awk '\''{ gsub(/\x1B\[[0-9;]*m/, "", $0); gsub(/.\x08/, "", $0); print }'\'' | bat -p -lman'
+MEMORY_PRESSURE_WATCH=/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/plasma-plasmashell.service/memory.pressure
+MEMORY_PRESSURE_WRITE=c29tZSAyMDAwMDAgMjAwMDAwMAA=
+MOTD_SHOWN=pam
+PAM_KWALLET5_LOGIN=/run/user/1000/kwallet5.socket
+PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/var/lib/flatpak/exports/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+PROFILEHOME=
+PWD=/home/mrbasa/Dev/TideReport
+QT_WAYLAND_RECONNECT=1
+SESSION_MANAGER=local/Zephyr:@/tmp/.ICE-unix/1644,unix/Zephyr:/tmp/.ICE-unix/1644
+SHELL_SESSION_ID=ab1e751b753546a68f13ba657f3aabd5
+SHELL=/usr/bin/fish
+SHLVL=1
+SYSTEMD_EXEC_PID=1694
+TERM=xterm-256color
+tide_character_icon=❯
+_tide_color_separator_same_color=[38;2;148;148;148m
+_tide_location_color=[38;2;95;215;0m
+_tide_pad= 
+USER=mrbasa
+VISUAL=kate
+WAYLAND_DISPLAY=wayland-0
+WINDOWID=94400384752240
+XAUTHORITY=/run/user/1000/xauth_FZCkrI
+XDG_CONFIG_DIRS=/home/mrbasa/.config/kdedefaults:/etc/xdg
+XDG_CURRENT_DESKTOP=KDE
+XDG_DATA_DIRS=/home/mrbasa/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share
+XDG_MENU_PREFIX=plasma-
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SEAT=seat0
+XDG_SESSION_CLASS=user
+XDG_SESSION_DESKTOP=KDE
+XDG_SESSION_ID=2
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session1
+XDG_SESSION_TYPE=wayland
+XDG_VTNR=1
+XKB_DEFAULT_LAYOUT=us
+
+===== FISH SESSION INFO =====
+fish --version:
+fish, version 4.5.0
+
+__fish_config_dir = /home/mrbasa/.config/fish
+status fish-path = /usr/bin/fish
+
+===== FUNCTIONS (all) =====
+N_
+__abbr_tips
+__abbr_tips_bind_newline
+__abbr_tips_bind_space
+__abbr_tips_clean
+__abbr_tips_init
+__abbr_tips_install
+__abbr_tips_uninstall
+__abbr_tips_update
+__fish_any_arg_in
+__fish_anyeditor
+__fish_anypager
+__fish_anypython
+__fish_append
+__fish_apply_theme
+__fish_apropos
+__fish_argcomplete_complete
+__fish_backup_config_files
+__fish_cache_put
+__fish_cache_sourced_completions
+__fish_cached
+__fish_cancel_commandline
+__fish_canonicalize_builtin
+__fish_change_key_bindings
+__fish_cmd__complete_args
+__fish_commandline_is_singlequoted
+__fish_complete_atool_archive_contents
+__fish_complete_bittorrent
+__fish_complete_blockdevice
+__fish_complete_cd
+__fish_complete_clang
+__fish_complete_command
+__fish_complete_convert_options
+__fish_complete_directories
+__fish_complete_docutils
+__fish_complete_freedesktop_icons
+__fish_complete_ftp
+__fish_complete_gpg
+__fish_complete_gpg_key_id
+__fish_complete_gpg_user_id
+__fish_complete_group_ids
+__fish_complete_groups
+__fish_complete_job_pids
+__fish_complete_list
+__fish_complete_lpr
+__fish_complete_lpr_option
+__fish_complete_magick
+__fish_complete_man
+__fish_complete_mount_opts
+__fish_complete_mysql
+__fish_complete_netcat
+__fish_complete_path
+__fish_complete_pg_database
+__fish_complete_pg_user
+__fish_complete_pgrep
+__fish_complete_pids
+__fish_complete_ppp_peer
+__fish_complete_proc
+__fish_complete_ssh
+__fish_complete_subcommand
+__fish_complete_suffix
+__fish_complete_user_at_hosts
+__fish_complete_user_ids
+__fish_complete_users
+__fish_complete_wireshark
+__fish_complete_zfs_mountpoint_properties
+__fish_complete_zfs_pools
+__fish_complete_zfs_ro_properties
+__fish_complete_zfs_rw_properties
+__fish_complete_zfs_write_once_properties
+__fish_concat_completions
+__fish_config_files
+__fish_config_interactive
+__fish_config_list_prompts
+__fish_config_prompt_reset
+__fish_config_theme_canonicalize
+__fish_config_theme_choose
+__fish_config_theme_choose_bad_color_theme
+__fish_config_theme_demo
+__fish_config_with_file
+__fish_contains_opt
+__fish_crux_packages
+__fish_cursor_konsole
+__fish_cursor_xterm
+__fish_data_with_directory
+__fish_default_command_not_found_handler
+__fish_describe_command
+__fish_echo
+__fish_edit_command_if_at_cursor
+__fish_expand_pid_args
+__fish_first_token
+__fish_git_prompt
+__fish_gnu_complete
+__fish_hg_prompt
+__fish_indent
+__fish_is_first_arg
+__fish_is_first_token
+__fish_is_git_repository
+__fish_is_nth_token
+__fish_is_switch
+__fish_is_token_n
+__fish_is_zfs_feature_enabled
+__fish_list_current_token
+__fish_locale_vars
+__fish_macos_set_env
+__fish_make_cache_dir
+__fish_make_completion_signals
+__fish_man1_pages
+__fish_man_page
+__fish_md5
+__fish_migrate
+__fish_mktemp_relative
+__fish_move_last
+__fish_no_arguments
+__fish_not_contain_opt
+__fish_npm_helper
+__fish_nth_token
+__fish_number_of_cmd_args_wo_opts
+__fish_on_interactive
+__fish_paginate
+__fish_parent_directories
+__fish_paste
+__fish_per_os_bind
+__fish_posix_quote
+__fish_posix_shell
+__fish_prepend_sudo
+__fish_prev_arg_in
+__fish_preview_current_file
+__fish_print_VBox_vms
+__fish_print_addresses
+__fish_print_apt_packages
+__fish_print_cmd_args
+__fish_print_cmd_args_without_options
+__fish_print_commands
+__fish_print_debian_apache_confs
+__fish_print_debian_apache_mods
+__fish_print_debian_apache_sites
+__fish_print_encodings
+__fish_print_eopkg_packages
+__fish_print_filesystems
+__fish_print_gpg_algo
+__fish_print_groups
+__fish_print_help
+__fish_print_hostnames
+__fish_print_interfaces
+__fish_print_lpr_options
+__fish_print_lpr_printers
+__fish_print_modules
+__fish_print_mounted
+__fish_print_opkg_packages
+__fish_print_packages
+__fish_print_pacman_packages
+__fish_print_pacman_repos
+__fish_print_pipestatus
+__fish_print_pkg_add_packages
+__fish_print_pkg_packages
+__fish_print_port_packages
+__fish_print_portage_available_pkgs
+__fish_print_portage_installed_pkgs
+__fish_print_portage_packages
+__fish_print_portage_repository_paths
+__fish_print_rpm_packages
+__fish_print_service_names
+__fish_print_svn_rev
+__fish_print_users
+__fish_print_windows_drives
+__fish_print_windows_users
+__fish_print_xbps_packages
+__fish_print_xdg_applications_directories
+__fish_print_xdg_mimetypes
+__fish_print_xwindows
+__fish_print_zfs_snapshots
+__fish_protontricks_complete_appid
+__fish_ps
+__fish_pwd
+__fish_reconstruct_path
+__fish_reg__complete_keys
+__fish_seen_argument
+__fish_seen_subcommand_from
+__fish_set_locale
+__fish_shared_key_bindings
+__fish_should_complete_switches
+__fish_svn_prompt
+__fish_systemctl
+__fish_systemctl_services
+__fish_systemd_machine_images
+__fish_systemd_machines
+__fish_theme_cat
+__fish_theme_dir
+__fish_theme_export_for_webconfig
+__fish_theme_for_each
+__fish_theme_freeze
+__fish_theme_names
+__fish_theme_paths
+__fish_theme_variable_filter
+__fish_theme_variables
+__fish_toggle_comment_commandline
+__fish_tokenizer_state
+__fish_tried_to_embed_manpages
+__fish_uname
+__fish_unexpand_tilde
+__fish_use_subcommand
+__fish_vcs_prompt
+__fish_webconfig_update_color_hook
+__fish_whatis
+__fish_whatis_current_token
+__fish_with_status
+__fish_without_manpager
+__git.branch_has_wip
+__git.current_branch
+__git.default_branch
+__git.delete_branches
+__git.destroy
+__git.init
+__ssh_history_completions
+__terlar_git_prompt
+_fish_chezmoi_abbr
+_fish_chezmoi_init
+_fish_chezmoi_install
+_fish_chezmoi_uninstall
+_fish_chezmoi_update
+_fzf_configure_bindings_help
+_fzf_extract_var_info
+_fzf_preview_changed_file
+_fzf_preview_file
+_fzf_report_diff_type
+_fzf_report_file_type
+_fzf_search_directory
+_fzf_search_git_log
+_fzf_search_git_status
+_fzf_search_history
+_fzf_search_processes
+_fzf_search_variables
+_fzf_wrapper
+_pisces_append
+_pisces_backspace
+_pisces_bind_pair
+_pisces_complete
+_pisces_insert_identical
+_pisces_insert_left
+_pisces_insert_right
+_pisces_jump
+_pisces_lookup
+_pisces_remove
+_pisces_should_insert
+_pisces_skip
+_pisces_uninstall
+_puffer_fish_expand_bang
+_puffer_fish_expand_buck
+_puffer_fish_expand_dot
+_puffer_fish_expand_star
+_sponge_clear_state
+_sponge_install
+_sponge_on_exit
+_sponge_on_postexec
+_sponge_on_preexec
+_sponge_on_prompt
+_sponge_remove_from_history
+_sponge_uninstall
+_tide_1_line_prompt
+_tide_2_line_prompt
+_tide_cache_variables
+_tide_detect_os
+_tide_find_and_remove
+_tide_fish_colorize
+_tide_init_install
+_tide_init_uninstall
+_tide_init_update
+_tide_item_aws
+_tide_item_bun
+_tide_item_character
+_tide_item_cmd_duration
+_tide_item_context
+_tide_item_crystal
+_tide_item_direnv
+_tide_item_distrobox
+_tide_item_docker
+_tide_item_elixir
+_tide_item_gcloud
+_tide_item_git
+_tide_item_go
+_tide_item_java
+_tide_item_jobs
+_tide_item_kubectl
+_tide_item_nix_shell
+_tide_item_node
+_tide_item_os
+_tide_item_php
+_tide_item_private_mode
+_tide_item_pulumi
+_tide_item_python
+_tide_item_ruby
+_tide_item_rustc
+_tide_item_shlvl
+_tide_item_status
+_tide_item_terraform
+_tide_item_time
+_tide_item_toolbox
+_tide_item_vi_mode
+_tide_item_zig
+_tide_parent_dirs
+_tide_print_item
+_tide_pwd
+_tide_remove_unusable_items
+_tide_sub_bug-report
+_tide_sub_configure
+_tide_sub_reload
+_validate_int
+abbr
+alias
+bg
+cd
+cdh
+contains_seq
+diff
+dirh
+dirs
+disown
+down-or-search
+edit
+edit_command_buffer
+emit
+export
+fg
+fish_add_path
+fish_breakpoint_prompt
+fish_clipboard_copy
+fish_clipboard_paste
+fish_command_not_found
+fish_commandline_append
+fish_commandline_prepend
+fish_config
+fish_default_key_bindings
+fish_default_mode_prompt
+fish_delta
+fish_fossil_prompt
+fish_git_prompt
+fish_greeting
+fish_hg_prompt
+fish_hybrid_key_bindings
+fish_in_macos_terminal
+fish_is_root_user
+fish_jj_prompt
+fish_job_summary
+fish_mode_prompt
+fish_opt
+fish_print_git_action
+fish_print_hg_root
+fish_prompt
+fish_sigtrap_handler
+fish_status_to_signal
+fish_svn_prompt
+fish_title
+fish_update_completions
+fish_vcs_prompt
+fish_vi_cursor
+fish_vi_key_bindings
+fisher
+fishtape
+fortune
+funced
+funcsave
+fzf_configure_bindings
+fzf_key_bindings
+gbage
+gbda
+gdv
+gignored
+glp
+grel
+grename
+grep
+grt
+gtest
+gtl
+gunwip
+gwip
+help
+history
+humantime
+insmod
+isatty
+kill
+la
+ll
+ls
+lsmod
+man
+nextd
+nextd-or-forward-token
+open
+popd
+prevd
+prevd-or-backward-token
+prompt_hostname
+prompt_login
+prompt_pwd
+psub
+pushd
+realpath
+rm
+rmmod
+seq
+setenv
+spark
+sponge_filter_failed
+sponge_filter_matched
+suspend
+tide
+trap
+trash
+trim_value
+umask
+up-or-search
+vared
+wait
+
+===== FUNCTION DEFINITIONS (key ones) =====
+
+----- function  emit  -----
+# Defined in /home/mrbasa/.config/fish/config.fish @ line 152
+function emit
+    echo (date -Iseconds) "EMIT: $argv" >> ~/tmp/tide_report_emit.log
+    builtin emit $argv
+end
+
+----- function  fisher  -----
+# Defined in /home/mrbasa/.config/fish/functions/fisher.fish @ line 1
+function fisher --description 'A plugin manager for Fish' --argument-names cmd
+    set --query fisher_path || set --local fisher_path $__fish_config_dir
+    set --local fisher_version 4.4.8
+    set --local fish_plugins $__fish_config_dir/fish_plugins
+
+    switch "$cmd"
+        case -v --version
+            echo "fisher, version $fisher_version"
+        case "" -h --help
+            echo "Usage: fisher install   <plugins...>  Install plugins"
+            echo "       fisher remove    <plugins...>  Remove installed plugins" 
+            echo "       fisher uninstall <plugins...>  Remove installed plugins (alias)" 
+            echo "       fisher update    <plugins...>  Update installed plugins"
+            echo "       fisher update                  Update all installed plugins"
+            echo "       fisher list    [<regex>]       List installed plugins matching regex"
+            echo "Options:"
+            echo "       -v, --version  Print version"
+            echo "       -h, --help     Print this help message"
+            echo "Variables:"
+            echo "       \$fisher_path  Plugin installation path. Default: $__fish_config_dir" | string replace --regex -- $HOME \~
+        case ls list
+            string match --entire --regex -- "$argv[2]" $_fisher_plugins
+        case install update remove uninstall
+            isatty || read --local --null --array stdin && set --append argv $stdin
+
+            test "$cmd" = uninstall && set cmd remove
+
+            set --local install_plugins
+            set --local update_plugins
+            set --local remove_plugins
+            set --local arg_plugins $argv[2..-1]
+            set --local old_plugins $_fisher_plugins
+            set --local new_plugins
+
+            test -e $fish_plugins && set --local file_plugins (string match --regex -- '^[^\s]+$' <$fish_plugins | string replace -- \~ ~)
+
+            if ! set --query argv[2]
+                if test "$cmd" != update
+                    echo "fisher: Not enough arguments for command: \"$cmd\"" >&2 && return 1
+                else if ! set --query file_plugins
+                    echo "fisher: \"$fish_plugins\" file not found: \"$cmd\"" >&2 && return 1
+                end
+                set arg_plugins $file_plugins
+            else if test "$cmd" = install && ! set --query old_plugins[1] 
+                set --append arg_plugins $file_plugins
+            end
+
+            for plugin in $arg_plugins
+                set plugin (test -e "$plugin" && realpath $plugin || string lower -- $plugin)
+                contains -- "$plugin" $new_plugins || set --append new_plugins $plugin
+            end
+
+            if set --query argv[2]
+                for plugin in $new_plugins
+                    if contains -- "$plugin" $old_plugins
+                        test "$cmd" = remove &&
+                            set --append remove_plugins $plugin ||
+                            set --append update_plugins $plugin
+                    else if test "$cmd" = install
+                        set --append install_plugins $plugin
+                    else
+                        echo "fisher: Plugin not installed: \"$plugin\"" >&2 && return 1
+                    end
+                end
+            else
+                for plugin in $new_plugins
+                    contains -- "$plugin" $old_plugins &&
+                        set --append update_plugins $plugin ||
+                        set --append install_plugins $plugin
+                end
+
+                for plugin in $old_plugins
+                    contains -- "$plugin" $new_plugins || set --append remove_plugins $plugin
+                end
+            end
+
+            set --local pid_list
+            set --local source_plugins
+            set --local fetch_plugins $update_plugins $install_plugins
+            set --local fish_path (status fish-path)
+
+            echo (set_color --bold)fisher $cmd version $fisher_version(set_color normal)
+
+            for plugin in $fetch_plugins
+                set --local source (command mktemp -d)
+                set --append source_plugins $source
+
+                command mkdir -p $source/{completions,conf.d,themes,functions}
+
+                $fish_path --command "
+                    if test -e $plugin
+                        command cp -Rf $plugin/* $source
+                    else
+                        set resp (command mktemp)
+                        set temp (command mktemp -d)
+                        set repo (string split -- \@ $plugin) || set repo[2] HEAD
+
+                        if set path (string replace --regex -- '^(https://)?gitlab.com/' '' \$repo[1])
+                            set name (string split -- / \$path)[-1]
+                            set url https://gitlab.com/\$path/-/archive/\$repo[2]/\$name-\$repo[2].tar.gz
+                        else
+                            set url https://api.github.com/repos/\$repo[1]/tarball/\$repo[2]
+                        end
+
+                        echo Fetching (set_color --underline)\$url(set_color normal)
+
+                        set http (command curl -q --silent -L -o \$resp -w %{http_code} \$url)
+
+                        if test \"\$http\" = 200 && command tar -xzC \$temp -f \$resp 2>/dev/null
+                            command cp -Rf \$temp/*/* $source
+                        else if test \"\$http\" = 403
+                            echo fisher: GitHub API rate limit exceeded \(HTTP 403\) >&2
+                            command rm -rf $source
+                        else
+                            echo fisher: Invalid plugin name or host unavailable: \\\"$plugin\\\" >&2
+                            command rm -rf $source
+                        end
+
+                        command rm -rf \$temp
+                    end
+
+                    set files $source/* && string match --quiet --regex -- .+\.fish\\\$ \$files
+                " &
+
+                set --append pid_list (jobs --last --pid)
+            end
+
+            wait $pid_list 2>/dev/null
+
+            for plugin in $fetch_plugins
+                if set --local source $source_plugins[(contains --index -- "$plugin" $fetch_plugins)] && test ! -e $source
+                    if set --local index (contains --index -- "$plugin" $install_plugins)
+                        set --erase install_plugins[$index]
+                    else
+                        set --erase update_plugins[(contains --index -- "$plugin" $update_plugins)]
+                    end
+                end
+            end
+
+            for plugin in $update_plugins $remove_plugins
+                if set --local index (contains --index -- "$plugin" $_fisher_plugins)
+                    set --local plugin_files_var _fisher_(string escape --style=var -- $plugin)_files
+
+                    if contains -- "$plugin" $remove_plugins
+                        for name in (string replace --filter --regex -- '.+/conf\.d/([^/]+)\.fish$' '$1' $$plugin_files_var)
+                            emit {$name}_uninstall
+                        end
+                        printf "%s\n" Removing\ (set_color red --bold)$plugin(set_color normal) "         "$$plugin_files_var | string replace -- \~ ~
+                        set --erase _fisher_plugins[$index]
+                    end
+
+                    command rm -rf (string replace -- \~ ~ $$plugin_files_var)
+
+                    functions --erase (string replace --filter --regex -- '.+/functions/([^/]+)\.fish$' '$1' $$plugin_files_var)
+
+                    for name in (string replace --filter --regex -- '.+/completions/([^/]+)\.fish$' '$1' $$plugin_files_var)
+                        complete --erase --command $name
+                    end
+
+                    set --erase $plugin_files_var
+                end
+            end
+
+            if set --query update_plugins[1] || set --query install_plugins[1]
+                command mkdir -p $fisher_path/{functions,themes,conf.d,completions}
+            end
+
+            for plugin in $update_plugins $install_plugins
+                set --local source $source_plugins[(contains --index -- "$plugin" $fetch_plugins)]
+                set --local files $source/{functions,themes,conf.d,completions}/*
+
+                if set --local index (contains --index -- $plugin $install_plugins)
+                    set --local user_files $fisher_path/{functions,themes,conf.d,completions}/*
+                    set --local conflict_files
+
+                    for file in (string replace -- $source/ $fisher_path/ $files)
+                        contains -- $file $user_files && set --append conflict_files $file
+                    end
+
+                    if set --query conflict_files[1] && set --erase install_plugins[$index]
+                        echo -s "fisher: Cannot install \"$plugin\": please remove or move conflicting files first:" \n"        "$conflict_files >&2
+                        continue
+                    end
+                end
+
+                for file in (string replace -- $source/ "" $files)
+                    command cp -RLf $source/$file $fisher_path/$file
+                end
+
+                set --local plugin_files_var _fisher_(string escape --style=var -- $plugin)_files
+
+                set --query files[1] && set --universal $plugin_files_var (string replace -- $source $fisher_path $files | string replace -- ~ \~)
+
+                contains -- $plugin $_fisher_plugins || set --universal --append _fisher_plugins $plugin
+                contains -- $plugin $install_plugins && set --local event install || set --local event update
+
+                printf "%s\n" Installing\ (set_color --bold)$plugin(set_color normal) "           "$$plugin_files_var | string replace -- \~ ~
+
+                for file in (string match --regex -- '.+/[^/]+\.fish$' $$plugin_files_var | string replace -- \~ ~)
+                    source $file
+                    if set --local name (string replace --regex -- '.+conf\.d/([^/]+)\.fish$' '$1' $file)
+                        emit {$name}_$event
+                    end
+                end
+            end
+
+            command rm -rf $source_plugins
+
+            if set --query _fisher_plugins[1]
+                set --local commit_plugins
+
+                for plugin in $file_plugins
+                    contains -- (string lower -- $plugin) (string lower -- $_fisher_plugins) && set --append commit_plugins $plugin
+                end
+
+                for plugin in $_fisher_plugins
+                    contains -- (string lower -- $plugin) (string lower -- $commit_plugins) || set --append commit_plugins $plugin
+                end
+
+                string replace --regex -- $HOME \~ $commit_plugins >$fish_plugins
+            else
+                set --erase _fisher_plugins
+                command rm -f $fish_plugins
+            end
+
+            set --local total (count $install_plugins) (count $update_plugins) (count $remove_plugins)
+
+            test "$total" != "0 0 0" && echo (string join ", " (
+                test $total[1] = 0 || echo "Installed $total[1]") (
+                test $total[2] = 0 || echo "Updated $total[2]") (
+                test $total[3] = 0 || echo "Removed $total[3]")
+            ) plugin/s
+        case \*
+            echo "fisher: Unknown command: \"$cmd\"" >&2 && return 1
+    end
+end
