@@ -9,4 +9,3 @@
 
 # Tests, fixtures, and test cache/home
 test/ export-ignore
-_test_home/ export-ignore
