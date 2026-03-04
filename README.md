@@ -19,7 +19,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## Quick start
 
 1. Install the plugin: `fisher install MrBasa/TideReport@v1`
-2. On a **fresh install**, the plugin adds **weather**, **moon**, and **github** to your prompt automatically. The **tide** item is not added by default.
+2. On a **first install** (when no Tide Report items are in your prompt), an **interactive wizard** runs: you see a preview of each prompt item and choose which to add (GitHub, weather, moon, tide). You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed).
 3. Run `tide reload` or open a new terminal to see the prompt.
 4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
 
@@ -39,6 +39,8 @@ Install with [Fisher][]:
 ```fish
 fisher install MrBasa/TideReport@v1
 ```
+
+On a **first install**, an interactive wizard lets you choose which items to add and shows a sample of each. Defaults: GitHub, weather, and moon are added (tide is not); weather format is medium. Non-interactive installs (e.g. in CI) get the same defaults without prompts.
 
 If you install from a **local path** (e.g. during development) and the prompt items do not appear, run:
 ```fish
@@ -67,7 +69,7 @@ If items still do not appear, run `tide_report_install` once to apply configurat
 
 ## 🔧 Usage
 
-On a fresh install, **weather**, **moon**, and **github** are added to your prompt for you. To add **tide** or change the order of items, edit the Tide prompt lists and reload:
+After the install wizard (or on a non-interactive install), **weather**, **moon**, and **github** are added by default; **tide** is not. To add **tide** or change the order of items, edit the Tide prompt lists and reload:
 
 ```fish
 set -Ua tide_right_prompt_items tide
@@ -150,7 +152,7 @@ The module displays stats for the current repository, with icons you can customi
 
 **This module requires `jq` for parsing JSON.**
 
-The weather format is a string with custom specifiers.
+The weather format is a string with custom specifiers. When you add the weather item in the install wizard, you can choose one of three presets: **concise** (emoji + temp), **medium** (emoji + temp + wind), or **detailed** (thermometer + temp, feels-like in parentheses, humidity + wind).
 
 | Specifier | Description                                   | Example     |
 | :---      | :---                                          | :---        |

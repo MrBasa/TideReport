@@ -8,6 +8,34 @@ set -q __tide_report_moon_J1970        || set -g __tide_report_moon_J1970 244058
 set -q __tide_report_moon_J2000        || set -g __tide_report_moon_J2000 2451545
 set -q __tide_report_moon_obliquity    || set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
 
+## Show sample render of each Tide Report prompt item (for install wizard). Optional weather_format: concise, medium, or detailed.
+function _tide_report_install_show_preview --description "Echo labeled sample output for github, weather, moon, tide" --argument-names weather_format
+    set -q tide_github_color || set -l tide_github_color white
+    set -q tide_weather_color || set -l tide_weather_color white
+    set -q tide_moon_color || set -l tide_moon_color white
+    set -q tide_tide_color || set -l tide_tide_color 0087AF
+    set -q tide_report_github_icon || set -l tide_report_github_icon ""
+    set -q tide_report_github_icon_stars || set -l tide_report_github_icon_stars "★"
+    set -q tide_report_github_icon_forks || set -l tide_report_github_icon_forks "⑂"
+    set -q tide_report_tide_symbol_high || set -l tide_report_tide_symbol_high "⇞"
+    set -q tide_report_tide_symbol_color || set -l tide_report_tide_symbol_color white
+
+    set -l star_color yellow
+    set -q tide_report_github_color_stars && set star_color $tide_report_github_color_stars
+
+    echo (set_color brwhite)"[1] github:   "(set_color normal)(set_color $tide_github_color)"$tide_report_github_icon "(set_color $star_color)"$tide_report_github_icon_stars 42 $tide_report_github_icon_forks 3"(set_color normal)
+    switch "$weather_format"
+        case concise
+            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️ +22°"(set_color normal)
+        case detailed
+            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️🌡️+22° (+21°) 65% ⬇12km/h"(set_color normal)
+        case "*"
+            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️ +22° ⬇12km/h"(set_color normal)
+    end
+    echo (set_color brwhite)"[3] moon:     "(set_color normal)(set_color $tide_moon_color)"🌕"(set_color normal)
+    echo (set_color brwhite)"[4] tide:     "(set_color normal)(set_color $tide_report_tide_symbol_color)"$tide_report_tide_symbol_high"(set_color $tide_tide_color)" 14:30 3.2m"(set_color normal)
+end
+
 ## Install Tide Report defaults and register prompt items on Fisher install event.
 function _tide_report_install --description "Install Tide Report defaults and prompt items on fisher event" --on-event tide_report_install
     set -l default_color $tide_time_color
@@ -91,28 +119,97 @@ function _tide_report_install --description "Install Tide Report defaults and pr
     set -q tide_report_tide_units && set -U -e tide_report_tide_units
     set -q tide_report_github_color_error && set -U -e tide_report_github_color_error
 
-    _tide_report_ensure_prompt_items 1
-
-    ## --- Prompt item placement message (full install only) ---
-    if set -q tide_left_prompt_items; and set -q tide_right_prompt_items
-        set -l left $tide_left_prompt_items
-        set -l right $tide_right_prompt_items
-        set -l our_items github weather moon tide
-        set -l skip_placement false
-        for item in $our_items
-            if contains -- $item $left; or contains -- $item $right
-                set skip_placement true
-                break
-            end
-        end
-        if $skip_placement
-            echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
-        else
-            echo (set_color brwhite)"Adding Tide Report items to your prompt: "(set_color normal)"github (left), weather and moon (right). Tide not added by default."
+    if not set -q tide_left_prompt_items; or not set -q tide_right_prompt_items
+        _tide_report_ensure_prompt_items 1
+        return 0
+    end
+    set -l left $tide_left_prompt_items
+    set -l right $tide_right_prompt_items
+    set -l our_items github weather moon tide
+    set -l any_present false
+    for item in $our_items
+        if contains -- $item $left; or contains -- $item $right
+            set any_present true
+            break
         end
     end
 
-    echo (set_color brwhite)"New prompt items will show in this shell after reload. In other open terminals, run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session."(set_color normal)
+    if $any_present
+        echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+    else if not status is-interactive
+        _tide_report_ensure_prompt_items 1
+        echo (set_color brwhite)"Tide Report: added github (left), weather, moon (right). Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
+    else
+        echo (set_color brwhite)"Choose which Tide Report items to add to your prompt."(set_color normal)
+        _tide_report_install_show_preview medium
+        echo ""
+
+        set -l add_github false
+        read -l -P (set_color brwhite)"Add GitHub to prompt? [Y/n]: "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
+            set add_github true
+        end
+
+        set -l add_weather false
+        read -l -P (set_color brwhite)"Add Weather to prompt? [Y/n]: "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
+            set add_weather true
+        end
+
+        set -l add_moon false
+        read -l -P (set_color brwhite)"Add Moon to prompt? [Y/n]: "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
+            set add_moon true
+        end
+
+        set -l add_tide false
+        read -l -P (set_color brwhite)"Add Tide to prompt? [y/N]: "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -n "$r"; and test "$r" != "n"; and test "$r" != "no"
+            if test "$r" = "y"; or test "$r" = "yes"
+                set add_tide true
+            end
+        end
+        if $add_weather
+            read -l -P (set_color brwhite)"Weather format? 1=concise 2=medium 3=detailed [2]: "(set_color normal) format_choice
+            set -l fmt "2"
+            if test -n "$format_choice"
+                string match -q -r '^[1-3]$' -- $format_choice && set fmt $format_choice
+            end
+            switch "$fmt"
+                case 1; set -U tide_report_weather_format "%c %t"
+                case 3; set -U tide_report_weather_format "%c 🌡️%t (%f) %h %d%w"
+                case "*"; set -U tide_report_weather_format "%c %t %d%w"
+            end
+        end
+        set -l left_add
+        set -l right_add
+        $add_github && set left_add github
+        $add_weather && set right_add $right_add weather
+        $add_moon && set right_add $right_add moon
+        $add_tide && set right_add $right_add tide
+        if test (count $left_add) -gt 0; or test (count $right_add) -gt 0
+            _tide_report_apply_prompt_items "$left_add" "$right_add"
+            set -l right_list
+            $add_weather && set right_list $right_list weather
+            $add_moon && set right_list $right_list moon
+            $add_tide && set right_list $right_list tide
+            set -l msg
+            if $add_github
+                set msg "Added: github (left)"
+                if test (count $right_list) -gt 0
+                    set msg "$msg, "(string join ", " $right_list)" (right)"
+                end
+            else
+                set msg "Added: "(string join ", " $right_list)" (right)"
+            end
+            echo (set_color brwhite)"$msg."(set_color normal)
+        end
+        echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
+    end
 end
 
 ## Handle Fisher update event: clear cache and re-run install logic.
@@ -161,7 +258,54 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to refresh your prompt."(set_color normal)
 end
 
-## Add Tide Report items to Tide prompt lists when none are present (helper used by install).
+## Apply chosen Tide Report items to Tide prompt lists (insertion rules: github after git/pwd, right items appended).
+function _tide_report_apply_prompt_items --description "Add selected Tide Report items to left/right prompt lists" --argument-names left_add right_add
+    set -q tide_left_prompt_items || return 0
+    set -q tide_right_prompt_items || return 0
+    set -l left $tide_left_prompt_items
+    set -l right $tide_right_prompt_items
+
+    set -l new_left $left
+    for item in $left_add
+        if not contains -- $item $new_left
+            if test "$item" = "github"
+                if contains -- git $left
+                    set -l out
+                    for i in $new_left
+                        set -a out $i
+                        if test "$i" = "git"
+                            set -a out github
+                        end
+                    end
+                    set new_left $out
+                else if contains -- pwd $left
+                    set -l out
+                    for i in $new_left
+                        if test "$i" = "pwd"
+                            set -a out github
+                        end
+                        set -a out $i
+                    end
+                    set new_left $out
+                else
+                    set new_left $new_left github
+                end
+            end
+        end
+    end
+
+    set -l new_right $right
+    for item in $right_add
+        if not contains -- $item $new_right
+            set new_right $new_right $item
+        end
+    end
+
+    set -U tide_left_prompt_items $new_left
+    set -U tide_right_prompt_items $new_right
+end
+
+## Add default Tide Report items when none are present (used when not interactive or when wizard is skipped).
 function _tide_report_ensure_prompt_items --description "Ensure Tide Report items exist in Tide prompt lists" --argument-names silent
     set -q tide_left_prompt_items || return 0
     set -q tide_right_prompt_items || return 0
@@ -173,27 +317,7 @@ function _tide_report_ensure_prompt_items --description "Ensure Tide Report item
             return 0
         end
     end
-    set -l new_left
-    if contains -- git $left
-        for i in $left
-            set -a new_left $i
-            if test "$i" = "git"
-                set -a new_left github
-            end
-        end
-    else if contains -- pwd $left
-        for i in $left
-            if test "$i" = "pwd"
-                set -a new_left github
-            end
-            set -a new_left $i
-        end
-    else
-        set new_left $left github
-    end
-    set -l new_right $right weather moon
-    set -U tide_left_prompt_items $new_left
-    set -U tide_right_prompt_items $new_right
+    _tide_report_apply_prompt_items github "weather moon"
     if test "$silent" != "1"
         echo (set_color brwhite)"Tide Report: added prompt items. Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
     end
