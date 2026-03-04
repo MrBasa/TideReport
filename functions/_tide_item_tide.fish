@@ -139,9 +139,12 @@ function __tide_report_fetch_tide --description "Fetch tide predictions from NOA
     set -l tide_data (curl -s -A "$tide_report_user_agent" --max-time 3 "$url")
     set -l curl_status $status
     if test $curl_status -ne 0; or test -z "$tide_data"
+        functions -q __tide_report_log_expected && __tide_report_log_expected tide "NOAA API unavailable or invalid response"
         return
     end
     if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' 2>/dev/null >/dev/null
         mkdir -p (dirname "$cache_file"); and printf "%s" "$tide_data" > "$cache_file"
+    else
+        functions -q __tide_report_log_expected && __tide_report_log_expected tide "NOAA API unavailable or invalid response"
     end
 end

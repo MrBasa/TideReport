@@ -3,6 +3,7 @@
 ## Plugin version (single source of truth for display and API client string)
 set -g _tide_report_version "1.5"
 set -q tide_report_user_agent || set -U tide_report_user_agent "tide-report/$_tide_report_version"
+set -q tide_report_log_expected || set -U tide_report_log_expected 1
 
 # Moon phase math constants (used by __tide_report_moon_* helpers, session-scoped globals)
 set -q __tide_report_moon_PI           || set -g __tide_report_moon_PI (math "acos(-1)")
@@ -56,12 +57,15 @@ function _tide_report_install --description "Install Tide Report defaults and pr
     ## --- Check dependencies ---
     if ! command -v "gh" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
+        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "gh not installed"
     end
     if ! command -v "jq" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
+        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "jq not installed"
     end
     if ! command -v "curl" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
+        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "curl not installed"
     end
 
     set -U tide_report_user_agent "tide-report/$_tide_report_version"

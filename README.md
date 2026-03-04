@@ -114,6 +114,14 @@ These settings apply to all modules in this plugin.
 | `tide_report_weather_provider`       | Weather backend: `wttr` or `openmeteo`.                    | `openmeteo`        |
 | `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS)       | `m`                |
 | `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%H:%M"`). | From Tide         |
+| `tide_report_log_expected`          | Set to `0`, `false`, or `no` to disable diagnostic logging.| `1`               |
+
+### Diagnostic log
+
+Expected issues (missing dependency, bad GitHub credentials, service API unavailable, invalid weather location, etc.) are written to a log file so the prompt is never delayed by I/O.
+
+- **Location**: `$XDG_STATE_HOME/tide-report/tide-report.log` (or `~/.local/state/tide-report/tide-report.log` if `XDG_STATE_HOME` is not set).
+- **When to look**: If a prompt item consistently shows its "unavailable" text (e.g. … or 🌊…), examine this log file for the cause. Log lines are tab-separated: timestamp, TideReport version, category (`dependency`, `github`, `weather`, `tide`, `moon`), and message. Disable logging by setting `tide_report_log_expected` to `0`, `false`, or `no`.
 
 ### 🤖 GitHub Module (`github`)
 

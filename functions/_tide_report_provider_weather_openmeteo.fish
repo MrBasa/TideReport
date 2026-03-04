@@ -35,6 +35,7 @@ function __tide_report_provider_openmeteo --description "Fetch weather from Open
         set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
         set -l geo_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$geo_url")
         if test $status -ne 0; or test -z "$geo_data"
+            functions -q __tide_report_log_expected && __tide_report_log_expected weather "geocoding failed or invalid location"
             return
         end
         set lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty')
@@ -43,15 +44,18 @@ function __tide_report_provider_openmeteo --description "Fetch weather from Open
     end
 
     if test -z "$lat"; or test -z "$lon"
+        functions -q __tide_report_log_expected && __tide_report_log_expected weather "geocoding failed or invalid location"
         return
     end
     set -l tz_escaped (string escape --style url "$tz")
     set -l forecast_url "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,apparent_temperature&daily=sunrise,sunset&timezone=$tz_escaped"
     set -l forecast_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$forecast_url")
     if test $status -ne 0; or test -z "$forecast_data"
+        functions -q __tide_report_log_expected && __tide_report_log_expected weather "API unavailable or invalid response"
         return
     end
     if not printf "%s" "$forecast_data" | jq -e '.current.temperature_2m != null' 2>/dev/null >/dev/null
+        functions -q __tide_report_log_expected && __tide_report_log_expected weather "API unavailable or invalid response"
         return
     end
     set -l tc (printf "%s" "$forecast_data" | jq -r '.current.temperature_2m')

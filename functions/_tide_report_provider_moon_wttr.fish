@@ -9,6 +9,7 @@ function __tide_report_provider_moon_wttr --description "Fetch moon phase from w
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
     set -l fetched_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")
     if test $status -ne 0; or test -z "$fetched_data"
+        functions -q __tide_report_log_expected && __tide_report_log_expected moon "wttr.in unavailable or no moon data"
         return
     end
     set -l phase (printf "%s" "$fetched_data" | jq -r '.weather[0].astronomy[0].moon_phase // ""')
@@ -17,5 +18,7 @@ function __tide_report_provider_moon_wttr --description "Fetch moon phase from w
         mkdir -p (dirname "$moon_cache")
         set -l moon_temp "$moon_cache.$fish_pid.tmp"
         printf "%s" "$moon_json" > "$moon_temp" && command mv -f "$moon_temp" "$moon_cache"
+    else
+        functions -q __tide_report_log_expected && __tide_report_log_expected moon "wttr.in unavailable or no moon data"
     end
 end
