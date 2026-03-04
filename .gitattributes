@@ -1,4 +1,12 @@
 # Exclude from release source archives (zip/tar.gz)
-debug/ export-ignore
+# Keep only plugin code + top-level README/LICENSE in release archives.
+
+# Non-runtime metadata and dev tooling
+.cursor/ export-ignore
+.github/ export-ignore
+.vscode/ export-ignore
+.gitattributes export-ignore
+
+# Tests, fixtures, and test cache/home
 test/ export-ignore
 _test_home/ export-ignore
