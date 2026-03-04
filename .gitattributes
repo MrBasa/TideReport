@@ -1,3 +1,4 @@
 # Exclude from release source archives (zip/tar.gz)
 debug/ export-ignore
 test/ export-ignore
+_test_home/ export-ignore
