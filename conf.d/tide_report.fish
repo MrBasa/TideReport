@@ -1,5 +1,9 @@
 ## Tide Report :: Default Configuration
 
+## Plugin version (single source of truth for display and API client string)
+set -g _tide_report_version "1.5"
+set -q tide_report_user_agent || set -U tide_report_user_agent "tide-report/$_tide_report_version"
+
 # Moon phase math constants (used by __tide_report_moon_* helpers, session-scoped globals)
 set -q __tide_report_moon_PI           || set -g __tide_report_moon_PI (math "acos(-1)")
 set -q __tide_report_moon_rad          || set -g __tide_report_moon_rad (math "$__tide_report_moon_PI / 180")
@@ -47,7 +51,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         sleep 3
     end
 
-    echo (set_color --bold brwhite)"Installing Tide Report Configuration..."(set_color normal)
+    echo (set_color --bold brwhite)"Installing Tide Report v$_tide_report_version..."(set_color normal)
 
     ## --- Check dependencies ---
     if ! command -v "gh" 2>/dev/null >/dev/null
@@ -60,7 +64,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
     end
 
-    set -U tide_report_user_agent "tide-report/1.5"
+    set -U tide_report_user_agent "tide-report/$_tide_report_version"
     set -q tide_report_service_timeout_millis || set -U tide_report_service_timeout_millis 6000
     set -q tide_report_wttr_url               || set -U tide_report_wttr_url "https://wttr.in"
     set -q tide_report_weather_provider       || set -U tide_report_weather_provider "openmeteo"

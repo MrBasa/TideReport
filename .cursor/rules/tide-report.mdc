@@ -63,9 +63,9 @@ New items should be consistent with the current approach:
 
 ## Versioned User Agent
 
-- The `tide_report_user_agent` set in `conf.d/tide_report.fish` must **always match the latest released version**.
-- When cutting a new release (e.g. `v1.5`), update the user agent to `tide-report/1.5` (matching the tag) as part of the release prep.
-- Do not ship a new release without bumping this value; it is used for external service telemetry/debugging.
+- The **single source of truth** for the plugin version is `_tide_report_version` in `conf.d/tide_report.fish`. The user agent sent to APIs is derived from it (`tide-report/$_tide_report_version`).
+- When cutting a new release (e.g. `v1.5`), update `_tide_report_version` to match (e.g. set to `1.5`). No separate user-agent edit is needed.
+- Do not ship a new release without bumping this value; it is used for display (e.g. install message) and for external service telemetry/debugging.
 
 ## Testing
 

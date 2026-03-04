@@ -19,7 +19,7 @@ When you make a new release available, **repoint the `v1` tag** to the latest re
 Handle the full release flow:
 
 1. **Pre-check:** Ensure working tree is clean (`git status`). If not, stop and ask the user to commit or stash.
-2. **Version:** Determine the next version (e.g. after v1.2.2 → v1.2.3 or v1.3.0). If unclear, ask the user.
+2. **Version:** Determine the next version (e.g. after v1.2.2 → v1.2.3 or v1.3.0). If unclear, ask the user. Update `_tide_report_version` in `conf.d/tide_report.fish` to that version (e.g. `1.6`; no `v` prefix). Commit the change before tagging.
 3. **Tag and push:**
    - Create the version tag on the current commit: `git tag <version>` (e.g. `v1.2.3`).
    - Push the branch and the new tag: `git push origin <branch> && git push origin <version>`.
