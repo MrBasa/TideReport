@@ -1,0 +1,33 @@
+---
+description: Disallow top-level execution in Fish functions/ files to keep Fisher installs safe
+alwaysApply: true
+---
+
+# Fish Functions — No Top-Level Execution
+
+In this project, files under `functions/` **must contain only function definitions** so they are safe for lazy-loading and for Fisher to source during install.
+
+- **Never** use `return`, `exit`, or `break` at the top level of a `functions/*.fish` file.
+- **Never** perform imperative work at the top level (no `set`, `math`, `command` calls, or I/O) in these files.
+- **Do** put any one-time initialization (like global constants) into `conf.d/tide_report.fish` or compute them as locals inside functions.
+- **Do** keep helper math or parsing logic encapsulated in functions (e.g. `__tide_report_moon_*`) with no side effects when the file is sourced.
+
+Example:
+
+- **Bad (`functions/_example.fish`)** — top-level guard and globals:
+
+```fish
+set -q __example_initialized; and test $__example_initialized = 1; and return
+set -g __example_initialized 1
+set -g __example_PI (math "acos(-1)")
+```
+
+- **Good** — constants moved to `conf.d/tide_report.fish` or computed in functions:
+
+```fish
+function __example_compute --argument-names x
+    set -l pi (math "acos(-1)")
+    math "$x * $pi"
+end
+```
+

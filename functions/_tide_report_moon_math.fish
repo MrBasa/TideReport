@@ -5,16 +5,6 @@
 #! We only implement the minimal subset needed to compute a numeric
 #! lunar phase fraction in [0,1).
 
-set -q __tide_report_moon_math_initialized; and test $__tide_report_moon_math_initialized = 1; and return
-set -g __tide_report_moon_math_initialized 1
-
-set -g __tide_report_moon_PI (math "acos(-1)")
-set -g __tide_report_moon_rad (math "$__tide_report_moon_PI / 180")
-set -g __tide_report_moon_day_seconds 86400
-set -g __tide_report_moon_J1970 2440588
-set -g __tide_report_moon_J2000 2451545
-set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
-
 function __tide_report_moon_to_days --argument-names unix_time
     set -l jd (math "$unix_time / $__tide_report_moon_day_seconds - 0.5 + $__tide_report_moon_J1970")
     math "$jd - $__tide_report_moon_J2000"
