@@ -107,6 +107,7 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
     end
 
     if test -z "$stars"
+        _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
         return
     end
 
@@ -163,5 +164,7 @@ function __tide_report_fetch_github --description "Fetch GitHub repo stats with 
     if test $status -eq 0; and test -n "$json_data"
         echo "$json_data" >"$temp_file"
         command mv -f "$temp_file" "$cache_file"
+    else
+        functions -q __tide_report_log_expected && __tide_report_log_expected github "fetch failed (check gh auth and network)"
     end
 end
