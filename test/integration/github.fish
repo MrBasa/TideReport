@@ -1,8 +1,9 @@
 ## Integration test: GitHub item.
 ## 1) Full item with valid cache: must call _tide_print_item and display something.
 ## 2) Parser with fixture data: exact output (★42 ⑂3 ⑀10 !2 PR1).
-## 3) Non-git dir: no git fatal on stderr.
-## 4) Stale cache: no disown error on stderr.
+## 3) Parser with CI cache: no status variable error, pass icon shown.
+## 4) Non-git dir: no git fatal on stderr.
+## 5) Stale cache: no disown error on stderr.
 
 source (dirname (dirname (status filename)))/setup.fish
 # Ensure REPO_ROOT is absolute so paths are valid regardless of cwd
@@ -63,6 +64,27 @@ echo "$_parser_plain" > $_parser_result_file
 @test "github parser output contains expected fixture values (★42, ⑂3, 10, !2, PR1)" (
     set -l p (cat $_parser_result_file 2>/dev/null)
     string match -q "*★42*" "$p"; and string match -q "*⑂3*" "$p"; and string match -q "*10*" "$p"; and string match -q "*!2*" "$p"; and string match -q "*PR1*" "$p"
+    echo $status
+) -eq 0
+
+## --- Parser with CI cache: no status variable error, pass icon shown ---
+set -g _ci_cache_dir "$REPO_ROOT/test/cache/github"
+command mkdir -p "$_ci_cache_dir"
+set -g _ci_cache_file "$_ci_cache_dir/ci_completed_success.json"
+echo '[{"status":"completed","conclusion":"success","name":"test"}]' > "$_ci_cache_file"
+set -g tide_report_github_show_ci true
+set -g _tide_print_item_calls
+set -g TIDE_REPORT_TEST 1
+__tide_report_parse_github "$_gh_cache_path" "$_gh_jq_line" "$_ci_cache_file"
+set -e TIDE_REPORT_TEST 2>/dev/null
+set -g _ci_parser_payload ""
+if set -q _tide_print_item_last_argv[2]
+    set _ci_parser_payload "$_tide_print_item_last_argv[2]"
+end
+
+@test "github parser with CI cache was invoked without status variable error" (count _tide_print_item_calls) -ge 1
+@test "github parser with CI cache output contains pass icon" (
+    string match -q "*✓*" "$_ci_parser_payload"
     echo $status
 ) -eq 0
 

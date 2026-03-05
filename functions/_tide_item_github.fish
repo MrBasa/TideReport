@@ -190,9 +190,9 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
             if test -n "$first"; and test "$first" != "null null"
                 set has_ci_run true
                 set -l parts (string split " " "$first")
-                set -l status "$parts[1]"
+                set -l run_status "$parts[1]"
                 set -l conclusion "$parts[2]"
-                if test "$status" = "completed"
+                if test "$run_status" = "completed"
                     if test "$conclusion" = "success"
                         set ci_state "pass"
                     else
