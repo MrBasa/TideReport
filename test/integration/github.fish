@@ -84,7 +84,7 @@ end
 
 @test "github parser with CI cache was invoked without status variable error" (count _tide_print_item_calls) -ge 1
 @test "github parser with CI cache output contains pass icon" (
-    string match -q "*✓*" "$_ci_parser_payload"
+    string match -q "*✔*" "$_ci_parser_payload"
     echo $status
 ) -eq 0
 

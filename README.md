@@ -155,14 +155,14 @@ The module displays stats for the current repository, with icons you can customi
 | `tide_report_github_color_prs`       | Color for PRs (defaults to `..._color_stars`).                  | `yellow`          |
 | `tide_report_github_refresh_seconds` | GitHub data cache time for a given repository.                  | `30`              |
 | `tide_report_github_show_ci`         | Whether to show CI status (latest workflow run) in the GitHub item. | `true`        |
-| `tide_report_github_icon_ci_pass`    | Icon when the latest workflow run succeeded.                   | `✓`               |
+| `tide_report_github_icon_ci_pass`    | Icon when the latest workflow run succeeded.                   | `✔`               |
 | `tide_report_github_icon_ci_fail`     | Icon when the latest workflow run failed or was cancelled.     | `✗`               |
 | `tide_report_github_icon_ci_pending`  | Icon when the workflow is queued or in progress.               | `⋯`               |
 | `tide_report_github_color_ci_pass`   | Color for the CI pass icon.                                    | `green`           |
 | `tide_report_github_color_ci_fail`   | Color for the CI fail icon.                                    | `red`             |
 | `tide_report_github_color_ci_pending`| Color for the CI pending icon.                                 | `yellow`          |
 | `tide_report_github_ci_refresh_seconds` | How long to cache CI status before refetching.               | `60`              |
-| `tide_report_github_unavailable_text`  | Text to display when GitHub data is not available.            | `...`            |
+| `tide_report_github_unavailable_text`  | Text to display when GitHub data is not available.            | `…`              |
 | `tide_report_github_unavailable_color` | Color for the unavailable text.                               | `red`             |
 
 ### ☔ Weather Module (`weather`)
@@ -194,7 +194,7 @@ The weather format is a string with custom specifiers. When you add the weather 
 | `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300`             |
 | `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `900`             |
 | `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`              |
-| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | `...`            |
+| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | `…`              |
 | `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `red`             |
 
 #### Weather location
@@ -227,7 +227,7 @@ The weather format is a string with custom specifiers. When you add the weather 
 | `tide_report_moon_provider`          | Moon backend: `local` (offline model) or `wttr`.                | `local`           |
 | `tide_report_moon_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`           |
 | `tide_report_moon_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`           |
-| `tide_report_moon_unavailable_text`  | Text to display when moon data is not available.                | `...`            |
+| `tide_report_moon_unavailable_text`  | Text to display when moon data is not available.                | `…`              |
 | `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `red`             |
 
 ### 🌊 Tide Module (`tide`)
@@ -246,7 +246,7 @@ To find your nearest station, use the [**NOAA Tides and Currents Map**](https://
 | `tide_report_tide_symbol_high`       | Symbol to show for an upcoming high tide.                       | `⇞`                |
 | `tide_report_tide_symbol_low`        | Symbol to show for an upcoming low tide.                        | `⇟`                |
 | `tide_report_tide_symbol_color`      | Color for the high/low tide symbol.                             | `white`            |
-| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊...`            |
+| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊…`              |
 | `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
 | `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
 

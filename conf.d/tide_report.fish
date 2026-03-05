@@ -244,7 +244,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
     set -q tide_report_weather_refresh_seconds     || set -U tide_report_weather_refresh_seconds 300
     set -q tide_report_weather_expire_seconds      || set -U tide_report_weather_expire_seconds 900
     set -q tide_report_weather_language            || set -U tide_report_weather_language "en"
-    set -q tide_report_weather_unavailable_text    || set -U tide_report_weather_unavailable_text "..."
+    set -q tide_report_weather_unavailable_text    || set -U tide_report_weather_unavailable_text "…"
     set -q tide_report_weather_unavailable_color   || set -U tide_report_weather_unavailable_color red
 
     set -q tide_moon_color                    || set -U tide_moon_color $default_color
@@ -252,7 +252,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
     set -q tide_report_moon_provider          || set -U tide_report_moon_provider "local"
     set -q tide_report_moon_refresh_seconds   || set -U tide_report_moon_refresh_seconds 14400
     set -q tide_report_moon_expire_seconds    || set -U tide_report_moon_expire_seconds 28800
-    set -q tide_report_moon_unavailable_text  || set -U tide_report_moon_unavailable_text "..."
+    set -q tide_report_moon_unavailable_text  || set -U tide_report_moon_unavailable_text "…"
     set -q tide_report_moon_unavailable_color || set -U tide_report_moon_unavailable_color red
 
     set -q tide_tide_color                    || set -U tide_tide_color 0087AF
@@ -263,11 +263,11 @@ function _tide_report_install --description "Install TideReport defaults and pro
     set -q tide_report_tide_symbol_high       || set -U tide_report_tide_symbol_high "⇞"
     set -q tide_report_tide_symbol_low        || set -U tide_report_tide_symbol_low "⇟"
     set -q tide_report_tide_symbol_color      || set -U tide_report_tide_symbol_color white
-    set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊..."
+    set -q tide_report_tide_unavailable_text  || set -U tide_report_tide_unavailable_text "🌊…"
     set -q tide_report_tide_unavailable_color || set -U tide_report_tide_unavailable_color red
     set -q tide_report_tide_show_level        || set -U tide_report_tide_show_level "true"
 
-    set -q tide_github_color                       || set -U tide_github_color $default_color
+    set -q tide_github_color                       || set -U tide_github_color white
     set -q tide_github_bg_color                    || set -U tide_github_bg_color $default_bg_color
     set -q tide_report_github_icon                 || set -U tide_report_github_icon ""
     set -q tide_report_github_icon_stars           || set -U tide_report_github_icon_stars "★"
@@ -280,11 +280,11 @@ function _tide_report_install --description "Install TideReport defaults and pro
     set -q tide_report_github_color_watchers       || set -U tide_report_github_color_watchers $tide_report_github_color_stars
     set -q tide_report_github_color_issues         || set -U tide_report_github_color_issues $tide_report_github_color_stars
     set -q tide_report_github_color_prs            || set -U tide_report_github_color_prs $tide_report_github_color_stars
-    set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "..."
+    set -q tide_report_github_unavailable_text     || set -U tide_report_github_unavailable_text "…"
     set -q tide_report_github_unavailable_color    || set -U tide_report_github_unavailable_color red
     set -q tide_report_github_refresh_seconds      || set -U tide_report_github_refresh_seconds 30
     set -q tide_report_github_show_ci              || set -U tide_report_github_show_ci true
-    set -q tide_report_github_icon_ci_pass         || set -U tide_report_github_icon_ci_pass "✓"
+    set -q tide_report_github_icon_ci_pass         || set -U tide_report_github_icon_ci_pass "✔"
     set -q tide_report_github_icon_ci_fail         || set -U tide_report_github_icon_ci_fail "✗"
     set -q tide_report_github_icon_ci_pending     || set -U tide_report_github_icon_ci_pending "⋯"
     set -q tide_report_github_color_ci_pass        || set -U tide_report_github_color_ci_pass green

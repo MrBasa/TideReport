@@ -28,12 +28,12 @@ set -q tide_report_weather_symbol_color   || set -g tide_report_weather_symbol_c
 set -q tide_report_weather_format         || set -g tide_report_weather_format "%c %t %d%w"
 set -q tide_report_weather_refresh_seconds    || set -g tide_report_weather_refresh_seconds 900
 set -q tide_report_weather_expire_seconds     || set -g tide_report_weather_expire_seconds 600
-set -q tide_report_weather_unavailable_text   || set -g tide_report_weather_unavailable_text "..."
+set -q tide_report_weather_unavailable_text   || set -g tide_report_weather_unavailable_text "…"
 set -q tide_report_weather_unavailable_color  || set -g tide_report_weather_unavailable_color red
 set -q tide_report_moon_provider          || set -g tide_report_moon_provider "local"
 set -q tide_report_moon_refresh_seconds   || set -g tide_report_moon_refresh_seconds 14400
 set -q tide_report_moon_expire_seconds    || set -g tide_report_moon_expire_seconds 28800
-set -q tide_report_moon_unavailable_text  || set -g tide_report_moon_unavailable_text "..."
+set -q tide_report_moon_unavailable_text  || set -g tide_report_moon_unavailable_text "…"
 set -q tide_report_moon_unavailable_color || set -g tide_report_moon_unavailable_color red
 set -q tide_report_tide_station_id        || set -g tide_report_tide_station_id "8443970"
 set -q tide_report_tide_refresh_seconds   || set -g tide_report_tide_refresh_seconds 14400
@@ -41,7 +41,7 @@ set -q tide_report_tide_expire_seconds    || set -g tide_report_tide_expire_seco
 set -q tide_report_tide_symbol_high       || set -g tide_report_tide_symbol_high "⇞"
 set -q tide_report_tide_symbol_low        || set -g tide_report_tide_symbol_low "⇟"
 set -q tide_report_tide_symbol_color      || set -g tide_report_tide_symbol_color white
-set -q tide_report_tide_unavailable_text  || set -g tide_report_tide_unavailable_text "🌊..."
+set -q tide_report_tide_unavailable_text  || set -g tide_report_tide_unavailable_text "🌊…"
 set -q tide_report_tide_unavailable_color || set -g tide_report_tide_unavailable_color red
 set -q tide_report_tide_show_level        || set -g tide_report_tide_show_level "true"
 set -q tide_report_github_icon            || set -g tide_report_github_icon ""
@@ -55,6 +55,11 @@ set -q tide_report_github_color_forks     || set -g tide_report_github_color_for
 set -q tide_report_github_color_watchers  || set -g tide_report_github_color_watchers yellow
 set -q tide_report_github_color_issues    || set -g tide_report_github_color_issues yellow
 set -q tide_report_github_color_prs      || set -g tide_report_github_color_prs yellow
-set -q tide_report_github_unavailable_text  || set -g tide_report_github_unavailable_text "..."
+set -q tide_report_github_unavailable_text  || set -g tide_report_github_unavailable_text "…"
 set -q tide_report_github_unavailable_color || set -g tide_report_github_unavailable_color red
 set -q tide_report_github_refresh_seconds || set -g tide_report_github_refresh_seconds 30
+# Force show_ci and CI icons so GitHub render tests get deterministic output
+set -g tide_report_github_show_ci true
+set -g tide_report_github_icon_ci_pass "✔"
+set -g tide_report_github_icon_ci_fail "✗"
+set -g tide_report_github_icon_ci_pending "⋯"
