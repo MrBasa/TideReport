@@ -374,6 +374,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
             ## Location step: show IP result or prompt manual input; validate and confirm.
             set -l ip_line ""
             if command -q curl; and command -q jq
+                echo (set_color brcyan)"Retrieving location..."(set_color normal)
                 set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time 5 "http://ip-api.com/json/?fields=lat,lon,city,regionName,country")
                 if test $status -eq 0; and test -n "$ip_data"
                     set -l _lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
@@ -412,6 +413,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
                     set use_ip true
                     break
                 end
+                echo (set_color brcyan)"Retrieving location..."(set_color normal)
                 set -l resolved (__tide_report_validate_weather_location "$manual")
                 set -l val_status $status
                 set resolved (string trim -- $resolved)
