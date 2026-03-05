@@ -68,6 +68,40 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
     _tide_print_item tide $output
 end
 
+## --- Render: display inputs → formatted string (no I/O) ---
+function __tide_report_render_tide --description "Render tide segment from type (H/L), time_str, value_metric, show_level" --argument-names type time_str value_metric show_level
+    set -q type || set type "H"
+    set -q time_str || set time_str ""
+    set -q value_metric || set value_metric ""
+    set -q show_level || set show_level "true"
+
+    set -q tide_report_tide_symbol_high || set -l tide_report_tide_symbol_high "⇞"
+    set -q tide_report_tide_symbol_low || set -l tide_report_tide_symbol_low "⇟"
+    set -q tide_report_tide_symbol_color || set -l tide_report_tide_symbol_color white
+    set -q tide_tide_color || set -l tide_tide_color 0087AF
+
+    set -l arrow_symbol
+    test "$type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
+    set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
+    set -l output_string "$arrow$time_str"
+
+    # Append level with unit (m or ft) when show_level is true
+    if test "$show_level" = "true"; and test -n "$value_metric"
+        set -l unit_suffix "m"
+        set -l level_value $value_metric
+        if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
+            set level_value (math --scale=1 "$value_metric * 3.28084")
+            set unit_suffix "ft"
+        else
+            set level_value (math --scale=1 $value_metric)
+        end
+        if test -n "$level_value"
+            set output_string "$output_string $level_value$unit_suffix"
+        end
+    end
+    echo "$output_string"
+end
+
 ## --- Parse Tide Data ---
 function __tide_report_parse_tide --description "Parse tide.json and compute the next tide time and level" --argument-names now cache_file gnu_date_cmd
     if not test -f "$cache_file"
@@ -106,26 +140,9 @@ function __tide_report_parse_tide --description "Parse tide.json and compute the
     end
 
     if test $status -eq 0; and test -n "$tide_time"
-        set -l arrow_symbol
-        test "$tide_type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
-
-        set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
-        set -l output_string "$arrow$tide_time"
-
-        if set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" = "true"
-            set -l level_value $tide_value_metric
-            set -l unit_suffix "m"
-            if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
-                set level_value "$tide_value_metric * 3.28084"
-                set unit_suffix "ft"
-            end
-            set -l level (math --scale=1 $level_value)
-
-            if test $status -eq 0; and test -n "$level"
-                set output_string "$output_string $level$unit_suffix"
-            end
-        end
-        echo $output_string
+        set -l show_level "true"
+        set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" != "true"; and set show_level "false"
+        __tide_report_render_tide "$tide_type" "$tide_time" "$tide_value_metric" "$show_level"
         return 0
     end
     return 1

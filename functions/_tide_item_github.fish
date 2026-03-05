@@ -119,35 +119,14 @@ function _tide_item_github --description "Displays GitHub stats"
     end
 end
 
-## --- Parser Function ---
-function __tide_report_parse_github --description "Parse cached GitHub repo stats JSON and print a formatted segment"
-    set -l cache_file $argv[1]
-    set -l line ""
-    if set -q argv[2]; and test -n "$argv[2]"
-        set line $argv[2]
-    else
-        set line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null)
-    end
-    set -l ci_cache_file ""
-    set -q argv[3]; and test -n "$argv[3]"; and set ci_cache_file "$argv[3]"
-    set -l stars ""
-    set -l forks ""
-    set -l watchers ""
-    set -l issues ""
-    set -l prs ""
-    if test -n "$line"
-        set -l parts (string split " " "$line")
-        set stars $parts[1]
-        set forks $parts[2]
-        set watchers $parts[3]
-        set issues $parts[4]
-        set prs $parts[5]
-    end
-
-    if test -z "$stars"
-        _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
-        return
-    end
+## --- Render: display inputs → formatted string (no I/O) ---
+function __tide_report_render_github --description "Render GitHub segment from stars/forks/watchers/issues/prs and ci_state (pass|fail|pending|none)" --argument-names stars forks watchers issues prs ci_state
+    set -q stars || set stars 0
+    set -q forks || set forks 0
+    set -q watchers || set watchers 0
+    set -q issues || set issues 0
+    set -q prs || set prs 0
+    set -q ci_state || set ci_state none
 
     # Ensure we have display values (avoid empty output when run from tests or minimal env)
     set -q tide_report_github_icon; or set -l tide_report_github_icon ""
@@ -180,59 +159,94 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
         test "$prs" != 0 && set output "$output $tide_report_github_icon_prs$prs"
     end
 
-    # Append CI status when show_ci is enabled and repo has at least one workflow run
-    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"
-        set -l has_ci_run false
-        set -l ci_state "pending"
-        if test -f "$ci_cache_file"
-            # Empty array (no workflows) yields no output; do not show any CI icon
-            set -l first (command jq -r 'if length > 0 then (.[0] | "\(.status) \(.conclusion)") else "" end' "$ci_cache_file" 2>/dev/null)
-            if test -n "$first"; and test "$first" != "null null"
-                set has_ci_run true
-                set -l parts (string split " " "$first")
-                set -l run_status "$parts[1]"
-                set -l conclusion "$parts[2]"
-                if test "$run_status" = "completed"
-                    if test "$conclusion" = "success"
-                        set ci_state "pass"
-                    else
-                        set ci_state "fail"
-                    end
-                end
+    # Append CI status when show_ci is enabled and ci_state is set (pass|fail|pending)
+    if test "$tide_report_github_show_ci" = true; and test -n "$ci_state"; and test "$ci_state" != "none"
+        set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✓"
+        set -q tide_report_github_icon_ci_fail; or set -l tide_report_github_icon_ci_fail "✗"
+        set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⋯"
+        set -q tide_report_github_color_ci_pass; or set -l tide_report_github_color_ci_pass "green"
+        set -q tide_report_github_color_ci_fail; or set -l tide_report_github_color_ci_fail "red"
+        set -q tide_report_github_color_ci_pending; or set -l tide_report_github_color_ci_pending "yellow"
+        if not set -q TIDE_REPORT_TEST
+            switch "$ci_state"
+                case pass
+                    set output "$output "(set_color $tide_report_github_color_ci_pass)$tide_report_github_icon_ci_pass
+                case fail
+                    set output "$output "(set_color $tide_report_github_color_ci_fail)$tide_report_github_icon_ci_fail
+                case "*"
+                    set output "$output "(set_color $tide_report_github_color_ci_pending)$tide_report_github_icon_ci_pending
             end
-        end
-        if test "$has_ci_run" = true
-            set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✓"
-            set -q tide_report_github_icon_ci_fail; or set -l tide_report_github_icon_ci_fail "✗"
-            set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⋯"
-            set -q tide_report_github_color_ci_pass; or set -l tide_report_github_color_ci_pass "green"
-            set -q tide_report_github_color_ci_fail; or set -l tide_report_github_color_ci_fail "red"
-            set -q tide_report_github_color_ci_pending; or set -l tide_report_github_color_ci_pending "yellow"
-            if not set -q TIDE_REPORT_TEST
-                switch "$ci_state"
-                    case pass
-                        set output "$output "(set_color $tide_report_github_color_ci_pass)$tide_report_github_icon_ci_pass
-                    case fail
-                        set output "$output "(set_color $tide_report_github_color_ci_fail)$tide_report_github_icon_ci_fail
-                    case "*"
-                        set output "$output "(set_color $tide_report_github_color_ci_pending)$tide_report_github_icon_ci_pending
-                end
-            else
-                switch "$ci_state"
-                    case pass
-                        set output "$output $tide_report_github_icon_ci_pass"
-                    case fail
-                        set output "$output $tide_report_github_icon_ci_fail"
-                    case "*"
-                        set output "$output $tide_report_github_icon_ci_pending"
-                end
+        else
+            switch "$ci_state"
+                case pass
+                    set output "$output $tide_report_github_icon_ci_pass"
+                case fail
+                    set output "$output $tide_report_github_icon_ci_fail"
+                case "*"
+                    set output "$output $tide_report_github_icon_ci_pending"
             end
         end
     end
 
     if test -n "$output"
-        set -l out_trimmed (string trim "$output")
-        _tide_print_item github "$out_trimmed"
+        string trim "$output"
+    end
+end
+
+## --- Parser Function ---
+function __tide_report_parse_github --description "Parse cached GitHub repo stats JSON and print a formatted segment"
+    set -l cache_file $argv[1]
+    set -l line ""
+    if set -q argv[2]; and test -n "$argv[2]"
+        set line $argv[2]
+    else
+        set line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null)
+    end
+    set -l ci_cache_file ""
+    set -q argv[3]; and test -n "$argv[3]"; and set ci_cache_file "$argv[3]"
+    set -l stars ""
+    set -l forks ""
+    set -l watchers ""
+    set -l issues ""
+    set -l prs ""
+    if test -n "$line"
+        set -l parts (string split " " "$line")
+        set stars $parts[1]
+        set forks $parts[2]
+        set watchers $parts[3]
+        set issues $parts[4]
+        set prs $parts[5]
+    end
+
+    if test -z "$stars"
+        _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
+        return
+    end
+
+    # Extract CI state from cache when show_ci is enabled
+    set -l ci_state "none"
+    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"; and test -f "$ci_cache_file"
+        # Empty array (no workflows) yields no output; do not show any CI icon
+        set -l first (command jq -r 'if length > 0 then (.[0] | "\(.status) \(.conclusion)") else "" end' "$ci_cache_file" 2>/dev/null)
+        if test -n "$first"; and test "$first" != "null null"
+            set -l parts (string split " " "$first")
+            set -l run_status "$parts[1]"
+            set -l conclusion "$parts[2]"
+            if test "$run_status" = "completed"
+                if test "$conclusion" = "success"
+                    set ci_state "pass"
+                else
+                    set ci_state "fail"
+                end
+            else
+                set ci_state "pending"
+            end
+        end
+    end
+
+    set -l out (__tide_report_render_github "$stars" "$forks" "$watchers" "$issues" "$prs" "$ci_state")
+    if test -n "$out"
+        _tide_print_item github "$out"
     end
 end
 

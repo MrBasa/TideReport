@@ -26,6 +26,56 @@ function _tide_item_weather --description "Displays weather, fetches asynchronou
     end
 end
 
+## --- Render: display inputs → formatted string (no I/O). Uses tide_report_weather_format and symbol color from globals. ---
+function __tide_report_render_weather --description "Render weather segment from format placeholder values" --argument-names temp_str feels_like_str cond_emoji cond_text wind_str wind_arrow humidity_str uv_str sunrise_str sunset_str
+    set -q temp_str || set temp_str ""
+    set -q feels_like_str || set feels_like_str ""
+    set -q cond_emoji || set cond_emoji ""
+    set -q cond_text || set cond_text ""
+    set -q wind_str || set wind_str ""
+    set -q wind_arrow || set wind_arrow ""
+    set -q humidity_str || set humidity_str ""
+    set -q uv_str || set uv_str ""
+    set -q sunrise_str || set sunrise_str ""
+    set -q sunset_str || set sunset_str ""
+
+    ## --- Build the final output string ---
+    # Normalize to a single string so replacements always run on one value (handles format set as multiple elements).
+    set -l output (string join ' ' $tide_report_weather_format)
+    set -l pairs '%t' $temp_str '%C' $cond_text '%c' $cond_emoji '%w' $wind_str '%h' $humidity_str '%f' $feels_like_str '%d' $wind_arrow '%u' $uv_str '%S' $sunrise_str '%s' $sunset_str
+    set -l n (count $pairs)
+    for i in (seq 1 2 $n)
+        set -l j (math $i + 1)
+        set output (string replace -a -- $pairs[$i] $pairs[$j] $output)
+    end
+
+    # Symbol coloring
+    # List of single-color text symbols (Nerd Font, Unicode)
+    set -l colorable_symbols \
+        # Sunrise/Sunset
+         󰖚 󰖛 󰖜  \
+        # Wind Direction
+        ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
+        # Simple Arrows
+        ↑ ↓ → ← ▴ ▾     \
+        # Temperature
+             🌡 󰔅 󰔄 \
+        # Humidity
+         󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
+        # UV
+        🕶 󰓠    󰖙  󰖨 \
+        # Wind
+           󱪈 󱪉 󰖝 󱗺 \
+        # Feel like
+         
+    # Apply symbol color
+    set -l symbol_color (set_color $tide_report_weather_symbol_color)
+    set -l text_color (set_color $tide_weather_color)
+    set -l pattern (string join '|' -- $colorable_symbols)
+    set output (string replace -a -r "($pattern)" "$symbol_color\$1$text_color" "$output")
+    echo "$output"
+end
+
 ## --- Parser Function (reads normalized weather.json) ---
 function __tide_report_parse_weather --description "Parse normalized weather.json and build formatted prompt string" --argument-names cache_file
     set -l temp_field "temp_c"
@@ -62,46 +112,8 @@ function __tide_report_parse_weather --description "Parse normalized weather.jso
     set -l sunrise_str (__tide_report_format_unix_time "$sunrise_utc" $tide_time_format)
     set -l sunset_str (__tide_report_format_unix_time "$sunset_utc" $tide_time_format)
 
-    ## --- Build the final output string ---
-    # Normalize to a single string so replacements always run on one value (handles format set as multiple elements).
-    set -l output (string join ' ' $tide_report_weather_format)
-    set -l pairs '%t' $temp_str '%C' $cond_text '%c' $cond_emoji '%w' $wind_str '%h' $humidity_str '%f' $feels_like_str '%d' $wind_arrow '%u' $uv_str '%S' $sunrise_str '%s' $sunset_str
-    set -l n (count $pairs)
-    for i in (seq 1 2 $n)
-        set -l j (math $i + 1)
-        set output (string replace -a -- $pairs[$i] $pairs[$j] $output)
-    end
-
-    # Symbol coloring
-    # List of single-color text symbols (Nerd Font, Unicode)
-    set -l colorable_symbols \
-        # Sunrise/Sunset
-         󰖚 󰖛 󰖜  \
-        # Wind Direction
-        ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
-        # Simple Arrows
-        ↑ ↓ → ← ▴ ▾     \
-        # Temperature
-             🌡 󰔅 󰔄 \
-        # Humidity
-         󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
-        # UV
-        🕶 󰓠    󰖙  󰖨 \
-        # Wind
-           󱪈 󱪉 󰖝 󱗺 \
-        # Feel like
-         
-
-    # Apply symbol color
-    set -l symbol_color (set_color $tide_report_weather_symbol_color)
-    set -l text_color (set_color $tide_weather_color)
-    # for sym in $colorable_symbols
-    #     set output (string replace -a -- $sym "$symbol_color$sym$text_color" $output)
-    # end
-    set -l pattern (string join '|' -- $colorable_symbols)
-    set output (string replace -a -r "($pattern)" "$symbol_color\$1$text_color" "$output")
-
-    _tide_print_item weather $output
+    set -l out (__tide_report_render_weather "$temp_str" "$feels_like_str" "$cond_emoji" "$cond_text" "$wind_str" "$wind_arrow" "$humidity_str" "$uv_str" "$sunrise_str" "$sunset_str")
+    _tide_print_item weather "$out"
 end
 
 ## --- Map wttr.in weatherCode to emoji ---

@@ -27,38 +27,59 @@ function _tide_report_warn_global_prompt_items --description "Warn when a global
     test -n "$right_list" && echo (set_color cyan)"  set -g tide_right_prompt_items $right_list"(set_color normal)
 end
 
-## Show sample render of each Tide Report prompt item (for install wizard). Optional weather_format: concise, medium, or detailed.
-function _tide_report_install_show_preview --description "Echo labeled sample output for github, weather, moon, tide" --argument-names weather_format
-    set -q tide_github_color || set -l tide_github_color white
-    set -q tide_weather_color || set -l tide_weather_color white
-    set -q tide_moon_color || set -l tide_moon_color white
-    set -q tide_tide_color || set -l tide_tide_color 0087AF
-    set -q tide_report_github_icon || set -l tide_report_github_icon ""
-    set -q tide_report_github_icon_stars || set -l tide_report_github_icon_stars "★"
-    set -q tide_report_github_icon_forks || set -l tide_report_github_icon_forks "⑂"
-    set -q tide_report_tide_symbol_high || set -l tide_report_tide_symbol_high "⇞"
-    set -q tide_report_tide_symbol_color || set -l tide_report_tide_symbol_color white
+## Show sample render of prompt item(s) for install wizard. which_item: github|weather|moon|tide|all. weather_format: concise|medium|detailed (for weather/all).
+## Uses render functions from item files; wraps each segment in Tide bg color. For "all", outputs one line with Tide separators.
+function _tide_report_install_show_preview --description "Echo sample output for one item or all items with separators" --argument-names which_item weather_format default_bg_color
+    set -q which_item || set which_item all
+    set -q weather_format || set weather_format medium
+    set -q default_bg_color || set default_bg_color (set -q tide_time_bg_color && echo $tide_time_bg_color || echo "normal")
 
-    set -l star_color yellow
-    set -q tide_report_github_color_stars && set star_color $tide_report_github_color_stars
-    set -q tide_report_github_show_ci || set -l tide_report_github_show_ci true
-    set -q tide_report_github_icon_ci_pass || set -l tide_report_github_icon_ci_pass "✓"
-    set -q tide_report_github_color_ci_pass || set -l tide_report_github_color_ci_pass green
-    set -l github_preview (set_color $tide_github_color)"$tide_report_github_icon "(set_color $star_color)"$tide_report_github_icon_stars 42 $tide_report_github_icon_forks 3"
-    if test "$tide_report_github_show_ci" = true
-        set github_preview "$github_preview "(set_color $tide_report_github_color_ci_pass)$tide_report_github_icon_ci_pass
+    set -q tide_github_bg_color || set -l tide_github_bg_color $default_bg_color
+    set -q tide_weather_bg_color || set -l tide_weather_bg_color $default_bg_color
+    set -q tide_moon_bg_color || set -l tide_moon_bg_color $default_bg_color
+    set -q tide_tide_bg_color || set -l tide_tide_bg_color $default_bg_color
+
+    set -q tide_left_prompt_separator_diff_color || set -l tide_left_prompt_separator_diff_color " "
+    set -q tide_right_prompt_separator_diff_color || set -l tide_right_prompt_separator_diff_color " "
+
+    if test "$which_item" = "all"
+        set -l gh_out (__tide_report_render_github 42 3 0 0 0 pass | string collect)
+        set -l left_part (set_color -b $tide_github_bg_color)$gh_out(set_color normal)
+        set -l rsep "$tide_right_prompt_separator_diff_color"
+        set -l w_fmt "%c %t %d%w"
+        test "$weather_format" = "concise" && set w_fmt "%c %t"
+        test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
+        set -l save_fmt $tide_report_weather_format
+        set -g tide_report_weather_format $w_fmt
+        set -l weather_out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
+        set -g tide_report_weather_format $save_fmt
+        set -l moon_out (__tide_report_get_moon_emoji "Full Moon")
+        set -l tide_out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
+        set -l right_parts (set_color -b $tide_weather_bg_color)$weather_out(set_color normal)"$rsep"(set_color -b $tide_moon_bg_color)$moon_out(set_color normal)"$rsep"(set_color -b $tide_tide_bg_color)$tide_out(set_color normal)
+        echo (set_color brwhite)"  $left_part $right_parts"(set_color normal)
+        return
     end
-    echo (set_color brwhite)"[1] github:   "(set_color normal)"$github_preview"(set_color normal)
-    switch "$weather_format"
-        case concise
-            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️ +22°"(set_color normal)
-        case detailed
-            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️🌡️+22° (+21°) 65% ⬇12km/h"(set_color normal)
-        case "*"
-            echo (set_color brwhite)"[2] weather:  "(set_color normal)(set_color $tide_weather_color)"☀️ +22° ⬇12km/h"(set_color normal)
+
+    switch "$which_item"
+        case github
+            set -l out (__tide_report_render_github 42 3 0 0 0 pass | string collect)
+            echo (set_color brwhite)"  GitHub:   "(set_color normal)(set_color -b $tide_github_bg_color)" $out "(set_color normal)
+        case weather
+            set -l w_fmt "%c %t %d%w"
+            test "$weather_format" = "concise" && set w_fmt "%c %t"
+            test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
+            set -l save_fmt $tide_report_weather_format
+            set -g tide_report_weather_format $w_fmt
+            set -l out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
+            set -g tide_report_weather_format $save_fmt
+            echo (set_color brwhite)"  Weather:  "(set_color normal)(set_color -b $tide_weather_bg_color)" $out "(set_color normal)
+        case moon
+            set -l out (__tide_report_get_moon_emoji "Full Moon")
+            echo (set_color brwhite)"  Moon:     "(set_color normal)(set_color -b $tide_moon_bg_color)" $out "(set_color normal)
+        case tide
+            set -l out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
+            echo (set_color brwhite)"  Tide:     "(set_color normal)(set_color -b $tide_tide_bg_color)" $out "(set_color normal)
     end
-    echo (set_color brwhite)"[3] moon:     "(set_color normal)(set_color $tide_moon_color)"🌕"(set_color normal)
-    echo (set_color brwhite)"[4] tide:     "(set_color normal)(set_color $tide_report_tide_symbol_color)"$tide_report_tide_symbol_high"(set_color $tide_tide_color)" 14:30 3.2m"(set_color normal)
 end
 
 ## Install Tide Report defaults and register prompt items on Fisher install event.
@@ -191,10 +212,18 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         tide reload 2>/dev/null; or true
         echo (set_color brwhite)"Tide Report: added github (left), weather, moon (right). Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
     else
-        echo (set_color brwhite)"Choose which Tide Report items to add to your prompt."(set_color normal)
-        _tide_report_install_show_preview medium
+        echo ""
+        echo (set_color --bold brwhite)"Tide Report prompt items"(set_color normal)
+        echo (set_color brwhite)"Choose which items to add to your prompt."(set_color normal)
+        echo ""
+        echo (set_color brwhite)"Preview (with your Tide separators):"(set_color normal)
+        _tide_report_install_show_preview all medium $default_bg_color
         echo ""
 
+        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
+        echo (set_color brcyan)"  GitHub"(set_color normal)
+        _tide_report_install_show_preview github "" $default_bg_color
+        echo ""
         set -l add_github false
         read -l -P (set_color brwhite)"Add GitHub to prompt? [Y/n]: "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
@@ -211,6 +240,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
         end
 
+        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
+        echo (set_color brcyan)"  Weather"(set_color normal)
+        _tide_report_install_show_preview weather medium $default_bg_color
+        echo ""
         set -l add_weather false
         read -l -P (set_color brwhite)"Add Weather to prompt? [Y/n]: "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
@@ -218,6 +251,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             set add_weather true
         end
 
+        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
+        echo (set_color brcyan)"  Moon"(set_color normal)
+        _tide_report_install_show_preview moon "" $default_bg_color
+        echo ""
         set -l add_moon false
         read -l -P (set_color brwhite)"Add Moon to prompt? [Y/n]: "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
@@ -225,6 +262,10 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             set add_moon true
         end
 
+        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
+        echo (set_color brcyan)"  Tide"(set_color normal)
+        _tide_report_install_show_preview tide "" $default_bg_color
+        echo ""
         set -l add_tide false
         read -l -P (set_color brwhite)"Add Tide to prompt? [y/N]: "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
@@ -234,7 +275,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
         end
         if $add_weather
-            read -l -P (set_color brwhite)"Weather format? 1=concise 2=medium 3=detailed [2]: "(set_color normal) format_choice
+            read -l -P (set_color brwhite)"Weather format? "(set_color cyan)"1"(set_color brwhite)"=concise "(set_color cyan)"2"(set_color brwhite)"=medium "(set_color cyan)"3"(set_color brwhite)"=detailed [2]: "(set_color normal) format_choice
             set -l fmt "2"
             if test -n "$format_choice"
                 string match -q -r '^[1-3]$' -- $format_choice && set fmt $format_choice

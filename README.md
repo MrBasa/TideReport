@@ -19,7 +19,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## Quick start
 
 1. Install the plugin: `fisher install MrBasa/TideReport@v1`
-2. On a **first install** (when no Tide Report items are in your prompt), an **interactive wizard** runs: you see a preview of each prompt item and choose which to add (GitHub, weather, moon, tide). You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed), then choose location: the wizard shows your IP-detected location (default) or lets you enter a city, postal code, or coordinates; it validates and confirms before saving.
+2. On a **first install** (when no Tide Report items are in your prompt), an **interactive wizard** runs: it shows a single-line preview of all items (using your Tide separators) and then, for each item (GitHub, Weather, Moon, Tide), shows a sample with the same background color as in your prompt before asking whether to add it. You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed), then choose location: the wizard shows your IP-detected location (default) or lets you enter a city, postal code, or coordinates; it validates and confirms before saving.
 3. The installer runs `tide reload` when Tide is available, so your prompt updates immediately. If it doesn’t, run `tide reload` or open a new terminal.
 4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
 
@@ -40,7 +40,7 @@ Install with [Fisher][]:
 fisher install MrBasa/TideReport@v1
 ```
 
-On a **first install**, an interactive wizard lets you choose which items to add and shows a sample of each. If you add weather, it helps you set location (IP-based by default, or city/postal/coordinates validated via Open-Meteo). Defaults: GitHub, weather, and moon are added (tide is not); weather format is medium. Non-interactive installs (e.g. in CI) get the same defaults without prompts. When the install or update completes, the plugin runs `tide reload` (if the Tide prompt is installed) so your prompt refreshes immediately.
+On a **first install**, an interactive wizard shows a combined preview of all prompt items (with Tide separators) and then, for each item, a sample with prompt-style background colors before asking whether to add it. If you add weather, it helps you set location (IP-based by default, or city/postal/coordinates validated via Open-Meteo). Defaults: GitHub, weather, and moon are added (tide is not); weather format is medium. Non-interactive installs (e.g. in CI) get the same defaults without prompts. When the install or update completes, the plugin runs `tide reload` (if the Tide prompt is installed) so your prompt refreshes immediately.
 
 If you install from a **local path** (e.g. during development) and the prompt items do not appear, run:
 ```fish
