@@ -28,7 +28,7 @@ function _tide_report_warn_global_prompt_items --description "Warn when a global
 end
 
 ## Show sample render of prompt item(s) for install wizard. which_item: github|weather|moon|tide|all. weather_format: concise|medium|detailed (for weather/all).
-## Uses render functions from item files; wraps each segment in Tide bg color. For "all", outputs one line with Tide separators and prompt-style backgrounds.
+## Uses render functions from item files; wraps each segment in Tide bg color and user-configured separators/suffix/prefix/connection.
 function _tide_report_install_show_preview --description "Echo sample output for one item or all items with separators" --argument-names which_item weather_format default_bg_color
     set -q which_item || set which_item all
     set -q weather_format || set weather_format medium
@@ -38,23 +38,36 @@ function _tide_report_install_show_preview --description "Echo sample output for
     set -q tide_weather_bg_color || set -l tide_weather_bg_color $default_bg_color
     set -q tide_moon_bg_color || set -l tide_moon_bg_color $default_bg_color
     set -q tide_tide_bg_color || set -l tide_tide_bg_color $default_bg_color
+    set -q tide_time_color || set -l tide_time_color white
+    set -q tide_github_color || set -l tide_github_color $tide_time_color
+    set -q tide_weather_color || set -l tide_weather_color $tide_time_color
+    set -q tide_moon_color || set -l tide_moon_color $tide_time_color
+    set -q tide_tide_color || set -l tide_tide_color $tide_time_color
 
-    set -q tide_left_prompt_separator_diff_color || set -l tide_left_prompt_separator_diff_color " "
-    set -q tide_right_prompt_separator_diff_color || set -l tide_right_prompt_separator_diff_color " "
+    set -q tide_left_prompt_separator_same_color || set -l tide_left_prompt_separator_same_color ""
+    set -q tide_left_prompt_separator_diff_color || set -l tide_left_prompt_separator_diff_color ""
+    set -q tide_left_prompt_suffix || set -l tide_left_prompt_suffix ""
+    set -q tide_right_prompt_prefix || set -l tide_right_prompt_prefix ""
+    set -q tide_right_prompt_separator_same_color || set -l tide_right_prompt_separator_same_color ""
+    set -q tide_right_prompt_separator_diff_color || set -l tide_right_prompt_separator_diff_color ""
+    set -q tide_prompt_icon_connection || set -l tide_prompt_icon_connection ""
+    set -q tide_prompt_color_frame_and_connection || set -l tide_prompt_color_frame_and_connection "normal"
+    set -q tide_color_separator_same_color || set -l tide_color_separator_same_color ""
+
+    set -l lsep "$tide_left_prompt_separator_same_color"
+    test -z "$lsep" && set lsep "$tide_left_prompt_separator_diff_color"
+    set -l left_suffix "$tide_left_prompt_suffix"
+    set -l right_prefix "$tide_right_prompt_prefix"
+    set -l rsep "$tide_right_prompt_separator_same_color"
+    test -z "$rsep" && set rsep "$tide_right_prompt_separator_diff_color"
+    test -z "$rsep" && set rsep " "
+    set -l conn_icon "$tide_prompt_icon_connection"
+    test -z "$conn_icon" && set conn_icon "─"
+    set -l sep_color "$tide_color_separator_same_color"
+    set -l conn_color "$tide_prompt_color_frame_and_connection"
 
     if test "$which_item" = "all"
         set -l gh_out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
-        set -l left_part (set_color -b $tide_github_bg_color)$gh_out(set_color normal)
-        set -l rsep " "
-        if set -q tide_right_prompt_separator_same_color
-            set rsep "$tide_right_prompt_separator_same_color"
-        else if set -q tide_right_prompt_separator_diff_color
-            set rsep "$tide_right_prompt_separator_diff_color"
-        else if set -q tide_left_prompt_separator_same_color
-            set rsep "$tide_left_prompt_separator_same_color"
-        else if set -q tide_left_prompt_separator_diff_color
-            set rsep "$tide_left_prompt_separator_diff_color"
-        end
         set -l w_fmt "%c %t %d%w"
         test "$weather_format" = "concise" && set w_fmt "%c %t"
         test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
@@ -65,31 +78,67 @@ function _tide_report_install_show_preview --description "Echo sample output for
         set -l moon_out (__tide_report_get_moon_emoji "Full Moon")
         set -l tide_out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
 
-        # Use Tide's configured separator string and color between preview items, keeping
-        # the separator on the previous item's background (like the real prompt).
-        set -l sep_color ""
-        if set -q tide_color_separator_same_color
-            set sep_color $tide_color_separator_same_color
+        # Left: … (prompt bg) + space + left_sep + space + GitHub sample + left_suffix (prompt bg, fg black)
+        set -l left_part (set_color $tide_github_color -b $tide_github_bg_color)" … "
+        if test -n "$sep_color"
+            set left_part "$left_part"(set_color $sep_color -b $tide_github_bg_color)"$lsep "
+        else
+            set left_part "$left_part"(set_color normal -b $tide_github_bg_color)"$lsep "
+        end
+        set left_part "$left_part"(set_color $tide_github_color -b $tide_github_bg_color)" $gh_out "(set_color normal)
+        if test -n "$left_suffix"
+            # Suffix: black bg, fg = prompt segment bg. Set both in one call: fg first, then -b for bg.
+            set left_part "$left_part"(set_color $tide_github_bg_color -b 000000)"$left_suffix"
+            set left_part "$left_part"(set_color normal)
         end
 
-        # Separator: set only the separator's foreground color; the background
-        # stays whatever the previous item used so it matches the real prompt.
-        # Also wrap the separator string in spaces.
-        # TODO temporary: bright red to verify color is applied; revert to $sep_color when confirmed
-        set -l right_parts (set_color -b $tide_weather_bg_color)"$weather_out"
-        set right_parts "$right_parts"(set_color brred)" $rsep "
-        set right_parts "$right_parts"(set_color -b $tide_moon_bg_color)"$moon_out"
-        set right_parts "$right_parts"(set_color brred)" $rsep "
-        set right_parts "$right_parts"(set_color -b $tide_tide_bg_color)"$tide_out"(set_color normal)
+        # Middle: 6 × connection icon (no spaces; icon replaces the gaps on either side)
+        set -l mid (set_color $conn_color)(string repeat -n 6 -- "$conn_icon")(set_color normal)
 
-        echo (set_color brwhite)"  $left_part $right_parts"(set_color normal)
+        # Right: right_prefix (first item bg, fg black) + … (prompt bg) + space + right_sep + weather/moon/tide (each with item fg)
+        set -l right_parts ""
+        if test -n "$right_prefix"
+            # Prefix: black bg, fg = first right segment bg.
+            set right_parts "$right_parts"(set_color $tide_weather_bg_color -b 000000)"$right_prefix"
+        end
+        set right_parts "$right_parts"(set_color $tide_weather_color -b $tide_weather_bg_color)" … "
+        if test -n "$sep_color"
+            set right_parts "$right_parts"(set_color $sep_color -b $tide_weather_bg_color)"$rsep "
+        else
+            set right_parts "$right_parts"(set_color normal -b $tide_weather_bg_color)"$rsep "
+        end
+        set right_parts "$right_parts"(set_color $tide_weather_color -b $tide_weather_bg_color)"$weather_out"
+        if test -n "$sep_color"
+            set right_parts "$right_parts"(set_color $sep_color -b $tide_weather_bg_color)" $rsep "
+        else
+            set right_parts "$right_parts"(set_color normal -b $tide_weather_bg_color)" $rsep "
+        end
+        set right_parts "$right_parts"(set_color $tide_moon_color -b $tide_moon_bg_color)"$moon_out"
+        if test -n "$sep_color"
+            set right_parts "$right_parts"(set_color $sep_color -b $tide_moon_bg_color)" $rsep "
+        else
+            set right_parts "$right_parts"(set_color normal -b $tide_moon_bg_color)" $rsep "
+        end
+        set right_parts "$right_parts"(set_color $tide_tide_color -b $tide_tide_bg_color)"$tide_out"(set_color normal)
+
+        echo (set_color brwhite)"$left_part$mid$right_parts"(set_color normal)
         return
     end
 
     switch "$which_item"
         case github
-            set -l out (__tide_report_render_github 42 3 0 0 0 pass | string collect)
-            echo "  "(set_color -b $tide_github_bg_color)" $out "(set_color normal)
+            set -l out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
+            set -l line (set_color $tide_github_color -b $tide_github_bg_color)" … "
+            if test -n "$sep_color"
+                set line "$line"(set_color $sep_color -b $tide_github_bg_color)"$lsep "
+            else
+                set line "$line"(set_color normal -b $tide_github_bg_color)"$lsep "
+            end
+            set line "$line"(set_color $tide_github_color -b $tide_github_bg_color)" $out "
+            if test -n "$left_suffix"
+                set line "$line"(set_color $tide_github_bg_color -b 000000)"$left_suffix"
+            end
+            echo (set_color brwhite)"$line"(set_color normal)
         case weather
             set -l w_fmt "%c %t %d%w"
             test "$weather_format" = "concise" && set w_fmt "%c %t"
@@ -98,13 +147,46 @@ function _tide_report_install_show_preview --description "Echo sample output for
             set -g tide_report_weather_format $w_fmt
             set -l out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
             set -g tide_report_weather_format $save_fmt
-            echo "  "(set_color -b $tide_weather_bg_color)" $out "(set_color normal)
+            set -l line ""
+            if test -n "$right_prefix"
+                set line (set_color $tide_weather_bg_color -b 000000)"$right_prefix"
+            end
+            set line "$line"(set_color $tide_weather_color -b $tide_weather_bg_color)" … "
+            if test -n "$sep_color"
+                set line "$line"(set_color $sep_color -b $tide_weather_bg_color)" $rsep "
+            else
+                set line "$line"(set_color normal -b $tide_weather_bg_color)" $rsep "
+            end
+            set line "$line"(set_color $tide_weather_color -b $tide_weather_bg_color)"$out"(set_color normal)
+            echo (set_color brwhite)"$line"(set_color normal)
         case moon
             set -l out (__tide_report_get_moon_emoji "Full Moon")
-            echo "  "(set_color -b $tide_moon_bg_color)" $out "(set_color normal)
+            set -l line ""
+            if test -n "$right_prefix"
+                set line (set_color $tide_moon_bg_color -b 000000)"$right_prefix"
+            end
+            set line "$line"(set_color $tide_moon_color -b $tide_moon_bg_color)" … "
+            if test -n "$sep_color"
+                set line "$line"(set_color $sep_color -b $tide_moon_bg_color)" $rsep "
+            else
+                set line "$line"(set_color normal -b $tide_moon_bg_color)" $rsep "
+            end
+            set line "$line"(set_color $tide_moon_color -b $tide_moon_bg_color)" $out "(set_color normal)
+            echo (set_color brwhite)"$line"(set_color normal)
         case tide
             set -l out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
-            echo "  "(set_color -b $tide_tide_bg_color)" $out "(set_color normal)
+            set -l line ""
+            if test -n "$right_prefix"
+                set line (set_color $tide_tide_bg_color -b 000000)"$right_prefix"
+            end
+            set line "$line"(set_color $tide_tide_color -b $tide_tide_bg_color)" … "
+            if test -n "$sep_color"
+                set line "$line"(set_color $sep_color -b $tide_tide_bg_color)" $rsep "
+            else
+                set line "$line"(set_color normal -b $tide_tide_bg_color)" $rsep "
+            end
+            set line "$line"(set_color $tide_tide_color -b $tide_tide_bg_color)" $out "(set_color normal)
+            echo (set_color brwhite)"$line"(set_color normal)
     end
 end
 

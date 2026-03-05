@@ -21,6 +21,17 @@ This project is a **Fish shell** plugin for [Tide][] that adds configurable prom
 - Prefer: `test` / `string` / `math` / `command`; `set -l` for locals; `set -q var || set -U var value` for optional universal defaults; `^/dev/null` or redirects like `2>/dev/null` where needed.
 - Give functions a `--description` for help. Use `--argument-names` for explicit arguments where it helps clarity.
 
+## Fish `set_color` — Correct usage
+
+Fish’s `set_color` sets terminal colors. **Argument order depends on whether `-b` is first** and is easy to get wrong.
+
+- **When `-b` / `--background` comes first:** `set_color -b BACKGROUND FOREGROUND`  
+  Example: `set_color -b white red` → red text on white background. So **suffix/prefix** (black bg, segment color as fg) must be: `set_color -b black $tide_github_bg_color`.
+- **When foreground is specified first:** `set_color FOREGROUND -b BACKGROUND`  
+  Example: `set_color white -b blue` → white text on blue background.
+- **Do not mix the two forms:** Use one or the other consistently. For “black background, segment color as text” always use `set_color -b black $segment_bg_color` (option first).
+- **Reference:** Tide’s install wizard uses `set_color $prev_bg_color -b normal` for suffix (foreground first; see `~/.config/fish/functions/tide/configure/functions/_fake_tide_prompt.fish`). Our wizard uses black background, so we use `set_color -b black $segment_bg_color`.
+
 ## Naming Conventions
 
 Follow existing TideReport and Tide patterns:
