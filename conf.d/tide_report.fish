@@ -298,7 +298,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
 
     if not set -q tide_left_prompt_items; or not set -q tide_right_prompt_items
         _tide_report_ensure_prompt_items 1
-        tide reload 2>/dev/null; or true
+        command -q tide && tide reload 2>/dev/null; or true
         return 0
     end
     set -l left $tide_left_prompt_items
@@ -314,10 +314,10 @@ function _tide_report_install --description "Install TideReport defaults and pro
 
     if $any_present
         echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
-        tide reload 2>/dev/null; or true
+        command -q tide && tide reload 2>/dev/null; or true
     else if not status is-interactive
         _tide_report_ensure_prompt_items 1
-        tide reload 2>/dev/null; or true
+        command -q tide && tide reload 2>/dev/null; or true
         echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
     else
         echo ""
@@ -485,7 +485,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
             end
             echo (set_color brwhite)"$msg."(set_color normal)
         end
-        tide reload 2>/dev/null; or true
+        command -q tide && tide reload 2>/dev/null; or true
         echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     end
 end
@@ -555,7 +555,7 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     # Remove cache
     command rm -rf ~/.cache/tide-report
 
-    tide reload 2>/dev/null; or true
+    command -q tide && tide reload 2>/dev/null; or true
     echo (set_color brwhite)"Prompt refreshed. Run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session if items still appear."(set_color normal)
 end
 

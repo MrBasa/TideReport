@@ -3,7 +3,7 @@
 
 function _uninstall_test_run --argument-names test_name
     set -l root (pwd)
-    set -l runner $root/test/integration/uninstall_runner.fish
+    set -l runner $root/test/support/uninstall_runner.fish
     set -l home (mktemp -d)
     mkdir -p $home/.config/fish
     env HOME=$home XDG_CONFIG_HOME=$home/.config fish $runner $test_name $root >/dev/null

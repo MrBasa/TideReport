@@ -58,6 +58,13 @@ set -q tide_report_github_color_prs      || set -g tide_report_github_color_prs 
 set -q tide_report_github_unavailable_text  || set -g tide_report_github_unavailable_text "…"
 set -q tide_report_github_unavailable_color || set -g tide_report_github_unavailable_color red
 set -q tide_report_github_refresh_seconds || set -g tide_report_github_refresh_seconds 30
+# Moon phase math constants (required by __tide_report_moon_* when conf.d is not sourced)
+set -q __tide_report_moon_PI           || set -g __tide_report_moon_PI (math "acos(-1)")
+set -q __tide_report_moon_rad          || set -g __tide_report_moon_rad (math "$__tide_report_moon_PI / 180")
+set -q __tide_report_moon_day_seconds  || set -g __tide_report_moon_day_seconds 86400
+set -q __tide_report_moon_J1970        || set -g __tide_report_moon_J1970 2440588
+set -q __tide_report_moon_J2000        || set -g __tide_report_moon_J2000 2451545
+set -q __tide_report_moon_obliquity   || set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
 # Force show_ci and CI icons so GitHub render tests get deterministic output
 set -g tide_report_github_show_ci true
 set -g tide_report_github_icon_ci_pass "✔"

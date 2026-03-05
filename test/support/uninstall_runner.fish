@@ -1,11 +1,11 @@
 ## Helper for uninstall tests: run in isolated fish with HOME and XDG_CONFIG_HOME set.
-## Usage: env HOME=$tmp XDG_CONFIG_HOME=$tmp/.config fish test/integration/uninstall_runner.fish $test_name $repo_root
+## Usage: env HOME=$tmp XDG_CONFIG_HOME=$tmp/.config fish test/support/uninstall_runner.fish $test_name $repo_root
 ## Exits 0 if the requested test passes, 1 otherwise.
 
 set -l test_name $argv[1]
 set -l root $argv[2]
 if test -z "$test_name"; or test -z "$root"
-    echo "Usage: fish uninstall_runner.fish <test_name> <repo_root>" >&2
+    echo "Usage: fish test/support/uninstall_runner.fish <test_name> <repo_root>" >&2
     exit 2
 end
 
