@@ -1,4 +1,4 @@
-# Tide Report Fish Shell Plugin
+# TideReport Fish Shell Plugin
 
 A collection of simple, asynchronous, and configurable prompt sections for the [Tide][] Fish prompt.
 This plugin provides prompt items that display **Weather**, **Moon Phase**, **Ocean Tides**, and **GitHub** data without slowing down your shell.
@@ -19,7 +19,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## Quick start
 
 1. Install the plugin: `fisher install MrBasa/TideReport@v1`
-2. On a **first install** (when no Tide Report items are in your prompt), an **interactive wizard** runs: it shows a single-line preview of all items (using your Tide separators) and then, for each item (GitHub, Weather, Moon, Tide), shows a sample with the same background color as in your prompt before asking whether to add it. You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed), then choose location: the wizard shows your IP-detected location (default) or lets you enter a city, postal code, or coordinates; it validates and confirms before saving.
+2. On a **first install** (when no TideReport items are in your prompt), an **interactive wizard** runs: it shows a single-line preview of all items (using your Tide separators) and then, for each item (GitHub, Weather, Moon, Tide), shows a sample with the same background color as in your prompt before asking whether to add it. You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed), then choose location: the wizard shows your IP-detected location (default) or lets you enter a city, postal code, or coordinates; it validates and confirms before saving.
 3. The installer runs `tide reload` when Tide is available, so your prompt updates immediately. If it doesn’t, run `tide reload` or open a new terminal.
 4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
 
@@ -54,7 +54,7 @@ See the [Fisher][] and [Tide][] documentation for more details on installing plu
 
 If the installer did not run (e.g. prompt items never appeared after install) or you see odd behavior after repeated installs/uninstalls, do a clean reinstall:
 
-1. Remove the plugin: `fisher remove MrBasa/TideReport` (or the path you used, e.g. `fisher remove /path/to/TideReport`). The uninstaller runs `tide reload` when Tide is available so the prompt updates without the Tide Report items.
+1. Remove the plugin: `fisher remove MrBasa/TideReport` (or the path you used, e.g. `fisher remove /path/to/TideReport`). The uninstaller runs `tide reload` when Tide is available so the prompt updates without the TideReport items.
 2. Optionally start a new Fish session so universals are reloaded.
 3. Install again: `fisher install MrBasa/TideReport@v1` (or your path). The installer will run `tide reload` when done.
 

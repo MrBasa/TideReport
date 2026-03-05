@@ -1,4 +1,4 @@
-## Tide Report :: Default Configuration
+## TideReport :: Default Configuration
 
 ## Plugin version (single source of truth for display and API client string)
 set -g _tide_report_version "1.5"
@@ -28,7 +28,7 @@ function _tide_report_warn_global_prompt_items --description "Warn when a global
 end
 
 ## Show sample render of prompt item(s) for install wizard. which_item: github|weather|moon|tide|all. weather_format: concise|medium|detailed (for weather/all).
-## Uses render functions from item files; wraps each segment in Tide bg color. For "all", outputs one line with Tide separators.
+## Uses render functions from item files; wraps each segment in Tide bg color. For "all", outputs one line with Tide separators and prompt-style backgrounds.
 function _tide_report_install_show_preview --description "Echo sample output for one item or all items with separators" --argument-names which_item weather_format default_bg_color
     set -q which_item || set which_item all
     set -q weather_format || set weather_format medium
@@ -43,9 +43,18 @@ function _tide_report_install_show_preview --description "Echo sample output for
     set -q tide_right_prompt_separator_diff_color || set -l tide_right_prompt_separator_diff_color " "
 
     if test "$which_item" = "all"
-        set -l gh_out (__tide_report_render_github 42 3 0 0 0 pass | string collect)
+        set -l gh_out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
         set -l left_part (set_color -b $tide_github_bg_color)$gh_out(set_color normal)
-        set -l rsep "$tide_right_prompt_separator_diff_color"
+        set -l rsep " "
+        if set -q tide_right_prompt_separator_same_color
+            set rsep "$tide_right_prompt_separator_same_color"
+        else if set -q tide_right_prompt_separator_diff_color
+            set rsep "$tide_right_prompt_separator_diff_color"
+        else if set -q tide_left_prompt_separator_same_color
+            set rsep "$tide_left_prompt_separator_same_color"
+        else if set -q tide_left_prompt_separator_diff_color
+            set rsep "$tide_left_prompt_separator_diff_color"
+        end
         set -l w_fmt "%c %t %d%w"
         test "$weather_format" = "concise" && set w_fmt "%c %t"
         test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
@@ -55,7 +64,24 @@ function _tide_report_install_show_preview --description "Echo sample output for
         set -g tide_report_weather_format $save_fmt
         set -l moon_out (__tide_report_get_moon_emoji "Full Moon")
         set -l tide_out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
-        set -l right_parts (set_color -b $tide_weather_bg_color)$weather_out(set_color normal)"$rsep"(set_color -b $tide_moon_bg_color)$moon_out(set_color normal)"$rsep"(set_color -b $tide_tide_bg_color)$tide_out(set_color normal)
+
+        # Use Tide's configured separator string and color between preview items, keeping
+        # the separator on the previous item's background (like the real prompt).
+        set -l sep_color ""
+        if set -q tide_color_separator_same_color
+            set sep_color $tide_color_separator_same_color
+        end
+
+        # Separator: set only the separator's foreground color; the background
+        # stays whatever the previous item used so it matches the real prompt.
+        # Also wrap the separator string in spaces.
+        # TODO temporary: bright red to verify color is applied; revert to $sep_color when confirmed
+        set -l right_parts (set_color -b $tide_weather_bg_color)"$weather_out"
+        set right_parts "$right_parts"(set_color brred)" $rsep "
+        set right_parts "$right_parts"(set_color -b $tide_moon_bg_color)"$moon_out"
+        set right_parts "$right_parts"(set_color brred)" $rsep "
+        set right_parts "$right_parts"(set_color -b $tide_tide_bg_color)"$tide_out"(set_color normal)
+
         echo (set_color brwhite)"  $left_part $right_parts"(set_color normal)
         return
     end
@@ -63,7 +89,7 @@ function _tide_report_install_show_preview --description "Echo sample output for
     switch "$which_item"
         case github
             set -l out (__tide_report_render_github 42 3 0 0 0 pass | string collect)
-            echo (set_color brwhite)"  GitHub:   "(set_color normal)(set_color -b $tide_github_bg_color)" $out "(set_color normal)
+            echo "  "(set_color -b $tide_github_bg_color)" $out "(set_color normal)
         case weather
             set -l w_fmt "%c %t %d%w"
             test "$weather_format" = "concise" && set w_fmt "%c %t"
@@ -72,18 +98,18 @@ function _tide_report_install_show_preview --description "Echo sample output for
             set -g tide_report_weather_format $w_fmt
             set -l out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
             set -g tide_report_weather_format $save_fmt
-            echo (set_color brwhite)"  Weather:  "(set_color normal)(set_color -b $tide_weather_bg_color)" $out "(set_color normal)
+            echo "  "(set_color -b $tide_weather_bg_color)" $out "(set_color normal)
         case moon
             set -l out (__tide_report_get_moon_emoji "Full Moon")
-            echo (set_color brwhite)"  Moon:     "(set_color normal)(set_color -b $tide_moon_bg_color)" $out "(set_color normal)
+            echo "  "(set_color -b $tide_moon_bg_color)" $out "(set_color normal)
         case tide
             set -l out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
-            echo (set_color brwhite)"  Tide:     "(set_color normal)(set_color -b $tide_tide_bg_color)" $out "(set_color normal)
+            echo "  "(set_color -b $tide_tide_bg_color)" $out "(set_color normal)
     end
 end
 
-## Install Tide Report defaults and register prompt items on Fisher install event.
-function _tide_report_install --description "Install Tide Report defaults and prompt items on fisher event" --on-event tide_report_install
+## Install TideReport defaults and register prompt items on Fisher install event.
+function _tide_report_install --description "Install TideReport defaults and prompt items on fisher event" --on-event tide_report_install
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
     ## --- Check for Dev Branch Install ---
@@ -105,7 +131,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
         sleep 3
     end
 
-    echo (set_color --bold brwhite)"Installing Tide Report v$_tide_report_version..."(set_color normal)
+    echo (set_color --bold brwhite)"Installing TideReport v$_tide_report_version..."(set_color normal)
 
     ## --- Check dependencies ---
     if ! command -v "gh" 2>/dev/null >/dev/null
@@ -205,33 +231,32 @@ function _tide_report_install --description "Install Tide Report defaults and pr
     end
 
     if $any_present
-        echo (set_color brwhite)"Tide Report prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+        echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
         tide reload 2>/dev/null; or true
     else if not status is-interactive
         _tide_report_ensure_prompt_items 1
         tide reload 2>/dev/null; or true
-        echo (set_color brwhite)"Tide Report: added github (left), weather, moon (right). Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
+        echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
     else
         echo ""
-        echo (set_color --bold brwhite)"Tide Report prompt items"(set_color normal)
+        echo (set_color --bold brwhite)"TideReport Prompt Items:"(set_color normal)
         echo (set_color brwhite)"Choose which items to add to your prompt."(set_color normal)
         echo ""
-        echo (set_color brwhite)"Preview (with your Tide separators):"(set_color normal)
+        echo (set_color brwhite)"Preview:"(set_color normal)
         _tide_report_install_show_preview all medium $default_bg_color
         echo ""
 
-        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
-        echo (set_color brcyan)"  GitHub"(set_color normal)
+        echo (set_color brcyan)"────────────────[ "(set_color brwhite)"GitHub"(set_color brcyan)" ]────────────────"(set_color normal)
         _tide_report_install_show_preview github "" $default_bg_color
         echo ""
         set -l add_github false
-        read -l -P (set_color brwhite)"Add GitHub to prompt? [Y/n]: "(set_color normal) reply
+        read -l -P (set_color brcyan)"Add GitHub to prompt? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
         if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
             set add_github true
         end
         if $add_github
-            read -l -P (set_color brwhite)"Show CI status in GitHub item? [Y/n]: "(set_color normal) reply
+            read -l -P (set_color brcyan)"Show CI status in GitHub item? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
             set -l r (string trim (string lower -- "$reply"))
             if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
                 set -U tide_report_github_show_ci true
@@ -240,42 +265,21 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
         end
 
-        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
-        echo (set_color brcyan)"  Weather"(set_color normal)
-        _tide_report_install_show_preview weather medium $default_bg_color
+        echo (set_color brcyan)"────────────────[ "(set_color brwhite)"Weather"(set_color brcyan)" ]───────────────"(set_color normal)
+        echo (set_color brwhite)"  Weather format samples:"(set_color normal)
+        echo (set_color brcyan)"    1"(set_color brwhite)") Concise  "(set_color normal); _tide_report_install_show_preview weather concise $default_bg_color
+        echo (set_color brcyan)"    2"(set_color brwhite)") Medium   "(set_color normal); _tide_report_install_show_preview weather medium $default_bg_color
+        echo (set_color brcyan)"    3"(set_color brwhite)") Detailed "(set_color normal); _tide_report_install_show_preview weather detailed $default_bg_color
         echo ""
+
         set -l add_weather false
-        read -l -P (set_color brwhite)"Add Weather to prompt? [Y/n]: "(set_color normal) reply
+        read -l -P (set_color brcyan)"Add Weather to prompt? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
         set -l r (string trim (string lower -- "$reply"))
         if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
             set add_weather true
         end
-
-        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
-        echo (set_color brcyan)"  Moon"(set_color normal)
-        _tide_report_install_show_preview moon "" $default_bg_color
-        echo ""
-        set -l add_moon false
-        read -l -P (set_color brwhite)"Add Moon to prompt? [Y/n]: "(set_color normal) reply
-        set -l r (string trim (string lower -- "$reply"))
-        if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
-            set add_moon true
-        end
-
-        echo (set_color brblack)"─────────────────────────────────────"(set_color normal)
-        echo (set_color brcyan)"  Tide"(set_color normal)
-        _tide_report_install_show_preview tide "" $default_bg_color
-        echo ""
-        set -l add_tide false
-        read -l -P (set_color brwhite)"Add Tide to prompt? [y/N]: "(set_color normal) reply
-        set -l r (string trim (string lower -- "$reply"))
-        if test -n "$r"; and test "$r" != "n"; and test "$r" != "no"
-            if test "$r" = "y"; or test "$r" = "yes"
-                set add_tide true
-            end
-        end
         if $add_weather
-            read -l -P (set_color brwhite)"Weather format? "(set_color cyan)"1"(set_color brwhite)"=concise "(set_color cyan)"2"(set_color brwhite)"=medium "(set_color cyan)"3"(set_color brwhite)"=detailed [2]: "(set_color normal) format_choice
+            read -l -P (set_color brcyan)"Weather format? "(set_color cyan)"1"(set_color brwhite)"=concise "(set_color cyan)"2"(set_color brwhite)"=medium "(set_color cyan)"3"(set_color brwhite)"=detailed "(set_color brgreen)"["(set_color bryellow)"2"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) format_choice
             set -l fmt "2"
             if test -n "$format_choice"
                 string match -q -r '^[1-3]$' -- $format_choice && set fmt $format_choice
@@ -303,7 +307,7 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             end
             set -l use_ip true
             if test -n "$ip_line"
-                read -l -P (set_color brwhite)"Detected location: $ip_line. Use this location? [Y/n]: "(set_color normal) reply
+                read -l -P (set_color brcyan)"Detected location: "(set_color brwhite)"$ip_line"(set_color brcyan)". Use this location? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
                 set -l r (string trim (string lower -- "$reply"))
                 if test "$r" = "n"; or test "$r" = "no"
                     set use_ip false
@@ -315,9 +319,9 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             set -l location_tries 0
             set -l max_location_tries 3
             while test "$use_ip" = false
-                set -l prompt_str (set_color brwhite)"Enter location (city, postal code, or lat,lon e.g. 52.52,13.41) or press Enter to use IP: "(set_color normal)
+                set -l prompt_str (set_color brcyan)"Enter location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to use IP: "(set_color normal)
                 if test -z "$ip_line"; and test "$first_manual_prompt" = true
-                    set prompt_str (set_color brwhite)"Could not detect location from IP. Enter location (city, postal code, or lat,lon e.g. 52.52,13.41) or press Enter to use IP: "(set_color normal)
+                    set prompt_str (set_color brcyan)"Could not detect location from IP. Enter location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to use IP: "(set_color normal)
                     set first_manual_prompt false
                 end
                 read -l -P "$prompt_str" reply
@@ -329,8 +333,8 @@ function _tide_report_install --description "Install Tide Report defaults and pr
                 set -l resolved (__tide_report_validate_weather_location "$manual")
                 set -l val_status $status
                 set resolved (string trim -- $resolved)
-                if test $val_status -eq 0
-                    read -l -P (set_color brwhite)"Resolved to: $resolved. Use this location? [Y/n]: "(set_color normal) reply2
+                    if test $val_status -eq 0
+                        read -l -P (set_color brcyan)"Resolved to: "(set_color brwhite)"$resolved"(set_color brcyan)". Use this location? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply2
                     set -l r2 (string trim (string lower -- "$reply2"))
                     if test -z "$r2"; or test "$r2" = "y"; or test "$r2" = "yes"
                         if string match -qr '^-?[0-9]+\.?[0-9]*\s*,\s*-?[0-9]+\.?[0-9]*$' -- "$manual"
@@ -353,6 +357,29 @@ function _tide_report_install --description "Install Tide Report defaults and pr
                 end
             end
         end
+
+        echo (set_color brcyan)"────────────────[ "(set_color brwhite)"Moon"(set_color brcyan)" ]────────────────"(set_color normal)
+        _tide_report_install_show_preview moon "" $default_bg_color
+        echo ""
+        set -l add_moon false
+        read -l -P (set_color brcyan)"Add Moon to prompt? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -z "$r"; or test "$r" = "y"; or test "$r" = "yes"
+            set add_moon true
+        end
+
+        echo (set_color brcyan)"────────────────[ "(set_color brwhite)"Tide"(set_color brcyan)" ]────────────────"(set_color normal)
+        _tide_report_install_show_preview tide "" $default_bg_color
+        echo ""
+        set -l add_tide false
+        read -l -P (set_color brcyan)"Add Tide to prompt? "(set_color brgreen)"["(set_color bryellow)"y"(set_color brgreen)"/"(set_color bryellow)"N"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
+        set -l r (string trim (string lower -- "$reply"))
+        if test -n "$r"; and test "$r" != "n"; and test "$r" != "no"
+            if test "$r" = "y"; or test "$r" = "yes"
+                set add_tide true
+            end
+        end
+
         set -l left_add
         set -l right_add
         $add_github && set left_add github
@@ -377,19 +404,19 @@ function _tide_report_install --description "Install Tide Report defaults and pr
             echo (set_color brwhite)"$msg."(set_color normal)
         end
         tide reload 2>/dev/null; or true
-        echo (set_color brwhite)"Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
+        echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     end
 end
 
 ## Handle Fisher update event: clear cache and re-run install logic.
-function _tide_report_update --description "Handle fisher update: clear Tide Report cache and re-run install" --on-event tide_report_update
+function _tide_report_update --description "Handle fisher update: clear TideReport cache and re-run install" --on-event tide_report_update
     command rm -rf ~/.cache/tide-report
     _tide_report_install
 end
 
-## Uninstall Tide Report: remove prompt items, variables, functions, and cache on Fisher uninstall.
-function _tide_report_uninstall --description "Handle fisher uninstall: remove Tide Report items, vars, functions, and cache" --on-event tide_report_uninstall
-    echo (set_color --bold brwhite)"Removing Tide Report Configuration & Cache..."(set_color normal)
+## Uninstall TideReport: remove prompt items, variables, functions, and cache on Fisher uninstall.
+function _tide_report_uninstall --description "Handle fisher uninstall: remove TideReport items, vars, functions, and cache" --on-event tide_report_uninstall
+    echo (set_color --bold brwhite)"Removing TideReport Configuration & Cache..."(set_color normal)
 
     set -l tide_report_items github weather moon tide
     set -l new_right
@@ -447,11 +474,11 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     command rm -rf ~/.cache/tide-report
 
     tide reload 2>/dev/null; or true
-    echo (set_color brwhite)"Prompt refreshed. Run "(set_color cyan)"tide reload"(set_color brwhite)" or start a new session if items still appear."(set_color normal)
+    echo (set_color brwhite)"Prompt refreshed. Run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session if items still appear."(set_color normal)
 end
 
-## Apply chosen Tide Report items to Tide prompt lists (insertion rules: github after git/pwd, right items appended).
-function _tide_report_apply_prompt_items --description "Add selected Tide Report items to left/right prompt lists" --argument-names left_add right_add
+## Apply chosen TideReport items to Tide prompt lists (insertion rules: github after git/pwd, right items appended).
+function _tide_report_apply_prompt_items --description "Add selected TideReport items to left/right prompt lists" --argument-names left_add right_add
     set -q tide_left_prompt_items || return 0
     set -q tide_right_prompt_items || return 0
     set -l left $tide_left_prompt_items
@@ -502,8 +529,8 @@ function _tide_report_apply_prompt_items --description "Add selected Tide Report
     _tide_report_warn_global_prompt_items (string join " " $new_left) (string join " " $new_right)
 end
 
-## Add default Tide Report items when none are present (used when not interactive or when wizard is skipped).
-function _tide_report_ensure_prompt_items --description "Ensure Tide Report items exist in Tide prompt lists" --argument-names silent
+## Add default TideReport items when none are present (used when not interactive or when wizard is skipped).
+function _tide_report_ensure_prompt_items --description "Ensure TideReport items exist in Tide prompt lists" --argument-names silent
     set -q tide_left_prompt_items || return 0
     set -q tide_right_prompt_items || return 0
     set -l left $tide_left_prompt_items
@@ -516,11 +543,11 @@ function _tide_report_ensure_prompt_items --description "Ensure Tide Report item
     end
     _tide_report_apply_prompt_items github "weather moon"
     if test "$silent" != "1"
-        echo (set_color brwhite)"Tide Report: added prompt items. Run "(set_color cyan)"tide reload"(set_color brwhite)" if they don't appear."(set_color normal)
+        echo (set_color brwhite)"TideReport: added prompt items. Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
     end
 end
 
 ## User-callable helper to run install logic manually (e.g. when Fisher event does not fire).
-function tide_report_install --description "Run Tide Report install manually: add prompt items and set config"
+function tide_report_install --description "Run TideReport install manually: add prompt items and set config"
     _tide_report_install
 end
