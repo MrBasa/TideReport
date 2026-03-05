@@ -161,7 +161,7 @@ function __tide_report_render_github --description "Render GitHub segment from s
 
     # Append CI status when show_ci is enabled and ci_state is set (pass|fail|pending)
     if test "$tide_report_github_show_ci" = true; and test -n "$ci_state"; and test "$ci_state" != "none"
-        set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✓"
+        set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✔"
         set -q tide_report_github_icon_ci_fail; or set -l tide_report_github_icon_ci_fail "✗"
         set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⋯"
         set -q tide_report_github_color_ci_pass; or set -l tide_report_github_color_ci_pass "green"
