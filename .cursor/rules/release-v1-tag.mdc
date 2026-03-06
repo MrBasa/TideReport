@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Release: Repoint v1 Tag
 
-**Current latest release:** `v1.6.0` (GitHub: "Version 1.6.0 - Interactive wizard & GitHub CI"). Update this line whenever a new release is published.
+**Current latest release:** `v1.6.1` (GitHub: "Version 1.6.1 - Lighter session startup"). Update this line whenever a new release is published.
 
 ---
 
