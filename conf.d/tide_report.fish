@@ -66,6 +66,16 @@ function _tide_report_install_show_preview --description "Echo sample output for
     set -l sep_color "$tide_color_separator_same_color"
     set -l conn_color "$tide_prompt_color_frame_and_connection"
 
+    # Sample strings for weather preview by units (tide uses tide_report_units in render)
+    set -l temp_sample "+22°"
+    set -l feels_sample "+21°"
+    set -l wind_sample "12km/h"
+    if set -q tide_report_units; and test "$tide_report_units" = "u"
+        set temp_sample "+72°"
+        set feels_sample "+71°"
+        set wind_sample "7mph"
+    end
+
     if test "$which_item" = "all"
         set -l gh_out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
         set -l w_fmt "%c %t %d%w"
@@ -73,7 +83,7 @@ function _tide_report_install_show_preview --description "Echo sample output for
         test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
         set -l save_fmt $tide_report_weather_format
         set -g tide_report_weather_format $w_fmt
-        set -l weather_out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
+        set -l weather_out (__tide_report_render_weather "$temp_sample" "$feels_sample" "☀️" "Clear" "$wind_sample" "⬇" "65%" "" "" "" | string collect)
         set -g tide_report_weather_format $save_fmt
         set -l moon_out (__tide_report_get_moon_emoji "Full Moon")
         set -l tide_out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
@@ -145,7 +155,7 @@ function _tide_report_install_show_preview --description "Echo sample output for
             test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
             set -l save_fmt $tide_report_weather_format
             set -g tide_report_weather_format $w_fmt
-            set -l out (__tide_report_render_weather "+22°" "+21°" "☀️" "Clear" "12km/h" "⬇" "65%" "" "" "" | string collect)
+            set -l out (__tide_report_render_weather "$temp_sample" "$feels_sample" "☀️" "Clear" "$wind_sample" "⬇" "65%" "" "" "" | string collect)
             set -g tide_report_weather_format $save_fmt
             set -l line ""
             if test -n "$right_prefix"
@@ -298,7 +308,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
 
     if not set -q tide_left_prompt_items; or not set -q tide_right_prompt_items
         _tide_report_ensure_prompt_items 1
-        command -q tide && tide reload 2>/dev/null; or true
+        type -q tide && tide reload 2>/dev/null; or true
         return 0
     end
     set -l left $tide_left_prompt_items
@@ -314,12 +324,28 @@ function _tide_report_install --description "Install TideReport defaults and pro
 
     if $any_present
         echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
-        command -q tide && tide reload 2>/dev/null; or true
+        type -q tide && tide reload 2>/dev/null; or true
     else if not status is-interactive
         _tide_report_ensure_prompt_items 1
-        command -q tide && tide reload 2>/dev/null; or true
+        type -q tide && tide reload 2>/dev/null; or true
         echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
     else
+        echo ""
+        echo (set_color brcyan)"────────────────[ "(set_color brwhite)"Units"(set_color brcyan)" ]────────────────"(set_color normal)
+        echo (set_color brwhite)"  Use metric or US?"(set_color normal)
+        echo (set_color brcyan)"    1"(set_color brwhite)") Metric (°C, km/h, m)"(set_color normal)
+        echo (set_color brcyan)"    2"(set_color brwhite)") Freedom Units (°F, mph, ft)"(set_color normal)
+        echo ""
+        read -l -P (set_color brcyan)"1=metric 2=US "(set_color brgreen)"["(set_color bryellow)"1"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) units_choice
+        set -l units "1"
+        if test -n "$units_choice"
+            string match -q -r '^[12]$' -- $units_choice && set units $units_choice
+        end
+        if test "$units" = "2"
+            set -U tide_report_units "u"
+        else
+            set -U tide_report_units "m"
+        end
         echo ""
         echo (set_color --bold brwhite)"TideReport Prompt Items:"(set_color normal)
         echo (set_color brwhite)"Choose which items to add to your prompt."(set_color normal)
@@ -487,7 +513,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
             end
             echo (set_color brwhite)"$msg."(set_color normal)
         end
-        command -q tide && tide reload 2>/dev/null; or true
+        type -q tide && tide reload 2>/dev/null; or true
         echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     end
 end
@@ -557,7 +583,7 @@ function _tide_report_uninstall --description "Handle fisher uninstall: remove T
     # Remove cache
     command rm -rf ~/.cache/tide-report
 
-    command -q tide && tide reload 2>/dev/null; or true
+    type -q tide && tide reload 2>/dev/null; or true
     echo (set_color brwhite)"Prompt refreshed. Run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session if items still appear."(set_color normal)
 end
 

@@ -89,7 +89,7 @@ function __tide_report_render_tide --description "Render tide segment from type 
     if test "$show_level" = "true"; and test -n "$value_metric"
         set -l unit_suffix "m"
         set -l level_value $value_metric
-        if set -q tide_report_tide_units; and test "$tide_report_tide_units" = "english"
+        if set -q tide_report_units; and test "$tide_report_units" = "u"
             set level_value (math --scale=1 "$value_metric * 3.28084")
             set unit_suffix "ft"
         else
