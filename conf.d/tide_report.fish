@@ -1,7 +1,7 @@
 ## TideReport :: Default Configuration
 
 ## Plugin version (single source of truth for display and API client string)
-set -g _tide_report_version "1.6"
+set -g _tide_report_version "1.6.1"
 set -q tide_report_user_agent || set -U tide_report_user_agent "tide-report/$_tide_report_version"
 set -q tide_report_log_expected || set -U tide_report_log_expected 1
 
