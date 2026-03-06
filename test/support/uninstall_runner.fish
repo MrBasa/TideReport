@@ -17,6 +17,9 @@ set -U tide_report_weather_format "%c %t"
 mkdir -p $HOME/.cache/tide-report
 touch $HOME/.cache/tide-report/foo
 
+# Add plugin functions dir so _tide_report_do_install/_tide_report_do_uninstall can be autoloaded
+set -g fish_function_path $root/functions $fish_function_path
+
 source $root/conf.d/tide_report.fish
 _tide_report_uninstall
 

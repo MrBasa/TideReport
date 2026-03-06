@@ -5,7 +5,7 @@
       "label": "Deploy (development)",
       "type": "shell",
       "command": "fish",
-      "args": ["-c", "functions -q _tide_report_uninstall && _tide_report_uninstall; fisher remove MrBasa/TideReport 2>/dev/null; fisher remove \"${workspaceFolder}\" 2>/dev/null; fisher install \"${workspaceFolder}\"; source $__fish_config_dir/conf.d/tide_report.fish; _tide_report_install"],
+      "args": ["-c", "fisher remove MrBasa/TideReport@v1 2>/dev/null; fisher remove \"${workspaceFolder}\" 2>/dev/null; fisher install \"${workspaceFolder}\""],
       "group": {
         "kind": "build",
         "isDefault": true
