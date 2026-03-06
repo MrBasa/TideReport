@@ -19,7 +19,7 @@ This plugin provides prompt items that display **Weather**, **Moon Phase**, **Oc
 ## Quick start
 
 1. Install the plugin: `fisher install MrBasa/TideReport@v1`
-2. On a **first install** (when no TideReport items are in your prompt), an **interactive wizard** runs: it first asks whether to use **metric** or **US** (and sets `tide_report_units`), then shows a single-line preview of all items (using your Tide separators) and then, for each item (GitHub, Weather, Moon, Tide), shows a sample with the same background color as in your prompt before asking whether to add it. You can press Enter at each step to accept the defaults (GitHub, weather, moon on; tide off). If you add weather, you can pick one of three format presets (concise, medium, or detailed), then choose location: the wizard shows your IP-detected location (default) or lets you enter a city, postal code, or coordinates; it validates and confirms before saving.
+2. In an **interactive** session you are asked whether to **run the install wizard** or **use defaults**. Use defaults to add the default prompt items (github, weather, moon) without prompts; run the wizard to choose units (metric/US), which items to add, weather format and location, etc. The wizard first asks metric or US (`tide_report_units`), then shows a single-line preview of all items and, for each item (GitHub, Weather, Moon, Tide), a sample before asking whether to add it. If you add weather, you can pick a format preset and set location (IP-based or city/postal/coordinates validated via Open-Meteo).
 3. The installer runs `tide reload` when Tide is available, so your prompt updates immediately. If it doesn’t, run `tide reload` or open a new terminal.
 4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
 
@@ -40,14 +40,10 @@ Install with [Fisher][]:
 fisher install MrBasa/TideReport@v1
 ```
 
-On a **first install**, an interactive wizard asks whether to use metric or US (sets `tide_report_units`), then shows a combined preview of all prompt items (with Tide separators) and then, for each item, a sample with prompt-style background colors before asking whether to add it. If you add weather, it helps you set location (IP-based by default, or city/postal/coordinates validated via Open-Meteo). Defaults: GitHub, weather, and moon are added (tide is not); weather format is medium. Non-interactive installs (e.g. in CI) get the same defaults without prompts. When the install or update completes, the plugin runs `tide reload` (if the Tide prompt is installed) so your prompt refreshes immediately.
+Both **`fisher install`** and **`fisher update`** run the same install logic. In an **interactive** session you are asked whether to **run the install wizard** or **use defaults**. Use defaults to add the default prompt items (github, weather, moon) without the wizard; run the wizard to choose units, which items to add, weather format and location, etc. Non-interactive installs and updates (e.g. in CI) always use defaults: no prompt, no wizard. When install or update completes, the plugin runs `tide reload` (if the Tide prompt is installed) so your prompt refreshes immediately.
 
-If you install from a **local path** (e.g. during development) and the prompt items do not appear, run:
-```fish
-tide_report_install
-```
+You can add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`; this is the recommended workflow when using a dotconfig manager. After `fisher update`, the same interactive prompt (wizard or use defaults) appears when the session is interactive.
 
-Or add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`. This is the recommended workflow when using a dotconfig manager.
 See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
 
 ### Clean reinstall
@@ -58,7 +54,7 @@ If the installer did not run (e.g. prompt items never appeared after install) or
 2. Optionally start a new Fish session so universals are reloaded.
 3. Install again: `fisher install MrBasa/TideReport@v1` (or your path). The installer will run `tide reload` when done.
 
-If items still do not appear, run `tide_report_install` once to apply configuration and add prompt items (it will run `tide reload` when Tide is available).
+If the installer never ran (e.g. you installed non-interactively), run `fisher update` in an interactive session and choose "run wizard" or "use defaults" to apply configuration and add prompt items.
 
 ## 🚀 Available Prompt Sections
 

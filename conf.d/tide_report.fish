@@ -77,7 +77,7 @@ function _tide_report_install_show_preview --description "Echo sample output for
     end
 
     if test "$which_item" = "all"
-        set -l gh_out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
+        set -l gh_out (__tide_report_render_github 86 75 30 9 42 pass | string collect)
         set -l w_fmt "%c %t %d%w"
         test "$weather_format" = "concise" && set w_fmt "%c %t"
         test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
@@ -137,7 +137,7 @@ function _tide_report_install_show_preview --description "Echo sample output for
 
     switch "$which_item"
         case github
-            set -l out (__tide_report_render_github 42 3 7 2 5 pass | string collect)
+            set -l out (__tide_report_render_github 86 75 30 9 42 pass | string collect)
             set -l line (set_color $tide_time_color -b $tide_github_bg_color)" … "
             if test -n "$sep_color"
                 set line "$line"(set_color $sep_color -b $tide_github_bg_color)"$lsep "
@@ -322,14 +322,33 @@ function _tide_report_install --description "Install TideReport defaults and pro
         end
     end
 
-    if $any_present
-        echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
-        type -q tide && tide reload 2>/dev/null; or true
-    else if not status is-interactive
-        _tide_report_ensure_prompt_items 1
-        type -q tide && tide reload 2>/dev/null; or true
-        echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
+    if not status is-interactive
+        if $any_present
+            echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+            type -q tide && tide reload 2>/dev/null; or true
+        else
+            _tide_report_ensure_prompt_items 1
+            type -q tide && tide reload 2>/dev/null; or true
+            echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
+        end
     else
+        read -l -P (set_color brcyan)"Run the TideReport install wizard? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) wizard_reply
+        set -l r (string trim (string lower -- "$wizard_reply"))
+        set -l run_wizard true
+        if test "$r" = "n"; or test "$r" = "no"
+            set run_wizard false
+        end
+        if not $run_wizard
+            if $any_present
+                echo (set_color brwhite)"TideReport prompt items already present; leaving your prompt configuration unchanged."(set_color normal)
+                type -q tide && tide reload 2>/dev/null; or true
+            else
+                _tide_report_ensure_prompt_items 1
+                type -q tide && tide reload 2>/dev/null; or true
+                echo (set_color brwhite)"TideReport: added github (left), weather, moon (right). Run "(set_color cyan)"'tide reload'"(set_color brwhite)" if they don't appear."(set_color normal)
+            end
+        else
+        echo (set_color brcyan)"────[ "(set_color -o brwhite)"TideReport Installation Wizard"(set_color normal && set_color brcyan)" ]────"(set_color normal)
         echo ""
         echo (set_color brcyan)"────────────────[ "(set_color brwhite)"Units"(set_color brcyan)" ]────────────────"(set_color normal)
         echo (set_color brwhite)"  Use metric or US?"(set_color normal)
@@ -347,10 +366,7 @@ function _tide_report_install --description "Install TideReport defaults and pro
             set -U tide_report_units "m"
         end
         echo ""
-        echo (set_color --bold brwhite)"TideReport Prompt Items:"(set_color normal)
         echo (set_color brwhite)"Choose which items to add to your prompt."(set_color normal)
-        echo ""
-        echo (set_color brwhite)"Preview:"(set_color normal)
         _tide_report_install_show_preview all medium $default_bg_color
         echo ""
 
@@ -515,6 +531,8 @@ function _tide_report_install --description "Install TideReport defaults and pro
         end
         type -q tide && tide reload 2>/dev/null; or true
         echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
+        echo (set_color brwhite)"To reconfigure TideReport later, run '"(set_color cyan)"fisher update MrBasa/TideReport@v1"(set_color brwhite)"' and choose to run the wizard."(set_color normal)
+        end
     end
 end
 
@@ -657,7 +675,3 @@ function _tide_report_ensure_prompt_items --description "Ensure TideReport items
     end
 end
 
-## User-callable helper to run install logic manually (e.g. when Fisher event does not fire).
-function tide_report_install --description "Run TideReport install manually: add prompt items and set config"
-    _tide_report_install
-end
