@@ -1,309 +1,304 @@
 # TideReport Fish Shell Plugin
 
-A collection of simple, asynchronous, and configurable prompt sections for the [Tide][] Fish prompt.
-This plugin provides prompt items that display **Weather**, **Moon Phase**, **Ocean Tides**, and **GitHub** data without slowing down your shell.
+A collection of beautiful, asynchronous, and highly configurable prompt sections for the [Tide](https://github.com/IlanCosman/tide "null") prompt for Fish shell.
+
+TideReport provides rich prompt items that display **Weather**, **Moon Phase**, **Ocean Tides**, and **GitHub** repository data. Built with performance in mind, it fetches everything in the background so your shell stays lightning-fast.
 
 ## ✨ Key Features
 
-* **Asynchronous**: Fetches data in the background to keep your prompt fast.
-* **Efficient**: With the default weather provider (Open-Meteo), weather is fetched in the background; moon uses a separate request when needed.
-* **Modular**: Provides independent prompt items. Use only the ones you want.
-* **Configurable**: Easily customize formats, units, location, and refresh rates.
-* **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
+- 🚀 **Zero-Lag Performance**: Uses asynchronous background fetches. Your prompt will _never_ hang waiting for a network request.
+    
+- 🧙‍♂️ **Interactive Setup**: Comes with a built-in installation wizard to easily configure your layout, units, and locations right in your terminal.
+    
+- 🧩 **Modular**: Completely independent modules. Use all of them, or just pick your favorites.
+    
+- 🎨 **Highly Configurable**: Easily tweak colors, icons, formats, refresh rates, and data providers to match your aesthetic.
+- 💁 **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
+    
 
-## Examples
+## 👀 Previews
 ![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
 ![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
 ![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
 
-## Quick start
+## ⚡ Quick Start
 
-1. Install the plugin: `fisher install MrBasa/TideReport@v1`
-2. In an **interactive** session you are asked whether to **run the install wizard** or **use defaults**. Use defaults to add the default prompt items (github, weather, moon) without prompts; run the wizard to choose units (metric/US), which items to add, weather format and location, etc. The wizard first asks metric or US (`tide_report_units`), then shows a single-line preview of all items and, for each item (GitHub, Weather, Moon, Tide), a sample before asking whether to add it. If you add weather, you can pick a format preset and set location (IP-based or city/postal/coordinates validated via Open-Meteo).
-3. The installer runs `tide reload` when Tide is available, so your prompt updates immediately. If it doesn’t, run `tide reload` or open a new terminal.
-4. If weather shows as unavailable at first, the plugin may still be detecting your location in the background; wait a moment or set [weather location](#weather-location) manually.
+### 1. Requirements
 
-## 🔗 Dependencies
+Before installing, make sure you have the following available on your system:
 
-* **`curl`**: Required by the `weather`, `moon`, and `tide` modules to fetch data.
-* **`gh`**: The [GitHub CLI](https://cli.github.com). Required by the `github` module. You must be authenticated (`gh auth login`).
-* **`jq`**: **Required by all modules** (`github`, `tide`, `weather`, `moon`) for parsing JSON data.
-* The latest version of [Fish][].
-* [Fisher][] plugin manager.
-* A [Nerd Font](https://github.com/ryanoasis/nerd-fonts) (optional, for icons).
+- **`curl`**: Required by the `weather`, `moon`, and `tide` modules.
+    
+- **`jq`**: **Required by all modules** for parsing JSON data.
+    
+- **`gh`**: The [GitHub CLI](https://cli.github.com/ "null"), only required if you want to use the `github` module. Remember to authenticate (`gh auth login`).
+    
+- The latest version of [Fish](https://fishshell.com/ "null") and the [Fisher](https://github.com/jorgebucaran/fisher "null") plugin manager.
+    
+- A **Nerd Font** (Recommended for rendering icons properly). You can download and install one directly from [https://www.nerdfonts.com/font-downloads](https://www.nerdfonts.com/font-downloads "null"), or use your system's package manager to install a widely available package like `ttf-firacode-nerd` or `font-fira-code-nerd-font`.
+    
 
-## 📦 Installation
+### 2. Installation & Setup Wizard
 
-Install with [Fisher][]:
+Install the plugin using [Fisher](https://github.com/jorgebucaran/fisher "null"):
 
 ```fish
 fisher install MrBasa/TideReport@v1
 ```
 
-Both **`fisher install`** and **`fisher update`** run the same install logic. In an **interactive** session you are asked whether to **run the install wizard** or **use defaults**. Use defaults to add the default prompt items (github, weather, moon) without the wizard; run the wizard to choose units, which items to add, weather format and location, etc. Non-interactive installs and updates (e.g. in CI) always use defaults: no prompt, no wizard. When install or update completes, the plugin runs `tide reload` (if the Tide prompt is installed) so your prompt refreshes immediately.
+If you are installing in an interactive terminal session, the **TideReport Installation Wizard** will automatically launch to walk you through the setup:
 
-You can add `MrBasa/TideReport@v1` to `~/.config/fish/fish_plugins` and run `fisher update`; this is the recommended workflow when using a dotconfig manager. After `fisher update`, the same interactive prompt (wizard or use defaults) appears when the session is interactive.
+1. **Choose Units**: Select Metric (°C, km/h, meters) or US/Imperial (°F, mph, feet).
+    
+2. **Preview & Select Modules**: The wizard will show live previews of the GitHub, Weather, Moon, and Tide modules. You will be prompted to choose `[Y/n]` to add each one to your prompt.
+    
+3. **Configure Weather**: If enabled, choose a display format (Concise, Medium, or Detailed).
+    
+4. **Set Location**: The wizard will attempt to auto-detect your location via IP. You can accept this, or manually enter your city, postal code, or GPS coordinates.
+    
 
-See the [Fisher][] and [Tide][] documentation for more details on installing plugins.
+The plugin automatically runs `tide reload` when finished, so your new prompt items will appear immediately!
 
-### Clean reinstall
+_(Note: If you install non-interactively, or choose to skip the wizard, the plugin defaults to adding GitHub, Weather, and Moon with standard settings.)_
 
-If the installer did not run (e.g. prompt items never appeared after install) or you see odd behavior after repeated installs/uninstalls, do a clean reinstall:
+### 3. Declarative Configuration (Dotfiles)
 
-1. Remove the plugin: `fisher remove MrBasa/TideReport` (or the path you used, e.g. `fisher remove /path/to/TideReport`). The uninstaller runs `tide reload` when Tide is available so the prompt updates without the TideReport items.
-2. Optionally start a new Fish session so universals are reloaded.
-3. Install again: `fisher install MrBasa/TideReport@v1` (or your path). The installer will run `tide reload` when done.
+If you prefer to manage your plugins declaratively, you can add `MrBasa/TideReport@v1` to your `~/.config/fish/fish_plugins` file and run `fisher update`. The same interactive wizard will appear if you run this in an interactive session.
 
-If the installer never ran (e.g. you installed non-interactively), run `fisher update` in an interactive session and choose "run wizard" or "use defaults" to apply configuration and add prompt items.
+## 📦 Available Modules Overview
 
-## 🚀 Available Prompt Sections
+|   |   |
+|---|---|
+|**Module**|**Description & Example**|
+|**`github`**|Displays stars, forks, watchers, issues, pull requests, and the latest CI workflow status for your current Git repository.|
+|**`weather`**|Displays the current weather using Open-Meteo (default) or wttr.in.|
+|**`moon`**|Displays the current moon phase using a fast, local, offline astronomical model (no network calls required!).|
+|**`tide`**|Displays the next high or low tide time and water level from NOAA (US-based stations).|
 
-* `github`: Displays stars, forks, watchers, issues, and PRs for the current `gh` repo, and optionally the latest CI run status for the current branch.
-* `weather`: Displays the current weather (from Open-Meteo or wttr.in).
-* `moon`: Displays the current moon phase (from a local offline model by default, or wttr.in when moon provider is wttr).
-* `tide`: Displays the next high/low tide from NOAA (US-based).
+# 🛠️ Advanced Configuration & Technical Details
 
-## 🔧 Usage
+The following sections are for users who want to manually tweak their prompt, change default behaviors, or understand how TideReport works under the hood. Set any of the following variables universally (e.g., `set -U tide_report_units "m"`) or add them to your `config.fish` to override defaults.
 
-After the install wizard (or on a non-interactive install), **weather**, **moon**, and **github** are added by default; **tide** is not. To add **tide** or change the order of items, edit the Tide prompt lists and reload:
+## 🎛️ Manual Prompt Management
+
+If you skipped the wizard or want to manually change the order of your items, you can edit the Tide prompt lists and reload:
 
 ```fish
 set -Ua tide_right_prompt_items tide
 tide reload
 ```
 
-If you manage these in `config.fish` with `set -g`, install and uninstall will show a message with the updated list so you can sync; you can keep using either universal or global.
-
-## ⚙️ Configuration
-Set any of the following variables universally or add them to your `config.fish` to override defaults.
-
 ## ⚡ Caching Behavior
 
-To keep your prompt fast, this plugin fetches data in the background and relies on cached data. This is done to prevent slow network requests from blocking your shell. Background fetch jobs are disowned so the shell does not wait for them when drawing the prompt (avoiding a 3–6 second delay on new shells when cache is empty or expired).
+To keep your prompt fast, this plugin fetches data in the background and relies on file-based cached data (stored in `~/.cache/tide-report/`).
 
-All file-based caches are stored in `~/.cache/tide-report/`.
+### Timers: Stale vs. Invalid
 
-### Weather, Moon, and Tide Modules
+Modules use an asynchronous caching system with two timers:
 
-These modules use an asynchronous, file-based caching system with two timers:
-1.  **Refresh (`..._refresh_seconds`)**: This is the "stale" timer. If you load your prompt and the cached data is older than this value, the prompt will **show the stale data** and trigger a fetch in the background. Your prompt is not blocked.
-2.  **Expire (`..._expire_seconds`)**: This is the "invalid" timer. If the cached data is older than this value (or doesn't exist), the prompt will **show the unavailable text** (e.g., `🌊`) and trigger a background fetch.
+1. **Refresh (`..._refresh_seconds`)**: The "stale" timer. If data is older than this value, the prompt **shows the stale data** and triggers a silent background fetch. Your prompt is never blocked.
+    
+2. **Expire (`..._expire_seconds`)**: The "invalid" timer. If data is older than this value (or doesn't exist), the prompt **shows the unavailable text** (e.g., `🌊…`) and triggers a background fetch.
+    
 
-This means it is **expected behavior** to see the "unavailable" text for a few seconds when the cache is empty or has expired.
+**It is expected behavior to see the "unavailable" text for a few seconds** when opening a terminal for the very first time, or after your cache has completely expired.
 
-With the **wttr** weather provider, one API call fills both weather and moon. With **Open-Meteo** (the default), weather and moon are independent. The moon item uses a **local, offline lunar phase model** by default, or **wttr.in** when `tide_report_moon_provider` is set to `wttr`.
+## 📓 Diagnostic Log
 
-### GitHub Module
+Expected issues (missing dependencies, bad GitHub credentials, API timeouts, invalid weather locations) are written silently to a log file so your prompt is never delayed by I/O.
 
-The `github` module caches repo stats and (when CI is enabled) workflow run status in `~/.cache/tide-report/github/`. Repo data is stored per repository; CI data is stored per repository and branch (e.g. `Owner-Repo-main-ci.json`).
-* Repo and CI data are fetched in the background when the cache is missing or older than their refresh timers. The prompt is never blocked.
-* When **Show CI status** is enabled, the item shows the latest GitHub Actions workflow run for the current branch (✓ pass, ✗ fail, ⋯ pending), using `gh run list`.
+- **Location**: `$XDG_STATE_HOME/tide-report/tide-report.log` (or `~/.local/state/tide-report/tide-report.log`).
+    
+- **When to look**: If a prompt item consistently shows its "unavailable" text (e.g. `…` or `🌊…`), check this file.
+    
 
-### Global Settings
+## ⚙️ Global Settings
 
-These settings apply to all modules in this plugin.
+|   |   |   |
+|---|---|---|
+|**Variable**|**Description**|**Default**|
+|`tide_report_service_timeout_millis`|Timeout for all web requests, in milliseconds.|`6000`|
+|`tide_report_wttr_url`|URL for [wttr.in](https://wttr.in/ "null"), used for weather (wttr) and moon.|`https://wttr.in`|
+|`tide_report_weather_provider`|Weather backend: `wttr` or `openmeteo`.|`openmeteo`|
+|`tide_report_units`|Units for weather and tide: `m` (Metric), `u` (USCS)|`m`|
+|`tide_time_format`|Time format string for Tide Prompt times.|From Tide|
+|`tide_report_log_expected`|Set to `0`, `false`, or `no` to disable diagnostic logging.|`1`|
 
-| Variable                             | Description                                                | Default            |
-| ------------------------------------ | ---------------------------------------------------------- | ------------------ |
-| `tide_report_service_timeout_millis` | Timeout for all web requests, in milliseconds.             | `6000`             |
-| `tide_report_wttr_url`               | URL for [wttr.in][], used for weather (wttr) and moon.     | `https://wttr.in`  |
-| `tide_report_weather_provider`       | Weather backend: `wttr` or `openmeteo`.                    | `openmeteo`        |
-| `tide_report_units`                  | Units for weather and tide: `m` (Metric), `u` (USCS)       | `m`                |
-| `tide_time_format`                   | Time format string for Tide Prompt times (e.g. `"%H:%M"`). | From Tide         |
-| `tide_report_log_expected`          | Set to `0`, `false`, or `no` to disable diagnostic logging.| `1`               |
+## 🤖 GitHub Module (`github`)
 
-### Diagnostic log
+Displays stats for the current repository. **Requires `gh` CLI to be authenticated.**
 
-Expected issues (missing dependency, bad GitHub credentials, service API unavailable, invalid weather location, etc.) are written to a log file so the prompt is never delayed by I/O.
+|   |   |
+|---|---|
+|**Symbol**|**Meaning**|
+|`★` / `⑂` / ``|Stars / Forks / Watchers|
+|`!` / `PR`|Open Issues / Open Pull Requests|
+|`✓` / `✗` / `⋯`|Latest CI run: pass / fail / pending|
+|`!auth`|`gh` CLI is not authenticated|
 
-- **Location**: `$XDG_STATE_HOME/tide-report/tide-report.log` (or `~/.local/state/tide-report/tide-report.log` if `XDG_STATE_HOME` is not set).
-- **When to look**: If a prompt item consistently shows its "unavailable" text (e.g. … or 🌊…), examine this log file for the cause. Log lines are tab-separated: timestamp, TideReport version, category (`dependency`, `github`, `weather`, `tide`, `moon`), and message. Disable logging by setting `tide_report_log_expected` to `0`, `false`, or `no`.
+|   |   |   |
+|---|---|---|
+|**Variable**|**Description**|**Default**|
+|`tide_github_color`|Prompt item text color.|`white`|
+|`tide_github_bg_color`|Prompt item background color.|`(theme default)`|
+|`tide_report_github_icon_*`|Icons for `stars`, `forks`, `watchers`, `issues`, `prs`.|`★`, `⑂`, ``, `!`, `PR`|
+|`tide_report_github_color_*`|Colors for `stars`, `forks`, `watchers`, `issues`, `prs`.|`yellow`|
+|`tide_report_github_show_ci`|Show latest workflow run for the current branch.|`true`|
+|`tide_report_github_icon_ci_*`|Icons for CI states: `pass`, `fail`, `pending`.|`✔`, `✗`, `⋯`|
+|`tide_report_github_color_ci_*`|Colors for CI states: `pass`, `fail`, `pending`.|`green`, `red`, `yellow`|
+|`tide_report_github_refresh_seconds`|Cache lifespan for repository stats.|`30`|
+|`tide_report_github_ci_refresh_seconds`|Cache lifespan for CI workflow status.|`60`|
+|`tide_report_github_unavailable_text`|Text displayed when data is unavailable.|`…`|
+|`tide_report_github_unavailable_color`|Color for unavailable text.|`red`|
 
-### 🤖 GitHub Module (`github`)
+## ☔ Weather Module (`weather`)
 
-**Requires `gh` CLI to be installed and authenticated.**
+|   |   |   |
+|---|---|---|
+|**Variable**|**Description**|**Default**|
+|`tide_weather_color`|Prompt item color.|`(theme default)`|
+|`tide_weather_bg_color`|Prompt item background color.|`(theme default)`|
+|`tide_report_weather_format`|Format string (see table below).|`"%c %t %d%w"`|
+|`tide_report_weather_symbol_color`|Color for symbols in weather output.|`white`|
+|`tide_report_weather_location`|Target location (see Location Rules below).|`""`|
+|`tide_report_weather_refresh_seconds`|How old data can be before background refresh.|`300`|
+|`tide_report_weather_expire_seconds`|How old data can be before it's considered invalid.|`900`|
+|`tide_report_weather_language`|Two-letter language code (e.g., `de`, `fr`, `zh-cn`).|`en`|
+|`tide_report_weather_unavailable_text`|Text displayed when data is unavailable.|`…`|
+|`tide_report_weather_unavailable_color`|Color for unavailable text.|`red`|
 
-The module displays stats for the current repository, with icons you can customize.
+### Formatting Specifiers
 
-| Symbol                                  | Meaning              |
-| --------------------------------------- | -------------------- |
-| `★` (Stars)                             | Total stargazer count|
-| `⑂` (Forks)                             | Total fork count     |
-| `` (Watchers)                          | Total watcher count  |
-| `!` (Issues)                            | Open issue count     |
-| `PR` (Pull Requests)                    | Open PR count        |
-| `✓` / `✗` / `⋯` (CI)                    | Latest workflow run: pass / fail / pending |
-| `!auth` (Error)                         | `gh` CLI is not authenticated |
+Build your own weather string using these specifiers:
 
-| Variable                             | Description                                                     | Default           |
-| ------------------------------------ | --------------------------------------------------------------- | ----------------- |
-| `tide_github_color`                  | Prompt item color                                               | `white`           |
-| `tide_github_bg_color`               | Prompt item background color                                    | `(theme default)` |
-| `tide_report_github_icon_stars`      | Icon for stars.                                                 | `★`               |
-| `tide_report_github_icon_forks`      | Icon for forks.                                                 | `⑂`               |
-| `tide_report_github_icon_watchers`   | Icon for watchers.                                              | ``               |
-| `tide_report_github_icon_issues`     | Icon for open issues.                                           | `!`               |
-| `tide_report_github_icon_prs`        | Icon for open pull requests.                                    | `PR`              |
-| `tide_report_github_color_stars`     | Color for stargazers.                                           | `yellow`          |
-| `tide_report_github_color_forks`     | Color for forks (defaults to `..._color_stars`).                | `yellow`          |
-| `tide_report_github_color_watchers`  | Color for watchers (defaults to `..._color_stars`).             | `yellow`          |
-| `tide_report_github_color_issues`    | Color for issues (defaults to `..._color_stars`).               | `yellow`          |
-| `tide_report_github_color_prs`       | Color for PRs (defaults to `..._color_stars`).                  | `yellow`          |
-| `tide_report_github_refresh_seconds` | GitHub data cache time for a given repository.                  | `30`              |
-| `tide_report_github_show_ci`         | Whether to show CI status (latest workflow run) in the GitHub item. | `true`        |
-| `tide_report_github_icon_ci_pass`    | Icon when the latest workflow run succeeded.                   | `✔`               |
-| `tide_report_github_icon_ci_fail`     | Icon when the latest workflow run failed or was cancelled.     | `✗`               |
-| `tide_report_github_icon_ci_pending`  | Icon when the workflow is queued or in progress.               | `⋯`               |
-| `tide_report_github_color_ci_pass`   | Color for the CI pass icon.                                    | `green`           |
-| `tide_report_github_color_ci_fail`   | Color for the CI fail icon.                                    | `red`             |
-| `tide_report_github_color_ci_pending`| Color for the CI pending icon.                                 | `yellow`          |
-| `tide_report_github_ci_refresh_seconds` | How long to cache CI status before refetching.               | `60`              |
-| `tide_report_github_unavailable_text`  | Text to display when GitHub data is not available.            | `…`              |
-| `tide_report_github_unavailable_color` | Color for the unavailable text.                               | `red`             |
+|   |   |   |
+|---|---|---|
+|**Specifier**|**Description**|**Example**|
+|`%t`|Temperature (`+10°`)|`+10°`|
+|`%f`|'Feels like' temp (`+8°`)|`+8°`|
+|`%C`|Condition text (`Clear`)|`Clear`|
+|`%c`|Condition emoji (`☀️`)|`☀️`|
+|`%w`|Wind speed (`15km/h`)|`15km/h`|
+|`%d`|Wind direction arrow (`⬇`)|`⬇`|
+|`%h`|Humidity (`80%`)|`80%`|
+|`%u`|UV Index (`42`)|`42`|
+|`%S` / `%s`|Sunrise / Sunset time (`06:37`)|`06:37`|
 
-### ☔ Weather Module (`weather`)
+### Location Rules
 
-**This module requires `jq` for parsing JSON.**
+`tide_report_weather_location` accepts different inputs based on your provider.
 
-The weather format is a string with custom specifiers. When you add the weather item in the install wizard, you can choose one of three presets: **concise** (emoji + temp), **medium** (emoji + temp + wind), or **detailed** (thermometer + temp, feels-like in parentheses, humidity + wind).
+**Open-Meteo (Default):**
 
-| Specifier | Description                                   | Example     |
-| :---      | :---                                          | :---        |
-| `%t`      | Temperature (with `+` or `-` sign)            | `+10°`      |
-| `%C`      | Condition text                                | `Clear`     |
-| `%c`      | Condition emoji                               | `☀️`        |
-| `%w`      | Wind speed and unit                           | `15km/h`    |
-| `%d`      | Wind direction arrow (direction wind is blowing *to*; matches wttr.in) | `⬇` etc.   |
-| `%h`      | Humidity                                      | `80%`       |
-| `%f`      | 'Feels like' temperature                      | `+8°`       |
-| `%u`      | UV Index                                      | `42`        |
-| `%S`      | Sunrise time                                  | `06:37`     |
-| `%s`      | Sunset time                                   | `19:46`     |
+- `""` (Empty string): Auto-detects location via IP.
+    
+- `Place name` or `Postal Code`: The value is sent to the Geocoding API (e.g., `Berlin`, `London`, `90210`).
+    
+- `lat,long`: GPS coordinates (e.g., `-78.46,106.79`).
+    
 
-| Variable                                | Description                                                             | Default           |
-| --------------------------------------- | ----------------------------------------------------------------------- | ----------------- |
-| `tide_weather_color`                    | Prompt item color                                                       | `(theme default)` |
-| `tide_weather_bg_color`                 | Prompt item background color                                            | `(theme default)` |
-| `tide_report_weather_format`            | Format string (see table above).                                        | `"%c %t %d%w"`    |
-| `tide_report_weather_symbol_color`      | Color for symbols in weather output.                                    | `white`           |
-| `tide_report_weather_location`          | Location for weather. See [Weather location](#weather-location) below.  | `""`              |
-| `tide_report_weather_refresh_seconds`   | How old data can be before a background refresh is triggered.           | `300`             |
-| `tide_report_weather_expire_seconds`    | How old data can be before it's considered invalid.                     | `900`             |
-| `tide_report_weather_language`          | Two-letter language code (e.g., `de`, `fr`, `zh-cn`).                   | `en`              |
-| `tide_report_weather_unavailable_text`  | Text to display when weather data is not available.                     | `…`              |
-| `tide_report_weather_unavailable_color` | Color for the unavailable text.                                         | `red`             |
+**wttr.in:**
 
-#### Weather location
+- `""` (Empty string): Uses IP address.
+    
+- Accepts single/hyphenated city names (`New-York`), 3-letter airport codes (`lhr`), postal codes, GPS coordinates, or domain names (`@stackoverflow.com`).
+    
 
-`tide_report_weather_location` controls where weather is fetched for. The install wizard can configure it (validated via Open-Meteo). Valid values depend on the weather provider (`tide_report_weather_provider`). **Both providers accept GPS coordinates** as `latitude,longitude` (e.g. `-78.46,106.79`). No spaces.
+## 🌕 Moon Module (`moon`)
 
-**When provider is `openmeteo` (default):**
+Computes moon phase. Defaults to an offline astronomical model.
 
-- **Empty string `""`** (default): Your location is detected from your IP in the background and cached per shell session (file under `~/.cache/tide-report/`). A new terminal in a new place will detect again. No need to set anything for IP-based weather.
-- **Place name or postal code:** The value is sent to the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api). Use a city name, region, or postal code (e.g. `Berlin`, `London`, `90210`). At least three characters are recommended for fuzzy matching.
-- **GPS coordinates:** Use `latitude,longitude` to skip geocoding.
+|   |   |   |
+|---|---|---|
+|**Variable**|**Description**|**Default**|
+|`tide_moon_color`|Prompt item color.|`(theme default)`|
+|`tide_moon_bg_color`|Prompt item background color.|`(theme default)`|
+|`tide_report_moon_provider`|Backend: `local` (offline model) or `wttr`.|`local`|
+|`tide_report_moon_refresh_seconds`|Background refresh trigger threshold.|`14400`|
+|`tide_report_moon_expire_seconds`|How old data can be before it's considered invalid.|`28800`|
+|`tide_report_moon_unavailable_text`|Text displayed when data is unavailable.|`…`|
+|`tide_report_moon_unavailable_color`|Color for unavailable text.|`red`|
 
-**When provider is `wttr`:**
+## 🌊 Tide Module (`tide`)
 
-- **Empty string `""`**: wttr.in uses your IP address to guess your location.
-- **City or place name:** Use a single word or hyphenated name (e.g. `Paris`, `Saint-Petersburg`, `New-York`). Unicode is supported. For spaces use hyphens or `+` (e.g. `Eiffel+tower`).
-- **3-letter airport code:** e.g. `muc`, `lhr`, `jfk`.
-- **Postal or area code:** e.g. `90210`, `94107`.
-- **GPS coordinates:** `latitude,longitude` (e.g. `-78.46,106.79`).
-- **Domain name:** Prefix with `@` (e.g. `@stackoverflow.com`) for location derived from the domain.
+**Requires setting a Station ID.** Find your nearest US station on the [NOAA Tides and Currents Map](https://tidesandcurrents.noaa.gov/map/index.html "null"). Ensure that the station has high and low tide predictions available.
 
-### 🌕 Moon Module (`moon`)
+|   |   |   |
+|---|---|---|
+|**Variable**|**Description**|**Default**|
+|`tide_tide_color`|Prompt item color.|`0087AF`|
+|`tide_tide_bg_color`|Prompt item background color.|`(theme default)`|
+|`tide_report_tide_station_id`|**Required.** The NOAA station ID (e.g., `8443970` for Boston).|`"8443970"`|
+|`tide_report_tide_show_level`|Show the height of the next tide.|`"true"`|
+|`tide_report_tide_symbol_high`|Symbol for upcoming high tide.|`⇞`|
+|`tide_report_tide_symbol_low`|Symbol for upcoming low tide.|`⇟`|
+|`tide_report_tide_symbol_color`|Color for the high/low tide symbol.|`white`|
+|`tide_report_tide_refresh_seconds`|Background refresh trigger threshold.|`14400`|
+|`tide_report_tide_expire_seconds`|How old data can be before it's considered invalid.|`28800`|
+|`tide_report_tide_unavailable_text`|Text displayed when data is unavailable.|`🌊…`|
+|`tide_report_tide_unavailable_color`|Color for unavailable text.|`red`|
 
-**This module requires `jq`.** It uses its own cache file (`~/.cache/tide-report/moon.json`). Moon phase is computed by a **local, offline astronomical model** by default (inspired by the Sun and Moon formulas from [SunCalc](https://github.com/mourner/suncalc)), or fetched from **wttr.in** when `tide_report_moon_provider` is `wttr`. When both moon and weather use wttr, one request fills both caches. It displays the moon phase emoji.
+## 🚑 Troubleshooting
 
-| Variable                              | Description                                                     | Default           |
-| ------------------------------------- | --------------------------------------------------------------- | ----------------- |
-| `tide_moon_color`                     | Prompt item color                                               | `(theme default)` |
-| `tide_moon_bg_color`                  | Prompt item background color                                    | `(theme default)` |
-| `tide_report_moon_provider`          | Moon backend: `local` (offline model) or `wttr`.                | `local`           |
-| `tide_report_moon_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`           |
-| `tide_report_moon_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`           |
-| `tide_report_moon_unavailable_text`  | Text to display when moon data is not available.                | `…`              |
-| `tide_report_moon_unavailable_color`  | Color for the unavailable text.                                 | `red`             |
+- **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set `tide_report_weather_location` explicitly.
+    
+- **Re-configure via Wizard:** If you want to change your units, toggle modules, or update your weather location, you can re-run the setup wizard at any time. Just run `fisher update MrBasa/TideReport@v1` in your terminal.
+    
+- **Persistent Unavailable Symbols (`…`, `🌊…`):** If a module gets stuck showing an unavailable state, check the diagnostic log located at `$XDG_STATE_HOME/tide-report/tide-report.log`. This usually indicates a missing dependency (like `jq` or `gh`), an API timeout, or bad credentials.
+    
+- **Clean Reinstall:** If things get weird and a regular update doesn't fix it, run `fisher remove MrBasa/TideReport`, optionally restart your shell, and run `fisher install MrBasa/TideReport@v1` for a completely fresh start.
+    
 
-### 🌊 Tide Module (`tide`)
+## 🧪 Development & Testing
 
-**This module requires `jq` and you must set a Station ID (default Boston).**
-
-To find your nearest station, use the [**NOAA Tides and Currents Map**](https://tidesandcurrents.noaa.gov/map/index.html). Search for your location (e.g., by city or ZIP code), click on a nearby station icon on the map, and copy the `Station ID` number. Ensure that the station has high and low tide predictions available.
-
-| Variable                             | Description                                                     | Default            |
-| ------------------------------------ | --------------------------------------------------------------- | ------------------ |
-| `tide_tide_color`                    | Prompt item color                                               | `0087AF`           |
-| `tide_tide_bg_color`                 | Prompt item background color                                    | `(theme default)`  |
-| `tide_report_tide_station_id`        | **Required.** The NOAA station ID (e.g., `8443970` for Boston). | `"8443970"`        |
-| `tide_report_tide_refresh_seconds`   | How old data can be before a background refresh is triggered.   | `14400`            |
-| `tide_report_tide_expire_seconds`    | How old data can be before it's considered invalid.             | `28800`            |
-| `tide_report_tide_symbol_high`       | Symbol to show for an upcoming high tide.                       | `⇞`                |
-| `tide_report_tide_symbol_low`        | Symbol to show for an upcoming low tide.                        | `⇟`                |
-| `tide_report_tide_symbol_color`      | Color for the high/low tide symbol.                             | `white`            |
-| `tide_report_tide_unavailable_text`  | Text to display when tide data is not available.                | `🌊…`              |
-| `tide_report_tide_unavailable_color` | Color for the unavailable text.                                 | `red`              |
-| `tide_report_tide_show_level`        | Set to `"true"` to show the height of the next tide.            | `"true"`           |
-
-## Testing
-
-The project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for unit and integration tests. Install it with Fisher:
+This project uses [Fishtape](https://github.com/jorgebucaran/fishtape "null") for testing.
 
 **CI:** GitHub Actions runs the test suite on **Ubuntu** (GNU `date`) and **macOS** (BSD `date`) on every push and PR so that date-formatting and cache logic stay compatible with both.
 
 ```fish
 fisher install jorgebucaran/fishtape
-```
-
-From the repo root, run all tests:
-
-```fish
 fishtape test/unit/*.fish test/integration/*.fish
 ```
 
-Run only unit tests or only integration tests:
+**Pre-push hook (gated check-in):** To run the test suite automatically before pushing to `main` or `master`, install the pre-push hook from the repo root:
 
 ```fish
-fishtape test/unit/*.fish
-fishtape test/integration/*.fish
-```
-
-**Pre-push hook (gated check-in):** To run the test suite automatically before every push to `main` or `master` (and block the push if tests fail), install the pre-push hook from the repo root:
-
-```sh
 cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
 ```
 
-You need Fish and Fishtape available (same as running the tests manually). The hook only runs when the push updates `main` or `master`; pushes to other branches are not gated.
+## 💖 Acknowledgements
 
-Tests use fixture data under `test/fixtures/` and do not require network access or Tide to be installed.
-
-## Troubleshooting
-
-- **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP in the background. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set [weather location](#weather-location) explicitly.
-
-## Acknowledgements
-* [Jorge Bucaran](https://github.com/jorgebucaran) and [Ilan Cosman](https://github.com/IlanCosman) for making [Fisher][] and [Tide][].
-* [Moby Dick](https://www.gutenberg.org/ebooks/2701), the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
-* [NOAA](https://www.noaa.gov) - we'll miss them when they're gone... 🇺🇸😢
-* [Igor Chubin](https://github.com/chubin) and all the contributors/sponsors of [wttr.in][].
-* [Vladimir Agafonkin](https://github.com/mourner) for the [SunCalc](https://github.com/mourner/suncalc) library, whose public moon phase formulas inspired the local lunar model used here.
+- [Jorge Bucaran](https://github.com/jorgebucaran "null") and [Ilan Cosman](https://github.com/IlanCosman "null") for creating [Fisher](https://github.com/jorgebucaran/fisher "null") and [Tide](https://github.com/IlanCosman/tide "null").
+    
+- [Open-Meteo](https://open-meteo.com/ "null") for their fantastic, free, open-source weather API.
+    
+- [wttr.in](https://github.com/chubin/wttr.in "null") by Igor Chubin for the excellent terminal weather service.
+    
+- [SunCalc](https://github.com/mourner/suncalc "null") by Vladimir Agafonkin, whose formulas inspired the local offline lunar model.
+    
+- [NOAA](https://www.noaa.gov/ "null") for keeping maritime data accessible.
+    
+- _Moby Dick_, the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
+    
 
 ### Other Handy Fish Plugins I Use:
-* [jorgebucaran/fisher](https://github.com/jorgebucaran/fisher)
-* [ilancosman/tide](https://github.com/ilancosman/tide)
-* [gazorby/fish-abbreviation-tips](https://github.com/gazorby/fish-abbreviation-tips)
-* [laughedelic/pisces](https://github.com/laughedelic/pisces)
-* [meaningful-ooo/sponge](https://github.com/meaningful-ooo/sponge)
-* [nickeb96/puffer-fish](https://github.com/nickeb96/puffer-fish)
-* [jorgebucaran/spark.fish](https://github.com/jorgebucaran/spark.fish)
-* [jorgebucaran/humantime.fish](https://github.com/jorgebucaran/humantime.fish)
-* [jhillyerd/plugin-git](https://github.com/jhillyerd/plugin-git)
-* [PatrickF1/fzf.fish](https://github.com/PatrickF1/fzf.fish)
 
-
-[fish]: https://fishshell.com/
-[fisher]: https://github.com/jorgebucaran/fisher
-[tide]: https://github.com/IlanCosman/tide
-[wttr.in]: https://github.com/chubin/wttr.in
+- [**Fisher**](https://github.com/jorgebucaran/fisher "null"): The premier, lightweight plugin manager for Fish.
+    
+- [**Tide**](https://github.com/ilancosman/tide "null"): A fast, highly configurable, and modern prompt framework.
+    
+- [**Abbreviation Tips**](https://github.com/gazorby/fish-abbreviation-tips "null"): Helps you learn and remember your abbreviations by displaying a tip when you type the full command.
+    
+- [**Pisces**](https://github.com/laughedelic/pisces "null"): A handy utility to automatically close parentheses, braces, quotes, and other paired characters as you type.
+    
+- [**Sponge**](https://github.com/meaningful-ooo/sponge "null"): Keeps your shell history clean from typos, failed commands, and duplicates.
+    
+- [**Puffer Fish**](https://github.com/nickeb96/puffer-fish "null"): Adds classic text expansions (like `...`, `!!`, and `!$`) to make navigation and command recall faster.
+    
+- [**Spark.fish**](https://github.com/jorgebucaran/spark.fish "null"): Generate simple sparkline graphs directly in your terminal.
+    
+- [**Humantime**](https://github.com/jorgebucaran/humantime.fish "null"): A neat utility that converts milliseconds into human-readable strings.
+    
+- [**Plugin Git**](https://github.com/jhillyerd/plugin-git "null"): An excellent, comprehensive collection of Git aliases and helper functions.
+    
+- [**fzf.fish**](https://github.com/PatrickF1/fzf.fish "null"): Powerful fuzzy-finder integrations for searching history, files, variables, and Git statuses.
