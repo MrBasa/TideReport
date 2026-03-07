@@ -30,6 +30,10 @@ switch $test_name
         if not contains -- github $tide_left_prompt_items; exit 1; end
         if not contains -- weather $tide_right_prompt_items; exit 1; end
         if not contains -- moon $tide_right_prompt_items; exit 1; end
+        # Verify key defaults are initialized
+        if test "$tide_report_weather_provider" != "openmeteo"; exit 1; end
+        if test "$tide_report_moon_provider" != "local"; exit 1; end
+        if test "$tide_report_units" != "m"; exit 1; end
     case "*"
         echo "Unknown test: $test_name" >&2
         exit 2

@@ -1,11 +1,7 @@
-## Unit tests for weather helpers (emoji, wind arrow, date cmd, time format).
-## Source only the weather item so we get __tide_report_get_weather_emoji, etc.
+## Unit tests for weather helpers and parser behavior.
 
-set -l root (dirname (dirname (dirname (status filename))))/functions
-## Stub _tide_print_item so weather tests can load plugin code without Tide.
-function _tide_print_item --description "Stub Tide's _tide_print_item for weather unit tests"
-end
-source "$root/_tide_item_weather.fish"
+source (dirname (dirname (status filename)))/helpers/setup.fish
+source "$REPO_ROOT/functions/_tide_item_weather.fish"
 
 @test "weather code 113 returns sun emoji" (__tide_report_get_weather_emoji 113) = "☀️"
 @test "weather code 119 returns cloud emoji" (__tide_report_get_weather_emoji 119) = "☁️"
@@ -31,3 +27,58 @@ source "$root/_tide_item_weather.fish"
 @test "format_unix_time returns something for valid epoch" -n (__tide_report_format_unix_time "1727692200" "%H:%M")
 @test "format_unix_time returns empty for empty input" -z (__tide_report_format_unix_time "" "%H:%M")
 @test "format_unix_time returns empty for null input" -z (__tide_report_format_unix_time "null" "%H:%M")
+
+@test "time_string_to_unix returns empty for empty input" -z (__tide_report_time_string_to_unix "")
+
+@test "time_string_to_unix returns numeric epoch for valid input" (
+    set -l out (__tide_report_time_string_to_unix "07:30 AM" | string collect)
+    string match -q -r '^[0-9]+$' "$out"
+    echo $status
+) -eq 0
+
+@test "time_string_to_unix returns empty for malformed input" (
+    set -l out (__tide_report_time_string_to_unix "not-a-time" | string collect)
+    test -z "$out"
+    echo $status
+) -eq 0
+
+@test "parse_weather prints parsed weather for metric units" (
+    set -l tmp (mktemp -d)
+    set -l cache "$tmp/weather.json"
+    cp "$REPO_ROOT/test/fixtures/weather/openmeteo.json" "$cache"
+    set -g tide_report_units m
+    set -g tide_report_weather_format "%c %t %w"
+    __tide_report_test_reset_print_capture
+    __tide_report_parse_weather "$cache"
+    set -l payload "$_tide_print_item_last_argv[2]"
+    command rm -rf "$tmp"
+    test -n "$payload"; and string match -q -r '[-+]?[0-9]+°' "$payload"; and string match -q '*km/h*' "$payload"
+    echo $status
+) -eq 0
+
+@test "parse_weather switches wind units for uscs mode" (
+    set -l tmp (mktemp -d)
+    set -l cache "$tmp/weather.json"
+    cp "$REPO_ROOT/test/fixtures/weather/openmeteo.json" "$cache"
+    set -g tide_report_units u
+    set -g tide_report_weather_format "%c %t %w"
+    __tide_report_test_reset_print_capture
+    __tide_report_parse_weather "$cache"
+    set -l payload "$_tide_print_item_last_argv[2]"
+    command rm -rf "$tmp"
+    string match -q '*mph*' "$payload"
+    echo $status
+) -eq 0
+
+@test "parse_weather prints unavailable text when temp is missing" (
+    set -l tmp (mktemp -d)
+    set -l cache "$tmp/weather_bad.json"
+    printf '%s\n' '{"temp_c":null}' > "$cache"
+    set -g tide_report_units m
+    __tide_report_test_reset_print_capture
+    __tide_report_parse_weather "$cache"
+    set -l item_name "$_tide_print_item_last_argv[1]"
+    command rm -rf "$tmp"
+    test "$item_name" = "weather"
+    echo $status
+) -eq 0

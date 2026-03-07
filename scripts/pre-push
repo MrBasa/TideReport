@@ -17,4 +17,4 @@ fi
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
 echo "Pre-push: running tests before push to main/master..." >&2
-exec fish -c "fishtape test/unit/*.fish test/integration/*.fish"
+exec fish -c "fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish; and if set -q RUN_NETWORK_TESTS; fishtape test/network/*.fish; end"

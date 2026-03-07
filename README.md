@@ -202,7 +202,9 @@ This project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for testi
 
 ```fish
 fisher install jorgebucaran/fishtape
-fishtape test/unit/*.fish test/integration/*.fish
+fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish
+# Optional live-network validations (enabled in CI):
+set -x RUN_NETWORK_TESTS 1; and fishtape test/network/*.fish
 ```
 
 **Pre-push hook (gated check-in):** To run the test suite automatically before pushing to `main` or `master`, install the pre-push hook from the repo root:
@@ -216,8 +218,8 @@ cp scripts/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
 - [Open-Meteo](https://open-meteo.com/) for their fantastic, free, open-source weather API.
 - [wttr.in](https://github.com/chubin/wttr.in) by Igor Chubin for the excellent terminal weather service.
 - [SunCalc](https://github.com/mourner/suncalc) by Vladimir Agafonkin, whose formulas inspired the local offline lunar model.
-- [NOAA](https://www.noaa.gov/) for keeping maritime data accessible.
--_Moby Dick_, the sweet air of the ocean breeze, and the gentle lullaby the sea sings before she breaks you on the rocks.
+- [NOAA](https://www.noaa.gov/) for keeping maritime data accessible - we'll miss them when they're gone... 🇺🇸😢
+- _Moby Dick_, and the sweet air of the ocean breeze.
 
 
 ### Other Handy Fish Plugins I Use:

@@ -14,6 +14,8 @@ set -U tide_right_prompt_items "weather moon" time
 set -U tide_report_user_agent test
 set -U tide_weather_color white
 set -U tide_report_weather_format "%c %t"
+set -U tide_report_github_show_ci true
+set -U tide_report_moon_provider wttr
 mkdir -p $HOME/.cache/tide-report
 touch $HOME/.cache/tide-report/foo
 
@@ -36,6 +38,8 @@ switch $test_name
         if set -q tide_report_user_agent; exit 1; end
         if set -q tide_weather_color; exit 1; end
         if set -q tide_report_weather_format; exit 1; end
+        if set -q tide_report_github_show_ci; exit 1; end
+        if set -q tide_report_moon_provider; exit 1; end
     case "cache"
         if test -d $HOME/.cache/tide-report; exit 1; end
     case "functions"

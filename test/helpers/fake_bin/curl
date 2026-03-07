@@ -1,0 +1,12 @@
+#!/usr/bin/env fish
+set -l response "$TIDE_REPORT_TEST_CURL_RESPONSE"
+set -l st 0
+if set -q TIDE_REPORT_TEST_CURL_STATUS
+    set st $TIDE_REPORT_TEST_CURL_STATUS
+end
+if test -n "$response"; and test -f "$response"
+    cat "$response"
+else
+    printf '%s' "$response"
+end
+exit $st

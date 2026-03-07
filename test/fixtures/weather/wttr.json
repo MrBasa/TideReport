@@ -1,0 +1,28 @@
+{
+  "current_condition": [
+    {
+      "temp_C": "12",
+      "temp_F": "54",
+      "FeelsLikeC": "10",
+      "FeelsLikeF": "50",
+      "weatherDesc": [{"value": "Clear"}],
+      "weatherCode": "113",
+      "windspeedKmph": "15",
+      "windspeedMiles": "9",
+      "winddir16Point": "SW",
+      "humidity": "72",
+      "uvIndex": "2"
+    }
+  ],
+  "weather": [
+    {
+      "astronomy": [
+        {
+          "sunrise": "07:30 AM",
+          "sunset": "05:45 PM",
+          "moon_phase": "Full Moon"
+        }
+      ]
+    }
+  ]
+}
