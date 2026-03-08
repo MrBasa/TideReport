@@ -19,12 +19,7 @@
       "label": "Test",
       "type": "shell",
       "command": "fish",
-      "args": ["-c", "fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish; and fishtape test/network/*.fish; set -l code $status; echo \"\"; if test $code -eq 0; echo \"--- Testing completed: all passed ---\"; else; echo \"--- Testing completed: FAILED (exit code $code) ---\"; end; exit $code"],
-      "options": {
-        "env": {
-          "RUN_NETWORK_TESTS": "1"
-        }
-      },
+      "args": ["scripts/run_tests_isolated.fish"],
       "group": "test",
       "presentation": {
         "reveal": "always",

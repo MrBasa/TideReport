@@ -1,5 +1,6 @@
 ## Helper for uninstall tests: run in isolated fish with HOME and XDG_CONFIG_HOME set.
 ## Usage: env HOME=$tmp XDG_CONFIG_HOME=$tmp/.config fish test/support/uninstall_runner.fish $test_name $repo_root
+## The VS Code "Test" task uses scripts/run_tests_isolated.fish so universals are not written to your shell.
 ## Exits 0 if the requested test passes, 1 otherwise.
 
 set -l test_name $argv[1]
