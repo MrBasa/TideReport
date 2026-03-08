@@ -203,8 +203,9 @@ This project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for testi
 ```fish
 fisher install jorgebucaran/fishtape
 fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish
-# Optional live-network validations (enabled in CI):
+# Network tests (fixture-based moon phase + optional live checks when RUN_NETWORK_TESTS=1; CI sets this):
 set -x RUN_NETWORK_TESTS 1; and fishtape test/network/*.fish
+# To refresh the moon phase fixture from ViewBits: fish scripts/fetch_moon_phase_fixture.fish
 ```
 
 **Pre-push hook (gated check-in):** To run the test suite automatically before pushing to `main` or `master`, install the pre-push hook from the repo root:

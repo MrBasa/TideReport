@@ -31,18 +31,32 @@ jobs:
         run: |
           fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fishtape"
 
-      # Step runs all tests; label indicates which date implementation this runner has (for debugging).
+      # Step runs all tests (unit, integration, network); label indicates which date implementation this runner has (for debugging).
       # Fail on any stderr (e.g. math errors) or on test assertion failure (fishtape exit code).
       - name: Run tests (on ${{ matrix.os }}, ${{ matrix.date_variant }} date)
+        env:
+          RUN_NETWORK_TESTS: 1
         run: |
           fish -c '
             set -l stderr_file (command mktemp)
-            fishtape test/unit/*.fish test/integration/*.fish 2> $stderr_file
+            fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish 2> $stderr_file
             set -l fishtape_status $status
             set -l stderr_content (command cat $stderr_file)
             command rm -f $stderr_file
             if test -n "$stderr_content"
               echo "Unexpected stderr (failing the job):"
+              echo "$stderr_content"
+              exit 1
+            end
+            if test $fishtape_status -ne 0
+              exit $fishtape_status
+            end
+            fishtape test/network/*.fish 2> $stderr_file
+            set -l fishtape_status $status
+            set -l stderr_content (command cat $stderr_file)
+            command rm -f $stderr_file
+            if test -n "$stderr_content"
+              echo "Unexpected stderr from network tests (failing the job):"
               echo "$stderr_content"
               exit 1
             end

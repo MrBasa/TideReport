@@ -1,0 +1,252 @@
+[
+  {
+    "unix": 1772582400,
+    "phase": "Full Moon",
+    "illumination": 99.5
+  },
+  {
+    "unix": 1772668800,
+    "phase": "Waning Gibbous",
+    "illumination": 97
+  },
+  {
+    "unix": 1772755200,
+    "phase": "Waning Gibbous",
+    "illumination": 92.3
+  },
+  {
+    "unix": 1772841600,
+    "phase": "Waning Gibbous",
+    "illumination": 85.7
+  },
+  {
+    "unix": 1772928000,
+    "phase": "Waning Gibbous",
+    "illumination": 77.5
+  },
+  {
+    "unix": 1773014400,
+    "phase": "Waning Gibbous",
+    "illumination": 68
+  },
+  {
+    "unix": 1773100800,
+    "phase": "Waning Gibbous",
+    "illumination": 57.8
+  },
+  {
+    "unix": 1773187200,
+    "phase": "Last Quarter",
+    "illumination": 47.2
+  },
+  {
+    "unix": 1773273600,
+    "phase": "Waning Crescent",
+    "illumination": 36.7
+  },
+  {
+    "unix": 1773360000,
+    "phase": "Waning Crescent",
+    "illumination": 26.8
+  },
+  {
+    "unix": 1773446400,
+    "phase": "Waning Crescent",
+    "illumination": 18
+  },
+  {
+    "unix": 1773532800,
+    "phase": "Waning Crescent",
+    "illumination": 10.6
+  },
+  {
+    "unix": 1773619200,
+    "phase": "Waning Crescent",
+    "illumination": 5
+  },
+  {
+    "unix": 1773705600,
+    "phase": "Waning Crescent",
+    "illumination": 1.4
+  },
+  {
+    "unix": 1773792000,
+    "phase": "Waning Crescent",
+    "illumination": 0
+  },
+  {
+    "unix": 1773878400,
+    "phase": "New Moon",
+    "illumination": 0.9
+  },
+  {
+    "unix": 1773964800,
+    "phase": "Waxing Crescent",
+    "illumination": 4
+  },
+  {
+    "unix": 1774051200,
+    "phase": "Waxing Crescent",
+    "illumination": 9.1
+  },
+  {
+    "unix": 1774137600,
+    "phase": "Waxing Crescent",
+    "illumination": 16.1
+  },
+  {
+    "unix": 1774224000,
+    "phase": "Waxing Crescent",
+    "illumination": 24.7
+  },
+  {
+    "unix": 1774310400,
+    "phase": "Waxing Crescent",
+    "illumination": 34.3
+  },
+  {
+    "unix": 1774396800,
+    "phase": "First Quarter",
+    "illumination": 44.7
+  },
+  {
+    "unix": 1774483200,
+    "phase": "Waxing Gibbous",
+    "illumination": 55.3
+  },
+  {
+    "unix": 1774569600,
+    "phase": "Waxing Gibbous",
+    "illumination": 65.7
+  },
+  {
+    "unix": 1774656000,
+    "phase": "Waxing Gibbous",
+    "illumination": 75.4
+  },
+  {
+    "unix": 1774742400,
+    "phase": "Waxing Gibbous",
+    "illumination": 83.9
+  },
+  {
+    "unix": 1774828800,
+    "phase": "Waxing Gibbous",
+    "illumination": 90.9
+  },
+  {
+    "unix": 1774915200,
+    "phase": "Waxing Gibbous",
+    "illumination": 96
+  },
+  {
+    "unix": 1775001600,
+    "phase": "Waxing Gibbous",
+    "illumination": 99.1
+  },
+  {
+    "unix": 1775088000,
+    "phase": "Full Moon",
+    "illumination": 100
+  },
+  {
+    "unix": 1775174400,
+    "phase": "Waning Gibbous",
+    "illumination": 98.6
+  },
+  {
+    "unix": 1775260800,
+    "phase": "Waning Gibbous",
+    "illumination": 95
+  },
+  {
+    "unix": 1775347200,
+    "phase": "Waning Gibbous",
+    "illumination": 89.4
+  },
+  {
+    "unix": 1775433600,
+    "phase": "Waning Gibbous",
+    "illumination": 82
+  },
+  {
+    "unix": 1775520000,
+    "phase": "Waning Gibbous",
+    "illumination": 73.2
+  },
+  {
+    "unix": 1775606400,
+    "phase": "Waning Gibbous",
+    "illumination": 63.3
+  },
+  {
+    "unix": 1775692800,
+    "phase": "Last Quarter",
+    "illumination": 52.8
+  },
+  {
+    "unix": 1775779200,
+    "phase": "Waning Crescent",
+    "illumination": 42.2
+  },
+  {
+    "unix": 1775865600,
+    "phase": "Waning Crescent",
+    "illumination": 31.9
+  },
+  {
+    "unix": 1775952000,
+    "phase": "Waning Crescent",
+    "illumination": 22.5
+  },
+  {
+    "unix": 1776038400,
+    "phase": "Waning Crescent",
+    "illumination": 14.3
+  },
+  {
+    "unix": 1776124800,
+    "phase": "Waning Crescent",
+    "illumination": 7.7
+  },
+  {
+    "unix": 1776211200,
+    "phase": "Waning Crescent",
+    "illumination": 3
+  },
+  {
+    "unix": 1776297600,
+    "phase": "Waning Crescent",
+    "illumination": 0.5
+  },
+  {
+    "unix": 1776384000,
+    "phase": "New Moon",
+    "illumination": 0.1
+  },
+  {
+    "unix": 1776470400,
+    "phase": "Waxing Crescent",
+    "illumination": 2.1
+  },
+  {
+    "unix": 1776556800,
+    "phase": "Waxing Crescent",
+    "illumination": 6.1
+  },
+  {
+    "unix": 1776643200,
+    "phase": "Waxing Crescent",
+    "illumination": 12.2
+  },
+  {
+    "unix": 1776729600,
+    "phase": "Waxing Crescent",
+    "illumination": 20
+  },
+  {
+    "unix": 1776816000,
+    "phase": "Waxing Crescent",
+    "illumination": 29.1
+  }
+]

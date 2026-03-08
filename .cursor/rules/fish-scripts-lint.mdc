@@ -1,0 +1,13 @@
+---
+description: Lint Fish scripts before considering script-related tasks done
+alwaysApply: true
+---
+
+# Fish scripts — lint before done
+
+When creating or editing **Fish script files** (e.g. under `scripts/*.fish` or any `.fish` file that is executed as a script), **verify syntax** before marking the task done:
+
+- Run: `fish -n path/to/script.fish`
+- Fix any reported errors (e.g. "Variables cannot be bracketed" → use `$var` not `${var}` in Fish).
+
+Do not rely only on runtime; `fish -n` catches syntax errors without executing the script.

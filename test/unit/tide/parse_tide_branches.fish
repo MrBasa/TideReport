@@ -22,5 +22,6 @@ set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
 
 @test "render_tide hides level when show_level=false" (
     set -l out (__tide_report_render_tide H "10:00" 3.0 false)
-    string match -q '*m*' "$out"; and echo 1; or echo 0
+    set -l plain (string replace -r '\e\[[0-9;]*m' '' -- "$out")
+    string match -q '*3.0m*' $plain; and echo 1; or echo 0
 ) -eq 0
