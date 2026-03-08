@@ -1,0 +1,3129 @@
+{
+  "source": "SunCalc canonical equations (mourner/suncalc, BSD-2-Clause)",
+  "generated_at_utc": "2026-03-08T21:07:21.678Z",
+  "cadence_hours": 6,
+  "timezone": "UTC",
+  "notes": "All timestamps are absolute Unix seconds in UTC; compare at exact instant, not local day.",
+  "samples": [
+    {
+      "unix": 1735689600,
+      "phase_fraction": 0.035608153252,
+      "illumination": 1.246195827,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735711200,
+      "phase_fraction": 0.043657378745,
+      "illumination": 1.869348,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735732800,
+      "phase_fraction": 0.051939947919,
+      "illumination": 2.639033226,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735754400,
+      "phase_fraction": 0.060384770732,
+      "illumination": 3.555810154,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735776000,
+      "phase_fraction": 0.068953657205,
+      "illumination": 4.619664661,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735797600,
+      "phase_fraction": 0.077624072708,
+      "illumination": 5.829971166,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735819200,
+      "phase_fraction": 0.086381565882,
+      "illumination": 7.185457484,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735840800,
+      "phase_fraction": 0.095216127516,
+      "illumination": 8.684174001,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735862400,
+      "phase_fraction": 0.104120304333,
+      "illumination": 10.323467963,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735884000,
+      "phase_fraction": 0.113088160806,
+      "illumination": 12.099963587,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735905600,
+      "phase_fraction": 0.122114679051,
+      "illumination": 14.009548688,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1735927200,
+      "phase_fraction": 0.131195398127,
+      "illumination": 16.047368384,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1735948800,
+      "phase_fraction": 0.140326190711,
+      "illumination": 18.207826382,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1735970400,
+      "phase_fraction": 0.149503121959,
+      "illumination": 20.4845942,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1735992000,
+      "phase_fraction": 0.158722359394,
+      "illumination": 22.870628579,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736013600,
+      "phase_fraction": 0.167980115514,
+      "illumination": 25.358197168,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736035200,
+      "phase_fraction": 0.177272611998,
+      "illumination": 27.938912439,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736056800,
+      "phase_fraction": 0.186596058504,
+      "illumination": 30.603773624,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736078400,
+      "phase_fraction": 0.195946641551,
+      "illumination": 33.343216311,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736100000,
+      "phase_fraction": 0.205320520457,
+      "illumination": 36.147169186,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736121600,
+      "phase_fraction": 0.214713828263,
+      "illumination": 39.005117274,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736143200,
+      "phase_fraction": 0.224122676186,
+      "illumination": 41.906170891,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736164800,
+      "phase_fraction": 0.233543160519,
+      "illumination": 44.839139402,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736186400,
+      "phase_fraction": 0.242971371164,
+      "illumination": 47.792608803,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1736208000,
+      "phase_fraction": 0.252403401154,
+      "illumination": 50.755022044,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736229600,
+      "phase_fraction": 0.261835356626,
+      "illumination": 53.714760983,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736251200,
+      "phase_fraction": 0.271263366758,
+      "illumination": 56.660228819,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736272800,
+      "phase_fraction": 0.280683593241,
+      "illumination": 59.57993187,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736294400,
+      "phase_fraction": 0.290092238821,
+      "illumination": 62.462559561,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736316000,
+      "phase_fraction": 0.299485554425,
+      "illumination": 65.297061567,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736337600,
+      "phase_fraction": 0.308859844319,
+      "illumination": 68.072721102,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736359200,
+      "phase_fraction": 0.318211468584,
+      "illumination": 70.779223465,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736380800,
+      "phase_fraction": 0.327536842041,
+      "illumination": 73.406719027,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736402400,
+      "phase_fraction": 0.336832428389,
+      "illumination": 75.945880003,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736424000,
+      "phase_fraction": 0.346094727858,
+      "illumination": 78.38795046,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736445600,
+      "phase_fraction": 0.35532025592,
+      "illumination": 80.724789161,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736467200,
+      "phase_fraction": 0.364505509337,
+      "illumination": 82.948904986,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736488800,
+      "phase_fraction": 0.373646913878,
+      "illumination": 85.053484806,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1736510400,
+      "phase_fraction": 0.382740744695,
+      "illumination": 87.032413822,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736532000,
+      "phase_fraction": 0.39178300467,
+      "illumination": 88.880288508,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736553600,
+      "phase_fraction": 0.400769235941,
+      "illumination": 90.592422405,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736575200,
+      "phase_fraction": 0.409694221223,
+      "illumination": 92.164845135,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736596800,
+      "phase_fraction": 0.41855149573,
+      "illumination": 93.594295054,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736618400,
+      "phase_fraction": 0.427332517972,
+      "illumination": 94.878206078,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736640000,
+      "phase_fraction": 0.436025191995,
+      "illumination": 96.01468924,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736661600,
+      "phase_fraction": 0.444611075459,
+      "illumination": 97.002509587,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736683200,
+      "phase_fraction": 0.453059714936,
+      "illumination": 97.841059049,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736704800,
+      "phase_fraction": 0.461316103841,
+      "illumination": 98.530325926,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736726400,
+      "phase_fraction": 0.469269815771,
+      "illumination": 99.070861616,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736748000,
+      "phase_fraction": 0.476669468513,
+      "illumination": 99.463745227,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736769600,
+      "phase_fraction": 0.482866378661,
+      "illumination": 99.710546635,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1736791200,
+      "phase_fraction": 0.513758490846,
+      "illumination": 99.813288587,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736812800,
+      "phase_fraction": 0.515124293175,
+      "illumination": 99.774408323,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736834400,
+      "phase_fraction": 0.520227686816,
+      "illumination": 99.59671923,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736856000,
+      "phase_fraction": 0.526978438911,
+      "illumination": 99.283372918,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736877600,
+      "phase_fraction": 0.534382009191,
+      "illumination": 98.837822109,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736899200,
+      "phase_fraction": 0.542064595257,
+      "illumination": 98.263784658,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736920800,
+      "phase_fraction": 0.549872286866,
+      "illumination": 97.565208965,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736942400,
+      "phase_fraction": 0.557733326172,
+      "illumination": 96.746241024,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736964000,
+      "phase_fraction": 0.565610737788,
+      "illumination": 95.81119327,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1736985600,
+      "phase_fraction": 0.573484046545,
+      "illumination": 94.76451537,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737007200,
+      "phase_fraction": 0.581341372306,
+      "illumination": 93.610767069,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737028800,
+      "phase_fraction": 0.58917566882,
+      "illumination": 92.354593148,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737050400,
+      "phase_fraction": 0.596982788029,
+      "illumination": 91.000700539,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737072000,
+      "phase_fraction": 0.604760417121,
+      "illumination": 89.553837624,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737093600,
+      "phase_fraction": 0.612507462307,
+      "illumination": 88.018775703,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737115200,
+      "phase_fraction": 0.620223674752,
+      "illumination": 86.400292612,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1737136800,
+      "phase_fraction": 0.627909414297,
+      "illumination": 84.703158469,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737158400,
+      "phase_fraction": 0.635565494929,
+      "illumination": 82.932123491,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737180000,
+      "phase_fraction": 0.643193080513,
+      "illumination": 81.091907834,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737201600,
+      "phase_fraction": 0.650793612411,
+      "illumination": 79.187193402,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737223200,
+      "phase_fraction": 0.658368757866,
+      "illumination": 77.222617558,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737244800,
+      "phase_fraction": 0.665920372241,
+      "illumination": 75.202768663,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737266400,
+      "phase_fraction": 0.673450470647,
+      "illumination": 73.132183395,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737288000,
+      "phase_fraction": 0.680961206055,
+      "illumination": 71.015345742,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737309600,
+      "phase_fraction": 0.688454851911,
+      "illumination": 68.856687629,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737331200,
+      "phase_fraction": 0.695933787901,
+      "illumination": 66.660591068,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737352800,
+      "phase_fraction": 0.703400487898,
+      "illumination": 64.431391773,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737374400,
+      "phase_fraction": 0.710857509411,
+      "illumination": 62.173384136,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737396000,
+      "phase_fraction": 0.718307484012,
+      "illumination": 59.890827479,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737417600,
+      "phase_fraction": 0.725753108375,
+      "illumination": 57.587953471,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737439200,
+      "phase_fraction": 0.733197135636,
+      "illumination": 55.268974617,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737460800,
+      "phase_fraction": 0.740642366831,
+      "illumination": 52.938093677,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737482400,
+      "phase_fraction": 0.748091642255,
+      "illumination": 50.599513901,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1737504000,
+      "phase_fraction": 0.755547832579,
+      "illumination": 48.257449933,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737525600,
+      "phase_fraction": 0.763013829634,
+      "illumination": 45.916139215,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737547200,
+      "phase_fraction": 0.770492536726,
+      "illumination": 43.579853731,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737568800,
+      "phase_fraction": 0.777986858441,
+      "illumination": 41.252911897,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737590400,
+      "phase_fraction": 0.785499689828,
+      "illumination": 38.93969039,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737612000,
+      "phase_fraction": 0.793033904907,
+      "illumination": 36.644635695,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737633600,
+      "phase_fraction": 0.800592344418,
+      "illumination": 34.372275131,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737655200,
+      "phase_fraction": 0.808177802718,
+      "illumination": 32.127227103,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737676800,
+      "phase_fraction": 0.815793013713,
+      "illumination": 29.914210311,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737698400,
+      "phase_fraction": 0.823440635678,
+      "illumination": 27.738051629,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737720000,
+      "phase_fraction": 0.831123234728,
+      "illumination": 25.603692375,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737741600,
+      "phase_fraction": 0.838843266647,
+      "illumination": 23.516192653,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737763200,
+      "phase_fraction": 0.846603056583,
+      "illumination": 21.480733492,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737784800,
+      "phase_fraction": 0.854404775913,
+      "illumination": 19.502616454,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737806400,
+      "phase_fraction": 0.8622504152,
+      "illumination": 17.587260446,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737828000,
+      "phase_fraction": 0.870141751576,
+      "illumination": 15.740195436,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1737849600,
+      "phase_fraction": 0.878080307921,
+      "illumination": 13.967052831,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737871200,
+      "phase_fraction": 0.886067299633,
+      "illumination": 12.273552272,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737892800,
+      "phase_fraction": 0.894103562039,
+      "illumination": 10.665484671,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737914400,
+      "phase_fraction": 0.902189446666,
+      "illumination": 9.148691326,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737936000,
+      "phase_fraction": 0.910324665685,
+      "illumination": 7.729039018,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737957600,
+      "phase_fraction": 0.91850804665,
+      "illumination": 6.412391066,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1737979200,
+      "phase_fraction": 0.926737124762,
+      "illumination": 5.204574349,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738000800,
+      "phase_fraction": 0.935007424487,
+      "illumination": 4.11134243,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738022400,
+      "phase_fraction": 0.943311106877,
+      "illumination": 3.138334938,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738044000,
+      "phase_fraction": 0.951634212619,
+      "illumination": 2.291033508,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738065600,
+      "phase_fraction": 0.959950461827,
+      "illumination": 1.574714619,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738087200,
+      "phase_fraction": 0.968205423175,
+      "illumination": 0.994399792,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738108800,
+      "phase_fraction": 0.976268663777,
+      "illumination": 0.554803677,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738130400,
+      "phase_fraction": 0.983753505902,
+      "illumination": 0.260280663,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738152000,
+      "phase_fraction": 0.989214290038,
+      "illumination": 0.114770693,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1738173600,
+      "phase_fraction": 0.011108718731,
+      "illumination": 0.121745064,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738195200,
+      "phase_fraction": 0.016975875285,
+      "illumination": 0.284153045,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738216800,
+      "phase_fraction": 0.024770801774,
+      "illumination": 0.604370159,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738238400,
+      "phase_fraction": 0.033203395349,
+      "illumination": 1.084149055,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738260000,
+      "phase_fraction": 0.041922510699,
+      "illumination": 1.724573859,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738281600,
+      "phase_fraction": 0.050805881815,
+      "illumination": 2.526018906,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738303200,
+      "phase_fraction": 0.059800262408,
+      "illumination": 3.488112721,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738324800,
+      "phase_fraction": 0.068878127188,
+      "illumination": 4.609708057,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738346400,
+      "phase_fraction": 0.07802312474,
+      "illumination": 5.888858738,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738368000,
+      "phase_fraction": 0.087224322751,
+      "illumination": 7.322803954,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738389600,
+      "phase_fraction": 0.096473637177,
+      "illumination": 8.907960535,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738411200,
+      "phase_fraction": 0.105764573347,
+      "illumination": 10.63992362,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738432800,
+      "phase_fraction": 0.115091564855,
+      "illumination": 12.513475987,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738454400,
+      "phase_fraction": 0.124449607622,
+      "illumination": 14.522606151,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1738476000,
+      "phase_fraction": 0.133834049562,
+      "illumination": 16.660535195,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738497600,
+      "phase_fraction": 0.143240466833,
+      "illumination": 18.919752119,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738519200,
+      "phase_fraction": 0.152664590502,
+      "illumination": 21.292057348,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738540800,
+      "phase_fraction": 0.162102263664,
+      "illumination": 23.768613886,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738562400,
+      "phase_fraction": 0.171549417546,
+      "illumination": 26.340005449,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738584000,
+      "phase_fraction": 0.1810020597,
+      "illumination": 28.996300791,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738605600,
+      "phase_fraction": 0.19045627004,
+      "illumination": 31.72712334,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738627200,
+      "phase_fraction": 0.199908201963,
+      "illumination": 34.52172514,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738648800,
+      "phase_fraction": 0.209354086764,
+      "illumination": 37.369064048,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738670400,
+      "phase_fraction": 0.2187902401,
+      "illumination": 40.257883102,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738692000,
+      "phase_fraction": 0.228213069653,
+      "illumination": 43.176790934,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738713600,
+      "phase_fraction": 0.237619083352,
+      "illumination": 46.114342121,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738735200,
+      "phase_fraction": 0.247004897704,
+      "illumination": 49.0591164,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1738756800,
+      "phase_fraction": 0.256367245868,
+      "illumination": 51.99979573,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738778400,
+      "phase_fraction": 0.265702985209,
+      "illumination": 54.92523823,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738800000,
+      "phase_fraction": 0.275009104077,
+      "illumination": 57.824548156,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738821600,
+      "phase_fraction": 0.284282727625,
+      "illumination": 60.687141148,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738843200,
+      "phase_fraction": 0.293521122476,
+      "illumination": 63.502804107,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738864800,
+      "phase_fraction": 0.30272170004,
+      "illumination": 66.26174919,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738886400,
+      "phase_fraction": 0.311882018288,
+      "illumination": 68.954661531,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738908000,
+      "phase_fraction": 0.320999781708,
+      "illumination": 71.572740417,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738929600,
+      "phase_fraction": 0.330072839151,
+      "illumination": 74.10773379,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738951200,
+      "phase_fraction": 0.339099179078,
+      "illumination": 76.551966035,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738972800,
+      "phase_fraction": 0.348076921624,
+      "illumination": 78.898359159,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1738994400,
+      "phase_fraction": 0.357004306497,
+      "illumination": 81.14044753,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1739016000,
+      "phase_fraction": 0.365879675348,
+      "illumination": 83.272386459,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1739037600,
+      "phase_fraction": 0.37470144641,
+      "illumination": 85.28895496,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1739059200,
+      "phase_fraction": 0.383468077973,
+      "illumination": 87.185553107,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739080800,
+      "phase_fraction": 0.392178015116,
+      "illumination": 88.958194425,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739102400,
+      "phase_fraction": 0.400829610345,
+      "illumination": 90.603493817,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739124000,
+      "phase_fraction": 0.409421001978,
+      "illumination": 92.118651525,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739145600,
+      "phase_fraction": 0.417949921208,
+      "illumination": 93.50143364,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739167200,
+      "phase_fraction": 0.4264133731,
+      "illumination": 94.750149678,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739188800,
+      "phase_fraction": 0.434807082679,
+      "illumination": 95.863627731,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739210400,
+      "phase_fraction": 0.44312447515,
+      "illumination": 96.841187666,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739232000,
+      "phase_fraction": 0.451354660005,
+      "illumination": 97.682612849,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739253600,
+      "phase_fraction": 0.459478077012,
+      "illumination": 98.388120804,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739275200,
+      "phase_fraction": 0.467455964037,
+      "illumination": 98.958333236,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739296800,
+      "phase_fraction": 0.475200792593,
+      "illumination": 99.394245745,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739318400,
+      "phase_fraction": 0.48247535592,
+      "illumination": 99.697197596,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739340000,
+      "phase_fraction": 0.488469641294,
+      "illumination": 99.868841809,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1739361600,
+      "phase_fraction": 0.50949132112,
+      "illumination": 99.911115842,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739383200,
+      "phase_fraction": 0.513273471811,
+      "illumination": 99.826213088,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739404800,
+      "phase_fraction": 0.51972329133,
+      "illumination": 99.616555379,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739426400,
+      "phase_fraction": 0.526952128523,
+      "illumination": 99.28476666,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739448000,
+      "phase_fraction": 0.534443939601,
+      "illumination": 98.833647974,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739469600,
+      "phase_fraction": 0.542035716871,
+      "illumination": 98.26615388,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739491200,
+      "phase_fraction": 0.54966367342,
+      "illumination": 97.585370384,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739512800,
+      "phase_fraction": 0.557298912194,
+      "illumination": 96.79449448,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739534400,
+      "phase_fraction": 0.564927153655,
+      "illumination": 95.896815347,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739556000,
+      "phase_fraction": 0.5725410968,
+      "illumination": 94.895697263,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739577600,
+      "phase_fraction": 0.580137124776,
+      "illumination": 93.794564267,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739599200,
+      "phase_fraction": 0.587713729256,
+      "illumination": 92.596886608,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739620800,
+      "phase_fraction": 0.595270692784,
+      "illumination": 91.306168989,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739642400,
+      "phase_fraction": 0.602808635395,
+      "illumination": 89.925940633,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739664000,
+      "phase_fraction": 0.610328748887,
+      "illumination": 88.459747161,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739685600,
+      "phase_fraction": 0.617832633427,
+      "illumination": 86.911144308,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1739707200,
+      "phase_fraction": 0.625322192667,
+      "illumination": 85.283693447,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739728800,
+      "phase_fraction": 0.632799563627,
+      "illumination": 83.580958917,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739750400,
+      "phase_fraction": 0.640267067929,
+      "illumination": 81.806507149,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739772000,
+      "phase_fraction": 0.647727176473,
+      "illumination": 79.963907533,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739793600,
+      "phase_fraction": 0.655182482732,
+      "illumination": 78.056735024,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739815200,
+      "phase_fraction": 0.662635681655,
+      "illumination": 76.088574406,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739836800,
+      "phase_fraction": 0.670089552224,
+      "illumination": 74.063026178,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739858400,
+      "phase_fraction": 0.677546942375,
+      "illumination": 71.98371398,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739880000,
+      "phase_fraction": 0.685010755431,
+      "illumination": 69.854293469,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739901600,
+      "phase_fraction": 0.692483937434,
+      "illumination": 67.67846254,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739923200,
+      "phase_fraction": 0.699969464999,
+      "illumination": 65.45997278,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739944800,
+      "phase_fraction": 0.707470333378,
+      "illumination": 63.202641987,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739966400,
+      "phase_fraction": 0.714989544562,
+      "illumination": 60.910367613,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1739988000,
+      "phase_fraction": 0.722530095291,
+      "illumination": 58.587140933,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1740009600,
+      "phase_fraction": 0.730094964883,
+      "illumination": 56.237061717,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1740031200,
+      "phase_fraction": 0.737687102848,
+      "illumination": 53.864353195,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1740052800,
+      "phase_fraction": 0.74530941628,
+      "illumination": 51.473377021,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1740074400,
+      "phase_fraction": 0.752964757014,
+      "illumination": 49.068647981,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740096000,
+      "phase_fraction": 0.760655908609,
+      "illumination": 46.654848112,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740117600,
+      "phase_fraction": 0.768385573172,
+      "illumination": 44.23683992,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740139200,
+      "phase_fraction": 0.776156358094,
+      "illumination": 41.819678333,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740160800,
+      "phase_fraction": 0.783970762769,
+      "illumination": 39.408621034,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740182400,
+      "phase_fraction": 0.79183116535,
+      "illumination": 37.009136792,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740204000,
+      "phase_fraction": 0.799739809641,
+      "illumination": 34.626911406,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740225600,
+      "phase_fraction": 0.807698792183,
+      "illumination": 32.267850882,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740247200,
+      "phase_fraction": 0.815710049624,
+      "illumination": 29.938081464,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740268800,
+      "phase_fraction": 0.823775346426,
+      "illumination": 27.643946157,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740290400,
+      "phase_fraction": 0.831896262973,
+      "illumination": 25.391997397,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740312000,
+      "phase_fraction": 0.840074184096,
+      "illumination": 23.188985575,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740333600,
+      "phase_fraction": 0.848310288017,
+      "illumination": 21.04184313,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740355200,
+      "phase_fraction": 0.856605535636,
+      "illumination": 18.957664015,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740376800,
+      "phase_fraction": 0.864960660012,
+      "illumination": 16.943678383,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740398400,
+      "phase_fraction": 0.873376155729,
+      "illumination": 15.007222402,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1740420000,
+      "phase_fraction": 0.881852267613,
+      "illumination": 13.155703221,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740441600,
+      "phase_fraction": 0.890388977838,
+      "illumination": 11.396559156,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740463200,
+      "phase_fraction": 0.89898598975,
+      "illumination": 9.7372153,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740484800,
+      "phase_fraction": 0.907642705354,
+      "illumination": 8.185034828,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740506400,
+      "phase_fraction": 0.916358190759,
+      "illumination": 6.747266397,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740528000,
+      "phase_fraction": 0.925131118336,
+      "illumination": 5.430988116,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740549600,
+      "phase_fraction": 0.933959661978,
+      "illumination": 4.243048696,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740571200,
+      "phase_fraction": 0.942841291958,
+      "illumination": 3.190006444,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740592800,
+      "phase_fraction": 0.95177233538,
+      "illumination": 2.278066892,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740614400,
+      "phase_fraction": 0.960746920433,
+      "illumination": 1.513019901,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740636000,
+      "phase_fraction": 0.96975400678,
+      "illumination": 0.900177148,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740657600,
+      "phase_fraction": 0.978766784333,
+      "illumination": 0.444310965,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740679200,
+      "phase_fraction": 0.987685473349,
+      "illumination": 0.149595493,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740700800,
+      "phase_fraction": 0.995549071036,
+      "illumination": 0.019551171,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1740722400,
+      "phase_fraction": 0.007599832822,
+      "illumination": 0.056993496,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740744000,
+      "phase_fraction": 0.016361860779,
+      "illumination": 0.263987036,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740765600,
+      "phase_fraction": 0.025528042053,
+      "illumination": 0.641805531,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740787200,
+      "phase_fraction": 0.034805939868,
+      "illumination": 1.190898905,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740808800,
+      "phase_fraction": 0.044142648076,
+      "illumination": 1.910867866,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740830400,
+      "phase_fraction": 0.053519488436,
+      "illumination": 2.800446678,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740852000,
+      "phase_fraction": 0.062926747915,
+      "illumination": 3.857494518,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740873600,
+      "phase_fraction": 0.072357873891,
+      "illumination": 5.078995731,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740895200,
+      "phase_fraction": 0.081807648907,
+      "illumination": 6.461069089,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740916800,
+      "phase_fraction": 0.091271496843,
+      "illumination": 7.99898603,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740938400,
+      "phase_fraction": 0.100745185037,
+      "illumination": 9.687197682,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740960000,
+      "phase_fraction": 0.11022468656,
+      "illumination": 11.519370317,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1740981600,
+      "phase_fraction": 0.119706114547,
+      "illumination": 13.488428734,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1741003200,
+      "phase_fraction": 0.129185691645,
+      "illumination": 15.586606932,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741024800,
+      "phase_fraction": 0.138659737613,
+      "illumination": 17.805505311,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741046400,
+      "phase_fraction": 0.148124666684,
+      "illumination": 20.136153542,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741068000,
+      "phase_fraction": 0.157576990277,
+      "illumination": 22.569078158,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741089600,
+      "phase_fraction": 0.167013322583,
+      "illumination": 25.094373869,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741111200,
+      "phase_fraction": 0.176430387617,
+      "illumination": 27.70177755,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741132800,
+      "phase_fraction": 0.185825026851,
+      "illumination": 30.380743869,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741154400,
+      "phase_fraction": 0.195194206893,
+      "illumination": 33.120521501,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741176000,
+      "phase_fraction": 0.204535026858,
+      "illumination": 35.910228933,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741197600,
+      "phase_fraction": 0.213844725208,
+      "illumination": 38.738928887,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741219200,
+      "phase_fraction": 0.223120685902,
+      "illumination": 41.595700503,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741240800,
+      "phase_fraction": 0.23236044378,
+      "illumination": 44.46970845,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741262400,
+      "phase_fraction": 0.241561689108,
+      "illumination": 47.350268284,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1741284000,
+      "phase_fraction": 0.250722271276,
+      "illumination": 50.226907435,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741305600,
+      "phase_fraction": 0.259840201635,
+      "illumination": 53.089421328,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741327200,
+      "phase_fraction": 0.268913655493,
+      "illumination": 55.927924269,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741348800,
+      "phase_fraction": 0.277940973302,
+      "illumination": 58.732894799,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741370400,
+      "phase_fraction": 0.286920661074,
+      "illumination": 61.495215366,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741392000,
+      "phase_fraction": 0.295851390069,
+      "illumination": 64.206206232,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741413600,
+      "phase_fraction": 0.30473199583,
+      "illumination": 66.857653646,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741435200,
+      "phase_fraction": 0.313561476597,
+      "illumination": 69.441832386,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741456800,
+      "phase_fraction": 0.322338991195,
+      "illumination": 71.951522847,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741478400,
+      "phase_fraction": 0.331063856423,
+      "illumination": 74.380022919,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741500000,
+      "phase_fraction": 0.339735544025,
+      "illumination": 76.721154938,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741521600,
+      "phase_fraction": 0.348353677283,
+      "illumination": 78.969268058,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741543200,
+      "phase_fraction": 0.356918027268,
+      "illumination": 81.119236381,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741564800,
+      "phase_fraction": 0.365428508769,
+      "illumination": 83.16645325,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741586400,
+      "phase_fraction": 0.373885175879,
+      "illumination": 85.106822079,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1741608000,
+      "phase_fraction": 0.382288217185,
+      "illumination": 86.93674412,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741629600,
+      "phase_fraction": 0.390637950421,
+      "illumination": 88.653103566,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741651200,
+      "phase_fraction": 0.398934816316,
+      "illumination": 90.253250352,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741672800,
+      "phase_fraction": 0.407179371156,
+      "illumination": 91.734981046,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741694400,
+      "phase_fraction": 0.415372277175,
+      "illumination": 93.096518156,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741716000,
+      "phase_fraction": 0.423514289124,
+      "illumination": 94.336488203,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741737600,
+      "phase_fraction": 0.431606233835,
+      "illumination": 95.453898862,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741759200,
+      "phase_fraction": 0.439648976226,
+      "illumination": 96.448115449,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741780800,
+      "phase_fraction": 0.447643357398,
+      "illumination": 97.318837036,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741802400,
+      "phase_fraction": 0.455590070247,
+      "illumination": 98.066072433,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741824000,
+      "phase_fraction": 0.463489379197,
+      "illumination": 98.690116247,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741845600,
+      "phase_fraction": 0.471340388733,
+      "illumination": 99.191525244,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741867200,
+      "phase_fraction": 0.479138692293,
+      "illumination": 99.571095185,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741888800,
+      "phase_fraction": 0.486865780848,
+      "illumination": 99.829838316,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741910400,
+      "phase_fraction": 0.494391820999,
+      "illumination": 99.968961656,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1741932000,
+      "phase_fraction": 0.503207531198,
+      "illumination": 99.989846242,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1741953600,
+      "phase_fraction": 0.51036390823,
+      "illumination": 99.894027448,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1741975200,
+      "phase_fraction": 0.517926206903,
+      "illumination": 99.683176511,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1741996800,
+      "phase_fraction": 0.525510319956,
+      "illumination": 99.359083361,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742018400,
+      "phase_fraction": 0.533083459299,
+      "illumination": 98.923640872,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742040000,
+      "phase_fraction": 0.540639167487,
+      "illumination": 98.378830625,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742061600,
+      "phase_fraction": 0.54817668074,
+      "illumination": 97.726710264,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742083200,
+      "phase_fraction": 0.555697110591,
+      "illumination": 96.969402539,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742104800,
+      "phase_fraction": 0.563202366446,
+      "illumination": 96.109086092,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742126400,
+      "phase_fraction": 0.570694767065,
+      "illumination": 95.147988067,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742148000,
+      "phase_fraction": 0.578176874479,
+      "illumination": 94.088378594,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742169600,
+      "phase_fraction": 0.585651412701,
+      "illumination": 92.932567189,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742191200,
+      "phase_fraction": 0.593121222789,
+      "illumination": 91.682901111,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742212800,
+      "phase_fraction": 0.600589234831,
+      "illumination": 90.341765708,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742234400,
+      "phase_fraction": 0.60805844828,
+      "illumination": 88.911586742,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742256000,
+      "phase_fraction": 0.615531916512,
+      "illumination": 87.39483471,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742277600,
+      "phase_fraction": 0.623012733523,
+      "illumination": 85.794031127,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1742299200,
+      "phase_fraction": 0.630504021633,
+      "illumination": 84.111756729,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742320800,
+      "phase_fraction": 0.63800891958,
+      "illumination": 82.350661535,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742342400,
+      "phase_fraction": 0.645530570652,
+      "illumination": 80.51347669,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742364000,
+      "phase_fraction": 0.653072110666,
+      "illumination": 78.603027956,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742385600,
+      "phase_fraction": 0.660636655697,
+      "illumination": 76.62225073,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742407200,
+      "phase_fraction": 0.668227289504,
+      "illumination": 74.574206415,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742428800,
+      "phase_fraction": 0.675847050675,
+      "illumination": 72.462099926,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742450400,
+      "phase_fraction": 0.683498919502,
+      "illumination": 70.289298129,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742472000,
+      "phase_fraction": 0.691185804654,
+      "illumination": 68.059348912,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742493600,
+      "phase_fraction": 0.698910529695,
+      "illumination": 65.776000616,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742515200,
+      "phase_fraction": 0.706675819543,
+      "illumination": 63.443221472,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742536800,
+      "phase_fraction": 0.714484286953,
+      "illumination": 61.065218694,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742558400,
+      "phase_fraction": 0.72233841912,
+      "illumination": 58.646456823,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742580000,
+      "phase_fraction": 0.730240564496,
+      "illumination": 56.191674919,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742601600,
+      "phase_fraction": 0.738192919941,
+      "illumination": 53.70590213,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742623200,
+      "phase_fraction": 0.746197518301,
+      "illumination": 51.194471213,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1742644800,
+      "phase_fraction": 0.754256216528,
+      "illumination": 48.663029515,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742666400,
+      "phase_fraction": 0.762370684427,
+      "illumination": 46.117546954,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742688000,
+      "phase_fraction": 0.770542394156,
+      "illumination": 43.564320531,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742709600,
+      "phase_fraction": 0.778772610551,
+      "illumination": 41.009974928,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742731200,
+      "phase_fraction": 0.787062382358,
+      "illumination": 38.461458771,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742752800,
+      "phase_fraction": 0.795412534465,
+      "illumination": 35.926036173,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742774400,
+      "phase_fraction": 0.803823661168,
+      "illumination": 33.411273218,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742796000,
+      "phase_fraction": 0.812296120535,
+      "illumination": 30.925019125,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742817600,
+      "phase_fraction": 0.820830029871,
+      "illumination": 28.475381879,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742839200,
+      "phase_fraction": 0.829425262294,
+      "illumination": 26.070698222,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742860800,
+      "phase_fraction": 0.838081444367,
+      "illumination": 23.719497969,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742882400,
+      "phase_fraction": 0.846797954695,
+      "illumination": 21.430462742,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742904000,
+      "phase_fraction": 0.855573923338,
+      "illumination": 19.212379294,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742925600,
+      "phase_fraction": 0.864408231752,
+      "illumination": 17.074087735,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742947200,
+      "phase_fraction": 0.873299512821,
+      "illumination": 15.024425056,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1742968800,
+      "phase_fraction": 0.882246150276,
+      "illumination": 13.072164507,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1742990400,
+      "phase_fraction": 0.891246276268,
+      "illumination": 11.225951437,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743012000,
+      "phase_fraction": 0.90029776504,
+      "illumination": 9.494236357,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743033600,
+      "phase_fraction": 0.909398218899,
+      "illumination": 7.885206054,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743055200,
+      "phase_fraction": 0.918544939329,
+      "illumination": 6.406713663,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743076800,
+      "phase_fraction": 0.927734868704,
+      "illumination": 5.066208685,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743098400,
+      "phase_fraction": 0.936964470936,
+      "illumination": 3.870667961,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743120000,
+      "phase_fraction": 0.946229475414,
+      "illumination": 2.826528654,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743141600,
+      "phase_fraction": 0.9555242815,
+      "illumination": 1.939624277,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743163200,
+      "phase_fraction": 0.964840389697,
+      "illumination": 1.215124808,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743184800,
+      "phase_fraction": 0.974161395046,
+      "illumination": 0.657481843,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743206400,
+      "phase_fraction": 0.983441038373,
+      "illumination": 0.270379737,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743228000,
+      "phase_fraction": 0.99242019804,
+      "illumination": 0.056693514,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1743249600,
+      "phase_fraction": 0.004324263667,
+      "illumination": 0.018454291,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743271200,
+      "phase_fraction": 0.012608641338,
+      "illumination": 0.156822789,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743292800,
+      "phase_fraction": 0.021887504553,
+      "illumination": 0.472071373,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743314400,
+      "phase_fraction": 0.031296286524,
+      "illumination": 0.963574928,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743336000,
+      "phase_fraction": 0.040747927089,
+      "illumination": 1.629810704,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743357600,
+      "phase_fraction": 0.050217843666,
+      "illumination": 2.468367107,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743379200,
+      "phase_fraction": 0.05969476841,
+      "illumination": 3.475961268,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743400800,
+      "phase_fraction": 0.069171699865,
+      "illumination": 4.648465061,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743422400,
+      "phase_fraction": 0.078643378411,
+      "illumination": 5.980939095,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743444000,
+      "phase_fraction": 0.08810539439,
+      "illumination": 7.467674098,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743465600,
+      "phase_fraction": 0.09755382161,
+      "illumination": 9.102238977,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743487200,
+      "phase_fraction": 0.106985050789,
+      "illumination": 10.877534763,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743508800,
+      "phase_fraction": 0.116395708767,
+      "illumination": 12.785853572,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1743530400,
+      "phase_fraction": 0.125782617856,
+      "illumination": 14.818941664,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743552000,
+      "phase_fraction": 0.135142775235,
+      "illumination": 16.968065638,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743573600,
+      "phase_fraction": 0.144473342754,
+      "illumination": 19.224080832,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743595200,
+      "phase_fraction": 0.153771642275,
+      "illumination": 21.577500959,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743616800,
+      "phase_fraction": 0.163035153907,
+      "illumination": 24.018568079,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743638400,
+      "phase_fraction": 0.172261515705,
+      "illumination": 26.537322045,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743660000,
+      "phase_fraction": 0.181448523964,
+      "illumination": 29.123668596,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743681600,
+      "phase_fraction": 0.190594133636,
+      "illumination": 31.7674454,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743703200,
+      "phase_fraction": 0.199696458588,
+      "illumination": 34.458485358,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743724800,
+      "phase_fraction": 0.208753771541,
+      "illumination": 37.186676637,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743746400,
+      "phase_fraction": 0.217764503601,
+      "illumination": 39.942018947,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743768000,
+      "phase_fraction": 0.226727243369,
+      "illumination": 42.714675677,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743789600,
+      "phase_fraction": 0.235640735622,
+      "illumination": 45.495021611,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743811200,
+      "phase_fraction": 0.244503879586,
+      "illumination": 48.273686012,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1743832800,
+      "phase_fraction": 0.253315726842,
+      "illumination": 51.041590958,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743854400,
+      "phase_fraction": 0.262075478912,
+      "illumination": 53.789984882,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743876000,
+      "phase_fraction": 0.270782484559,
+      "illumination": 56.510471329,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743897600,
+      "phase_fraction": 0.279436236854,
+      "illumination": 59.195033029,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743919200,
+      "phase_fraction": 0.288036370047,
+      "illumination": 61.836051394,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743940800,
+      "phase_fraction": 0.296582656272,
+      "illumination": 64.426321643,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743962400,
+      "phase_fraction": 0.305075002106,
+      "illumination": 66.959063734,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1743984000,
+      "phase_fraction": 0.313513444982,
+      "illumination": 69.427929372,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744005600,
+      "phase_fraction": 0.321898149441,
+      "illumination": 71.827005322,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744027200,
+      "phase_fraction": 0.330229403181,
+      "illumination": 74.150813325,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744048800,
+      "phase_fraction": 0.338507612802,
+      "illumination": 76.394306877,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744070400,
+      "phase_fraction": 0.346733299124,
+      "illumination": 78.552865167,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744092000,
+      "phase_fraction": 0.354907091864,
+      "illumination": 80.622284456,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744113600,
+      "phase_fraction": 0.363029723339,
+      "illumination": 82.598767176,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744135200,
+      "phase_fraction": 0.371102020727,
+      "illumination": 84.47890902,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1744156800,
+      "phase_fraction": 0.37912489614,
+      "illumination": 86.259684301,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744178400,
+      "phase_fraction": 0.387099333387,
+      "illumination": 87.93842983,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744200000,
+      "phase_fraction": 0.39502636963,
+      "illumination": 89.51282756,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744221600,
+      "phase_fraction": 0.402907069048,
+      "illumination": 90.980886254,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744243200,
+      "phase_fraction": 0.41074248365,
+      "illumination": 92.340922379,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744264800,
+      "phase_fraction": 0.418533592813,
+      "illumination": 93.591540474,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744286400,
+      "phase_fraction": 0.426281206252,
+      "illumination": 94.731613191,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744308000,
+      "phase_fraction": 0.433985801208,
+      "illumination": 95.760261211,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744329600,
+      "phase_fraction": 0.441647234784,
+      "illumination": 96.676833246,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744351200,
+      "phase_fraction": 0.44926420293,
+      "illumination": 97.480886299,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744372800,
+      "phase_fraction": 0.456833141356,
+      "illumination": 98.172166382,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744394400,
+      "phase_fraction": 0.464345761475,
+      "illumination": 98.750589859,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744416000,
+      "phase_fraction": 0.471782754268,
+      "illumination": 99.216225587,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744437600,
+      "phase_fraction": 0.479094483543,
+      "illumination": 99.569278028,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744459200,
+      "phase_fraction": 0.486123409122,
+      "illumination": 99.810071485,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744480800,
+      "phase_fraction": 0.492139822655,
+      "illumination": 99.93903562,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744502400,
+      "phase_fraction": 0.493375341193,
+      "illumination": 99.956692404,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1744524000,
+      "phase_fraction": 0.5117566877,
+      "illumination": 99.86364464,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744545600,
+      "phase_fraction": 0.518555543368,
+      "illumination": 99.660566185,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744567200,
+      "phase_fraction": 0.525726589786,
+      "illumination": 99.348194021,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744588800,
+      "phase_fraction": 0.533026630288,
+      "illumination": 98.927322254,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744610400,
+      "phase_fraction": 0.540386760525,
+      "illumination": 98.398798175,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744632000,
+      "phase_fraction": 0.547782057903,
+      "illumination": 97.763520468,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744653600,
+      "phase_fraction": 0.555202604664,
+      "illumination": 97.022439622,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744675200,
+      "phase_fraction": 0.56264470462,
+      "illumination": 96.176560632,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744696800,
+      "phase_fraction": 0.570107610686,
+      "illumination": 95.226948008,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744718400,
+      "phase_fraction": 0.577592112789,
+      "illumination": 94.174733111,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744740000,
+      "phase_fraction": 0.585099856504,
+      "illumination": 93.021123821,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744761600,
+      "phase_fraction": 0.592632983123,
+      "illumination": 91.767416473,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744783200,
+      "phase_fraction": 0.600193924101,
+      "illumination": 90.415010028,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744804800,
+      "phase_fraction": 0.607785275046,
+      "illumination": 88.965422341,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744826400,
+      "phase_fraction": 0.615409713144,
+      "illumination": 87.420308424,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744848000,
+      "phase_fraction": 0.62306993949,
+      "illumination": 85.781480508,
+      "phase": "Full Moon"
+    },
+    {
+      "unix": 1744869600,
+      "phase_fraction": 0.630768636322,
+      "illumination": 84.050929691,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744891200,
+      "phase_fraction": 0.638508433568,
+      "illumination": 82.230848931,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744912800,
+      "phase_fraction": 0.646291881432,
+      "illumination": 80.323657067,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744934400,
+      "phase_fraction": 0.654121427093,
+      "illumination": 78.332023539,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744956000,
+      "phase_fraction": 0.661999394337,
+      "illumination": 76.258893421,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744977600,
+      "phase_fraction": 0.669927965414,
+      "illumination": 74.107512349,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1744999200,
+      "phase_fraction": 0.677909164688,
+      "illumination": 71.881450879,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745020800,
+      "phase_fraction": 0.685944843816,
+      "illumination": 69.584627784,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745042400,
+      "phase_fraction": 0.694036668298,
+      "illumination": 67.221331783,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745064000,
+      "phase_fraction": 0.702186105347,
+      "illumination": 64.796241141,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745085600,
+      "phase_fraction": 0.710394413003,
+      "illumination": 62.314440613,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745107200,
+      "phase_fraction": 0.718662630515,
+      "illumination": 59.781435159,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745128800,
+      "phase_fraction": 0.726991569959,
+      "illumination": 57.203159887,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745150400,
+      "phase_fraction": 0.735381809123,
+      "illumination": 54.585985704,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745172000,
+      "phase_fraction": 0.743833685629,
+      "illumination": 51.936720171,
+      "phase": "Waning Gibbous"
+    },
+    {
+      "unix": 1745193600,
+      "phase_fraction": 0.75234729231,
+      "illumination": 49.262603106,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745215200,
+      "phase_fraction": 0.760922473786,
+      "illumination": 46.571296553,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745236800,
+      "phase_fraction": 0.769558824218,
+      "illumination": 43.870868783,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745258400,
+      "phase_fraction": 0.778255686142,
+      "illumination": 41.169772095,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745280000,
+      "phase_fraction": 0.787012150289,
+      "illumination": 38.47681426,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745301600,
+      "phase_fraction": 0.795827056221,
+      "illumination": 35.801123581,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745323200,
+      "phase_fraction": 0.804698993567,
+      "illumination": 33.152107637,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745344800,
+      "phase_fraction": 0.813626303556,
+      "illumination": 30.539405904,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745366400,
+      "phase_fraction": 0.822607080403,
+      "illumination": 27.97283657,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745388000,
+      "phase_fraction": 0.831639171953,
+      "illumination": 25.462337985,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745409600,
+      "phase_fraction": 0.84072017871,
+      "illumination": 23.017905308,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745431200,
+      "phase_fraction": 0.849847449953,
+      "illumination": 20.649523028,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745452800,
+      "phase_fraction": 0.859018075027,
+      "illumination": 18.367094141,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745474400,
+      "phase_fraction": 0.868228866814,
+      "illumination": 16.180366867,
+      "phase": "Last Quarter"
+    },
+    {
+      "unix": 1745496000,
+      "phase_fraction": 0.877476332628,
+      "illumination": 14.098859846,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745517600,
+      "phase_fraction": 0.886756624673,
+      "illumination": 12.131786853,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745539200,
+      "phase_fraction": 0.896065456641,
+      "illumination": 10.287982062,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745560800,
+      "phase_fraction": 0.905397962444,
+      "illumination": 8.575826958,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745582400,
+      "phase_fraction": 0.914748452143,
+      "illumination": 7.00317994,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745604000,
+      "phase_fraction": 0.924109976084,
+      "illumination": 5.577309675,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745625600,
+      "phase_fraction": 0.933473508961,
+      "illumination": 4.304833183,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745647200,
+      "phase_fraction": 0.942826322237,
+      "illumination": 3.191659562,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745668800,
+      "phase_fraction": 0.95214845254,
+      "illumination": 2.242940185,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745690400,
+      "phase_fraction": 0.961404127723,
+      "illumination": 1.463026071,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745712000,
+      "phase_fraction": 0.970517503049,
+      "illumination": 0.855433002,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745733600,
+      "phase_fraction": 0.979287536048,
+      "illumination": 0.422814856,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745755200,
+      "phase_fraction": 0.986990569241,
+      "illumination": 0.166945419,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745776800,
+      "phase_fraction": 0.990518045864,
+      "illumination": 0.088708857,
+      "phase": "Waning Crescent"
+    },
+    {
+      "unix": 1745798400,
+      "phase_fraction": 0.013809546253,
+      "illumination": 0.188098821,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745820000,
+      "phase_fraction": 0.021704584373,
+      "illumination": 0.464226053,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745841600,
+      "phase_fraction": 0.030500344719,
+      "illumination": 0.9153342,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745863200,
+      "phase_fraction": 0.03958810359,
+      "illumination": 1.538823427,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745884800,
+      "phase_fraction": 0.048792100839,
+      "illumination": 2.331281304,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745906400,
+      "phase_fraction": 0.058044347989,
+      "illumination": 3.288520339,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745928000,
+      "phase_fraction": 0.067312452336,
+      "illumination": 4.405621455,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745949600,
+      "phase_fraction": 0.076578413034,
+      "illumination": 5.676982646,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745971200,
+      "phase_fraction": 0.085830961161,
+      "illumination": 7.096372007,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1745992800,
+      "phase_fraction": 0.095062349098,
+      "illumination": 8.656984294,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1746014400,
+      "phase_fraction": 0.10426684727,
+      "illumination": 10.351500187,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1746036000,
+      "phase_fraction": 0.113439977476,
+      "illumination": 12.172147424,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1746057600,
+      "phase_fraction": 0.122578094313,
+      "illumination": 14.110762995,
+      "phase": "New Moon"
+    },
+    {
+      "unix": 1746079200,
+      "phase_fraction": 0.131678143515,
+      "illumination": 16.158855645,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746100800,
+      "phase_fraction": 0.140737515651,
+      "illumination": 18.307667961,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746122400,
+      "phase_fraction": 0.149753953846,
+      "illumination": 20.548237394,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746144000,
+      "phase_fraction": 0.158725493341,
+      "illumination": 22.871455613,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746165600,
+      "phase_fraction": 0.16765042053,
+      "illumination": 25.26812569,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746187200,
+      "phase_fraction": 0.176527244249,
+      "illumination": 27.729016645,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746208800,
+      "phase_fraction": 0.185354674994,
+      "illumination": 30.244914982,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746230400,
+      "phase_fraction": 0.194131609404,
+      "illumination": 32.806672913,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746252000,
+      "phase_fraction": 0.202857118317,
+      "illumination": 35.405253016,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746273600,
+      "phase_fraction": 0.211530437307,
+      "illumination": 38.031769167,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746295200,
+      "phase_fraction": 0.220150958986,
+      "illumination": 40.677523612,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746316800,
+      "phase_fraction": 0.228718226598,
+      "illumination": 43.334040139,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746338400,
+      "phase_fraction": 0.237231928558,
+      "illumination": 45.993093304,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746360000,
+      "phase_fraction": 0.245691893719,
+      "illumination": 48.646733769,
+      "phase": "Waxing Crescent"
+    },
+    {
+      "unix": 1746381600,
+      "phase_fraction": 0.254098087186,
+      "illumination": 51.287309798,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746403200,
+      "phase_fraction": 0.262450606534,
+      "illumination": 53.907485018,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746424800,
+      "phase_fraction": 0.270749678326,
+      "illumination": 56.500252553,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746446400,
+      "phase_fraction": 0.278995654812,
+      "illumination": 59.058945696,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746468000,
+      "phase_fraction": 0.287189010704,
+      "illumination": 61.577245265,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746489600,
+      "phase_fraction": 0.295330339897,
+      "illumination": 64.049183827,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746511200,
+      "phase_fraction": 0.303420351994,
+      "illumination": 66.469146973,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746532800,
+      "phase_fraction": 0.311459868467,
+      "illumination": 68.831871847,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746554400,
+      "phase_fraction": 0.319449818221,
+      "illumination": 71.132443124,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746576000,
+      "phase_fraction": 0.327391232308,
+      "illumination": 73.366286646,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746597600,
+      "phase_fraction": 0.335285237391,
+      "illumination": 75.529160937,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746619200,
+      "phase_fraction": 0.34313304751,
+      "illumination": 77.61714679,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746640800,
+      "phase_fraction": 0.350935953472,
+      "illumination": 79.626635161,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746662400,
+      "phase_fraction": 0.358695308948,
+      "illumination": 81.554313573,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746684000,
+      "phase_fraction": 0.366412512002,
+      "illumination": 83.397151254,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746705600,
+      "phase_fraction": 0.374088980154,
+      "illumination": 85.152383224,
+      "phase": "First Quarter"
+    },
+    {
+      "unix": 1746727200,
+      "phase_fraction": 0.381726116212,
+      "illumination": 86.817493547,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746748800,
+      "phase_fraction": 0.389325260622,
+      "illumination": 88.390197974,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746770400,
+      "phase_fraction": 0.396887623727,
+      "illumination": 89.868426182,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746792000,
+      "phase_fraction": 0.404414187306,
+      "illumination": 91.25030384,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746813600,
+      "phase_fraction": 0.411905557732,
+      "illumination": 92.534134713,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746835200,
+      "phase_fraction": 0.419361740447,
+      "illumination": 93.71838302,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746856800,
+      "phase_fraction": 0.426781781534,
+      "illumination": 94.801656261,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746878400,
+      "phase_fraction": 0.434163174961,
+      "illumination": 95.782688739,
+      "phase": "Waxing Gibbous"
+    },
+    {
+      "unix": 1746900000,
+      "phase_fraction": 0.441500835561,
+      "illumination": 96.660325959,
+      "phase": "Waxing Gibbous"
+    }
+  ]
+}

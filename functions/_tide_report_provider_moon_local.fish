@@ -4,12 +4,8 @@
 ##   { "phase": "Full Moon" }
 ## Phase names are chosen to match __tide_report_get_moon_emoji.
 
-## Map Unix timestamp to a human-readable moon phase name using the local model.
-function __tide_report_moon_phase_from_unix --description "Map Unix time to a human-readable moon phase name" --argument-names unix_time
-    set -l phase_fraction (__tide_report_moon_phase_fraction_from_unix $unix_time)
-    if test -z "$phase_fraction"
-        return 1
-    end
+## Map phase fraction [0,1) to phase name (bucket 0–7). Used by __tide_report_moon_phase_from_unix.
+function __tide_report_moon_phase_name_from_fraction --description "Map phase fraction to phase name" --argument-names phase_fraction
     set -l bucket (math "floor($phase_fraction * 8)")
     switch $bucket
         case 0
@@ -29,6 +25,15 @@ function __tide_report_moon_phase_from_unix --description "Map Unix time to a hu
         case 7 '*'
             echo "Waning Crescent"
     end
+end
+
+## Map Unix timestamp to a human-readable moon phase name using the local model.
+function __tide_report_moon_phase_from_unix --description "Map Unix time to a human-readable moon phase name" --argument-names unix_time
+    set -l phase_fraction (__tide_report_moon_phase_fraction_from_unix $unix_time)
+    if test -z "$phase_fraction"
+        return 1
+    end
+    __tide_report_moon_phase_name_from_fraction $phase_fraction
 end
 
 if not functions -q __tide_report_moon_phase_fraction_from_unix

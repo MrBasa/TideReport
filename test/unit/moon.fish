@@ -5,12 +5,12 @@ set -l root (dirname (dirname (dirname (status filename))))/functions
 function _tide_print_item --description "Stub Tide's _tide_print_item for moon unit tests"
 end
 ## Moon phase math constants (required by _tide_report_moon_math; not sourced from conf.d here)
-set -g __tide_report_moon_PI (math "acos(-1)")
-set -g __tide_report_moon_rad (math "$__tide_report_moon_PI / 180")
+set -g __tide_report_moon_PI (math --scale=max "acos(-1)")
+set -g __tide_report_moon_rad (math --scale=max "$__tide_report_moon_PI / 180")
 set -g __tide_report_moon_day_seconds 86400
 set -g __tide_report_moon_J1970 2440588
 set -g __tide_report_moon_J2000 2451545
-set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
+set -g __tide_report_moon_obliquity (math --scale=max "$__tide_report_moon_rad * 23.4397")
 source "$root/_tide_item_moon.fish"
 source "$root/_tide_report_provider_moon_local.fish"
 

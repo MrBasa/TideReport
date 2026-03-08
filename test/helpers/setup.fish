@@ -91,12 +91,12 @@ set -q _tide_report_version; or set -g _tide_report_version "test"
 set -q tide_report_user_agent; or set -g tide_report_user_agent "tide-report/test"
 
 # Moon math constants for tests that source moon helpers directly.
-set -q __tide_report_moon_PI; or set -g __tide_report_moon_PI (math "acos(-1)")
-set -q __tide_report_moon_rad; or set -g __tide_report_moon_rad (math "$__tide_report_moon_PI / 180")
+set -q __tide_report_moon_PI; or set -g __tide_report_moon_PI (math --scale=max "acos(-1)")
+set -q __tide_report_moon_rad; or set -g __tide_report_moon_rad (math --scale=max "$__tide_report_moon_PI / 180")
 set -q __tide_report_moon_day_seconds; or set -g __tide_report_moon_day_seconds 86400
 set -q __tide_report_moon_J1970; or set -g __tide_report_moon_J1970 2440588
 set -q __tide_report_moon_J2000; or set -g __tide_report_moon_J2000 2451545
-set -q __tide_report_moon_obliquity; or set -g __tide_report_moon_obliquity (math "$__tide_report_moon_rad * 23.4397")
+set -q __tide_report_moon_obliquity; or set -g __tide_report_moon_obliquity (math --scale=max "$__tide_report_moon_rad * 23.4397")
 
 # Preserve compatibility with existing tests that assume setup preloads item functions.
 __tide_report_test_source_items
