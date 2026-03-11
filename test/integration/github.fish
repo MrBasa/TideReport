@@ -39,5 +39,19 @@ popd >/dev/null
     echo $status
 ) -eq 0
 
+@test "github item emits nothing when origin is not on GitHub" (
+    set -l other_tmp "$tmp/repo-non-github"
+    mkdir -p "$other_tmp"
+    pushd "$other_tmp" >/dev/null
+    command git init >/dev/null 2>&1
+    command git remote add origin "https://gitlab.com/group/repo.git"
+    __tide_report_test_reset_print_capture
+    _tide_item_github
+    set -l c (count $_tide_print_item_calls)
+    popd >/dev/null
+    test $c -eq 0
+    echo $status
+) -eq 0
+
 set -e TIDE_REPORT_TEST
 command rm -rf "$tmp"

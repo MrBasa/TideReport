@@ -80,6 +80,10 @@ New items should be consistent with the current approach:
 
 ## Testing
 
-- There is **no automated test suite** yet. Testing is manual in the developer’s shell. Do not assume or introduce a test framework unless the user asks. When tests are added later, rules can be updated.
+- This repo has an automated **Fishtape** test suite. After substantive changes, prefer running the VS Code `Test` task or `fish scripts/run_tests_isolated.fish` from the repo root.
+- The isolated runner exists so tests that use `set -U` do not modify the developer's real Fish universal variables. Preserve that isolation when changing test flow.
+- GitHub Actions runs the suite on **Ubuntu** and **macOS** on pushes and pull requests. Keep changes compatible with both GNU and BSD `date` behavior.
+- A supported pre-push gated check-in hook exists at `scripts/pre-push`; when relevant, keep it aligned with the current test entrypoint.
+- Do not introduce a different test framework unless the user asks.
 
 [Tide]: https://github.com/IlanCosman/tide

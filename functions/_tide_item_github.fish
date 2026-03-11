@@ -15,6 +15,11 @@ function _tide_item_github --description "Displays GitHub stats"
         return 0 # No remote 'origin' found
     end
 
+    # Only show this item when origin is a GitHub remote
+    if not string match -qr 'github\.com[/:]' "$remote_url"
+        return 0
+    end
+
     # Parse Owner and Repo Name
     # Handles: https://github.com/Owner/Repo.git and git@github.com:Owner/Repo.git
     set -l repo_parts (echo "$remote_url" | string replace -r '^.*[:/]([^/]+)/([^/]+?)(\.git)?$' '$1\n$2')

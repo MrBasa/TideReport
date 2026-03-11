@@ -95,7 +95,7 @@ Expected issues (missing dependencies, bad GitHub credentials, API timeouts, inv
 |`tide_report_log_expected`|Set to `0`, `false`, or `no` to disable diagnostic logging.|`1`|
 
 ## 🤖 GitHub Module (`github`)
-Displays stats for the current repository. **Requires `gh` CLI to be authenticated.**
+Displays stats for the current repository. **Requires `gh` CLI to be authenticated.** The item is only shown when the repo's `origin` remote is on GitHub; in other git repos (e.g. GitLab) the item is hidden.
 
 |**Symbol**|**Meaning**|
 |---|---|
