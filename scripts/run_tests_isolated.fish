@@ -6,26 +6,10 @@
 ## universals (e.g. tide_left_prompt_items).
 ## Used by the VS Code "Test" task and the pre-push hook. Run from repo root.
 
-set -l fishtape_path
-if functions -q fishtape
-    # functions -D fishtape prints e.g. \"# Defined in /path/to/fishtape.fish @ line 1\"
-    set fishtape_path (functions -D fishtape | string match -rg 'Defined in (.+) @' | head -n 1)
-end
-if test -z \"$fishtape_path\"
-    # Fallback to the standard Fisher-installed location under the current config dir.
-    set -l cfg
-    if set -q XDG_CONFIG_HOME; and test -n \"$XDG_CONFIG_HOME\"
-        set cfg \"$XDG_CONFIG_HOME\"
-    else
-        set cfg \"$HOME/.config\"
-    end
-    set -l candidate \"$cfg/fish/functions/fishtape.fish\"
-    if test -f \"$candidate\"
-        set fishtape_path \"$candidate\"
-    end
-end
-if test -z \"$fishtape_path\"
-    echo \"run_tests_isolated.fish: fishtape is not installed or could not be found\" >&2
+set -l fishtape_path ~/.config/fish/functions/fishtape.fish
+if not test -f "$fishtape_path"
+    echo "run_tests_isolated.fish: fishtape is not installed at $fishtape_path" >&2
+    echo "Install it once with: fisher install jorgebucaran/fishtape" >&2
     exit 1
 end
 
