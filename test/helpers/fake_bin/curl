@@ -1,9 +1,43 @@
 #!/usr/bin/env fish
 set -l response "$TIDE_REPORT_TEST_CURL_RESPONSE"
 set -l st 0
-if set -q TIDE_REPORT_TEST_CURL_STATUS
-    set st $TIDE_REPORT_TEST_CURL_STATUS
+set -l url ""
+set -l matched_specific false
+
+for arg in $argv
+    if string match -qr '^https?://' -- "$arg"
+        set url "$arg"
+    end
 end
+
+if test -n "$url"
+    if string match -q '*ip-api.com*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_RESPONSE
+        set matched_specific true
+        set response "$TIDE_REPORT_TEST_CURL_IP_RESPONSE"
+        if set -q TIDE_REPORT_TEST_CURL_IP_STATUS
+            set st $TIDE_REPORT_TEST_CURL_IP_STATUS
+        end
+    else if string match -q '*geocoding-api.open-meteo.com*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_GEOCODE_RESPONSE
+        set matched_specific true
+        set response "$TIDE_REPORT_TEST_CURL_GEOCODE_RESPONSE"
+        if set -q TIDE_REPORT_TEST_CURL_GEOCODE_STATUS
+            set st $TIDE_REPORT_TEST_CURL_GEOCODE_STATUS
+        end
+    else if string match -q '*api.open-meteo.com/v1/forecast*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE
+        set matched_specific true
+        set response "$TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE"
+        if set -q TIDE_REPORT_TEST_CURL_FORECAST_STATUS
+            set st $TIDE_REPORT_TEST_CURL_FORECAST_STATUS
+        end
+    end
+end
+
+if test "$matched_specific" = false
+    if set -q TIDE_REPORT_TEST_CURL_STATUS
+        set st $TIDE_REPORT_TEST_CURL_STATUS
+    end
+end
+
 if test -n "$response"; and test -f "$response"
     cat "$response"
 else

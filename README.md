@@ -39,7 +39,7 @@ If you are installing in an interactive terminal session, the **TideReport Insta
 
 3. **Configure Weather**: If enabled, choose a display format (Concise, Medium, or Detailed).
 
-4. **Set Location**: The wizard will attempt to auto-detect your location via IP. You can accept this, or manually enter your city, postal code, or GPS coordinates.
+4. **Set Location**: The wizard will show two weather-location modes. IP-based auto-detect uses your current network/IP and can change when you move, switch networks, or use a VPN. If you want weather pinned to one place, enter a fixed city, postal code, or GPS coordinates instead.
 
 The plugin automatically runs `tide reload` when finished, so your new prompt items will appear immediately!
 

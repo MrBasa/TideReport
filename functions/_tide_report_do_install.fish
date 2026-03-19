@@ -153,7 +153,10 @@ function _tide_report_do_install --description "Install TideReport defaults and 
                 case 3; set -U tide_report_weather_format "%c 🌡️%t (%f) %h %d%w"
                 case "*"; set -U tide_report_weather_format "%c %t %d%w"
             end
-            ## Location step: show IP result or prompt manual input; validate and confirm.
+            ## Location step: explain IP-based auto-detection vs a saved fixed location.
+            echo (set_color brwhite)"  Weather location modes:"(set_color normal)
+            echo (set_color brcyan)"    IP-based auto-detect"(set_color brwhite)" follows your current network/location and may change over time."(set_color normal)
+            echo (set_color brcyan)"    Fixed location"(set_color brwhite)" saves a city, postal code, or coordinates so weather stays pinned to one place."(set_color normal)
             set -l ip_line ""
             if command -q curl; and command -q jq
                 echo (set_color brcyan)"Retrieving location..."(set_color normal)
@@ -170,29 +173,33 @@ function _tide_report_do_install --description "Install TideReport defaults and 
                     end
                 end
             end
-            set -l use_ip true
+            set -l use_ip_location true
             if test -n "$ip_line"
-                read -l -P (set_color brcyan)"Detected location: "(set_color brwhite)"$ip_line"(set_color brcyan)". Use this location? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
+                echo (set_color brwhite)"  Choosing IP-based auto-detect keeps tide_report_weather_location empty, so weather follows your current IP-based location."(set_color normal)
+                read -l -P (set_color brcyan)"Detected IP-based location: "(set_color brwhite)"$ip_line"(set_color brcyan)". Use IP-based auto-detect for weather? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
                 set -l r (string trim (string lower -- "$reply"))
                 if test "$r" = "n"; or test "$r" = "no"
-                    set use_ip false
+                    set use_ip_location false
+                else
+                    set -U tide_report_weather_location ""
                 end
             else
-                set use_ip false
+                set use_ip_location false
             end
             set -l first_manual_prompt true
             set -l location_tries 0
             set -l max_location_tries 3
-            while test "$use_ip" = false
-                set -l prompt_str (set_color brcyan)"Enter location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to use IP: "(set_color normal)
+            while test "$use_ip_location" = false
+                set -l prompt_str (set_color brcyan)"Enter a fixed location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to keep IP-based auto-detect: "(set_color normal)
                 if test -z "$ip_line"; and test "$first_manual_prompt" = true
-                    set prompt_str (set_color brcyan)"Could not detect location from IP. Enter location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to use IP: "(set_color normal)
+                    set prompt_str (set_color brcyan)"Could not detect an IP-based location right now. Enter a fixed location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to keep IP-based auto-detect: "(set_color normal)
                     set first_manual_prompt false
                 end
                 read -l -P "$prompt_str" reply
                 set -l manual (string trim -- "$reply")
                 if test -z "$manual"
-                    set use_ip true
+                    set -U tide_report_weather_location ""
+                    set use_ip_location true
                     break
                 end
                 echo (set_color brcyan)"Retrieving location..."(set_color normal)
@@ -200,7 +207,8 @@ function _tide_report_do_install --description "Install TideReport defaults and 
                 set -l val_status $status
                 set resolved (string trim -- $resolved)
                 if test $val_status -eq 0
-                    read -l -P (set_color brcyan)"Resolved to: "(set_color brwhite)"$resolved"(set_color brcyan)". Use this location? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply2
+                    echo (set_color brwhite)"  Saving a fixed location writes tide_report_weather_location so weather stays pinned to this place."(set_color normal)
+                    read -l -P (set_color brcyan)"Resolved fixed location: "(set_color brwhite)"$resolved"(set_color brcyan)". Save this fixed location? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply2
                     set -l r2 (string trim (string lower -- "$reply2"))
                     if test -z "$r2"; or test "$r2" = "y"; or test "$r2" = "yes"
                         if string match -qr '^-?[0-9]+\.?[0-9]*\s*,\s*-?[0-9]+\.?[0-9]*$' -- "$manual"
@@ -209,15 +217,16 @@ function _tide_report_do_install --description "Install TideReport defaults and 
                         else
                             set -U tide_report_weather_location "$manual"
                         end
-                        set use_ip true
+                        set use_ip_location true
                         break
                     end
                 else
                     echo (set_color red)"Location not found or weather unavailable. Try another."(set_color normal)
                     set location_tries (math $location_tries + 1)
                     if test $location_tries -ge $max_location_tries
-                        echo (set_color bryellow)"Using IP-based location. You can set tide_report_weather_location later."(set_color normal)
-                        set use_ip true
+                        echo (set_color bryellow)"Using IP-based auto-detection. You can set tide_report_weather_location later to pin a fixed location."(set_color normal)
+                        set -U tide_report_weather_location ""
+                        set use_ip_location true
                         break
                     end
                 end

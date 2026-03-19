@@ -10,10 +10,24 @@ if test -z "$test_name"; or test -z "$root"
     exit 2
 end
 
+# Seed Tide colors so install previews can render in isolated test shells.
+set -g tide_time_color white
+set -g tide_time_bg_color normal
+
 # Add plugin functions dir so _tide_report_do_install can be autoloaded
 set -g fish_function_path $root/functions $fish_function_path
+set -g REPO_ROOT $root
+source $root/test/helpers/setup.fish
 
 source $root/conf.d/tide_report.fish
+
+function _install_test_prepare_wizard --argument-names root
+    set -l fakebin $root/test/helpers/fake_bin
+    set -gx PATH "$fakebin" $PATH
+    set -U tide_left_prompt_items git pwd
+    set -U tide_right_prompt_items time
+    set -U tide_report_weather_location "OldTown"
+end
 
 switch $test_name
     case "load"
@@ -35,6 +49,21 @@ switch $test_name
         if test "$tide_report_weather_provider" != "openmeteo"; exit 1; end
         if test "$tide_report_moon_provider" != "local"; exit 1; end
         if test "$tide_report_units" != "m"; exit 1; end
+    case "wizard_ip_auto"
+        _install_test_prepare_wizard "$root"
+        emit tide_report_install
+        if not contains -- weather $tide_right_prompt_items; exit 1; end
+        if test -n "$tide_report_weather_location"; exit 1; end
+    case "wizard_fixed_location"
+        _install_test_prepare_wizard "$root"
+        emit tide_report_install
+        if not contains -- weather $tide_right_prompt_items; exit 1; end
+        if test "$tide_report_weather_location" != "Seattle"; exit 1; end
+    case "wizard_ip_fallback"
+        _install_test_prepare_wizard "$root"
+        emit tide_report_install
+        if not contains -- weather $tide_right_prompt_items; exit 1; end
+        if test -n "$tide_report_weather_location"; exit 1; end
     case "*"
         echo "Unknown test: $test_name" >&2
         exit 2
