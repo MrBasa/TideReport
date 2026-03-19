@@ -62,8 +62,6 @@ if test $count -eq 0
     set failed (math "$failed + 1")
 end
 
-echo "SunCalc fixture check: samples=$count max_phase_diff=$max_phase_diff max_illum_diff=$max_illum_diff" >&2
-
 @test "local moon math matches canonical SunCalc fixture" (
     test $failed -eq 0
     echo $status

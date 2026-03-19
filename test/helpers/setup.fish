@@ -100,3 +100,9 @@ set -q __tide_report_moon_obliquity; or set -g __tide_report_moon_obliquity (mat
 
 # Preserve compatibility with existing tests that assume setup preloads item functions.
 __tide_report_test_source_items
+
+# Provide a no-op stub for _tide_report_warn_global_prompt_items in tests when the real
+# implementation from conf.d/tide_report.fish has not been sourced. This prevents
+# \"Unknown command\" errors (stderr noise) when install helpers call it.
+functions -q _tide_report_warn_global_prompt_items; or function _tide_report_warn_global_prompt_items --argument-names left_list right_list
+end

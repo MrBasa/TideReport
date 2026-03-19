@@ -13,14 +13,14 @@ set -g tide_report_user_agent "tide-report/test"
 ) -eq 0
 
 @test "validate_weather_location rejects empty input" (
-    __tide_report_validate_weather_location ""
+    __tide_report_validate_weather_location "" 2>/dev/null
     echo $status
 ) -eq 1
 
 @test "validate_weather_location rejects when curl fails" (
     set -gx TIDE_REPORT_TEST_CURL_STATUS 1
     set -gx TIDE_REPORT_TEST_CURL_RESPONSE ''
-    __tide_report_validate_weather_location "Berlin"
+    __tide_report_validate_weather_location "Berlin" 2>/dev/null
     echo $status
 ) -eq 1
 
