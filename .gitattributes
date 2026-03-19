@@ -1,5 +1,5 @@
 # Exclude from release source archives (zip/tar.gz)
-# Keep only plugin code + top-level README/LICENSE in release archives.
+# Keep only runtime plugin files (conf.d/, functions/) and top-level README/LICENSE.
 
 # Non-runtime metadata and dev tooling
 .cursor/ export-ignore
@@ -8,4 +8,6 @@
 .gitattributes export-ignore
 
 # Tests, fixtures, and test cache/home
+scripts/ export-ignore
 test/ export-ignore
+vendor/ export-ignore
