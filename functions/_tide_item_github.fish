@@ -215,7 +215,9 @@ end
 
 function __tide_report_github_context --description "Resolve repo/cache metadata and cache it per repo root"
     if set -q __tide_report_github_context_repo_root
-        if __tide_report_github_path_within "$PWD" "$__tide_report_github_context_repo_root"
+        set -l current_dir (path resolve "$PWD" 2>/dev/null | string collect)
+        test -n "$current_dir"; or set current_dir (path normalize "$PWD")
+        if __tide_report_github_path_within "$current_dir" "$__tide_report_github_context_repo_root"
             printf "%s\n" $__tide_report_github_context_values
             return 0
         end
@@ -225,7 +227,8 @@ function __tide_report_github_context --description "Resolve repo/cache metadata
     if test -z "$repo_root"
         return 1
     end
-    set repo_root (path normalize "$repo_root")
+    set repo_root (path resolve "$repo_root" 2>/dev/null | string collect)
+    test -n "$repo_root"; or set repo_root (path normalize "$repo_root")
 
     set -l git_dir (command git rev-parse --git-dir 2>/dev/null)
     if test -z "$git_dir"
