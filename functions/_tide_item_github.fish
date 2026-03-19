@@ -6,7 +6,130 @@ if not functions -q __tide_report_lock_acquire
     source (status filename | path dirname)/_tide_report_lock_helpers.fish
 end
 
+function __tide_report_github_path_within --description "Return success when path is inside repo_root" --argument-names candidate repo_root
+    test -n "$candidate"; and test -n "$repo_root"; or return 1
+    if test "$candidate" = "$repo_root"
+        return 0
+    end
+    string match -q -- "$repo_root/*" "$candidate"
+end
+
+function __tide_report_github_file_mtime --description "Return file mtime using Fish builtins" --argument-names file_path
+    set -l stamp (path mtime -- "$file_path" 2>/dev/null | string collect | string trim)
+    string match -qr '^[0-9]+$' -- "$stamp"; or return 1
+    echo "$stamp"
+end
+
+function __tide_report_github_stats_file --description "Return stats sidecar file for repo cache" --argument-names cache_file
+    echo "$cache_file.stats"
+end
+
+function __tide_report_github_state_file --description "Return CI sidecar file for CI cache" --argument-names ci_cache_file
+    echo "$ci_cache_file.state"
+end
+
+function __tide_report_github_stats_line_valid --description "Validate compact GitHub stats line" --argument-names line
+    set -l parts (string split " " -- (string trim -- "$line"))
+    test (count $parts) -eq 5; or return 1
+
+    for value in $parts
+        string match -qr '^[0-9]+$' -- "$value"; or return 1
+    end
+
+    return 0
+end
+
+function __tide_report_github_ci_state_valid --description "Validate normalized GitHub CI state" --argument-names ci_state
+    contains -- "$ci_state" pass fail pending none
+end
+
+function __tide_report_github_ci_cache_file --description "Return CI cache path for cache key and branch" --argument-names cache_dir cache_key branch
+    set -l branch_safe detached
+    if test -n "$branch"
+        set branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
+    end
+    echo "$cache_dir/$cache_key-$branch_safe-ci.json"
+end
+
+function __tide_report_github_branch_from_head --description "Read branch name from git HEAD without invoking git" --argument-names git_dir
+    set -l head_file "$git_dir/HEAD"
+    test -f "$head_file"; or return 1
+
+    set -l head_ref ""
+    read -l head_ref < "$head_file"
+    if string match -qr '^ref: refs/heads/' -- "$head_ref"
+        string replace -r '^ref: refs/heads/' '' -- "$head_ref"
+    end
+end
+
+function __tide_report_github_stats_from_json --description "Extract compact stats line from repo JSON" --argument-names cache_file
+    command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null
+end
+
+function __tide_report_github_read_stats_line --description "Read GitHub stats from sidecar or legacy JSON fallback" --argument-names cache_file
+    set -l stats_file (__tide_report_github_stats_file "$cache_file")
+    if test -f "$stats_file"
+        set -l line ""
+        read -l line < "$stats_file"
+        if __tide_report_github_stats_line_valid "$line"
+            echo "$line"
+            return 0
+        end
+    end
+
+    set -l line (__tide_report_github_stats_from_json "$cache_file")
+    if __tide_report_github_stats_line_valid "$line"
+        echo "$line"
+        return 0
+    end
+
+    return 1
+end
+
+function __tide_report_github_ci_state_from_json --description "Normalize GitHub CI state from legacy JSON cache" --argument-names ci_cache_file
+    set -l first (command jq -r 'if length > 0 then (.[0] | "\(.status) \(.conclusion)") else "" end' "$ci_cache_file" 2>/dev/null)
+    if test -z "$first"; or test "$first" = "null null"
+        echo none
+        return 0
+    end
+
+    set -l parts (string split " " "$first")
+    set -l run_status "$parts[1]"
+    set -l conclusion "$parts[2]"
+    if test "$run_status" = "completed"
+        if test "$conclusion" = "success"
+            echo pass
+        else
+            echo fail
+        end
+    else
+        echo pending
+    end
+end
+
+function __tide_report_github_read_ci_state --description "Read normalized GitHub CI state from sidecar or legacy JSON fallback" --argument-names ci_cache_file
+    set -l state_file (__tide_report_github_state_file "$ci_cache_file")
+    if test -f "$state_file"
+        set -l ci_state ""
+        read -l ci_state < "$state_file"
+        if __tide_report_github_ci_state_valid "$ci_state"
+            echo "$ci_state"
+            return 0
+        end
+    end
+
+    test -f "$ci_cache_file"; or return 1
+    set -l ci_state (__tide_report_github_ci_state_from_json "$ci_cache_file")
+    if __tide_report_github_ci_state_valid "$ci_state"
+        echo "$ci_state"
+        return 0
+    end
+
+    return 1
+end
+
 function _tide_item_github --description "Displays GitHub stats"
+    set -l now (command date +%s)
     set -l context (__tide_report_github_context)
     test (count $context) -ge 6; or return 0
 
@@ -14,8 +137,9 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l cache_key $context[2]
     set -l cache_dir $context[3]
     set -l cache_file $context[4]
-    set -l branch $context[5]
-    set -l ci_cache_file $context[6]
+    set -l git_dir $context[6]
+    set -l branch (__tide_report_github_branch_from_head "$git_dir" | string collect)
+    set -l ci_cache_file (__tide_report_github_ci_cache_file "$cache_dir" "$cache_key" "$branch")
     set -l refresh_seconds $tide_report_github_refresh_seconds
     set -l ci_refresh_seconds $tide_report_github_ci_refresh_seconds
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
@@ -24,11 +148,11 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l trigger_fetch false
     set -l trigger_ci_fetch false
     set -l output_valid false
-    set -l now (command date +%s)
 
     # Check cache status
     if test -f "$cache_file"
-        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
+        set -l mod_time (__tide_report_github_file_mtime "$cache_file" | string collect)
+        test -n "$mod_time"; or set mod_time 0
         set -l age (math $now - $mod_time)
 
         # Check if cache is stale
@@ -44,7 +168,8 @@ function _tide_item_github --description "Displays GitHub stats"
     # Check CI cache when show_ci is enabled
     if test "$tide_report_github_show_ci" = true
         if test -f "$ci_cache_file"
-            set -l ci_mod (command date -r "$ci_cache_file" +%s 2>/dev/null; or echo 0)
+            set -l ci_mod (__tide_report_github_file_mtime "$ci_cache_file" | string collect)
+            test -n "$ci_mod"; or set ci_mod 0
             if test (math $now - $ci_mod) -gt $ci_refresh_seconds
                 set trigger_ci_fetch true
             end
@@ -88,17 +213,26 @@ function _tide_item_github --description "Displays GitHub stats"
     end
 end
 
-function __tide_report_github_context --description "Resolve repo/cache metadata and cache it briefly per working directory"
-    set -l now (command date +%s)
-    if set -q __tide_report_github_context_pwd; and test "$__tide_report_github_context_pwd" = "$PWD"
-        if set -q __tide_report_github_context_expires; and test "$__tide_report_github_context_expires" -ge $now
+function __tide_report_github_context --description "Resolve repo/cache metadata and cache it per repo root"
+    if set -q __tide_report_github_context_repo_root
+        if __tide_report_github_path_within "$PWD" "$__tide_report_github_context_repo_root"
             printf "%s\n" $__tide_report_github_context_values
-            return
+            return 0
         end
     end
 
-    if not command git rev-parse --is-inside-work-tree 2>/dev/null >/dev/null
+    set -l repo_root (command git rev-parse --show-toplevel 2>/dev/null)
+    if test -z "$repo_root"
         return 1
+    end
+    set repo_root (path normalize "$repo_root")
+
+    set -l git_dir (command git rev-parse --git-dir 2>/dev/null)
+    if test -z "$git_dir"
+        return 1
+    end
+    if not string match -q '/*' -- "$git_dir"
+        set git_dir (path normalize "$PWD/$git_dir")
     end
 
     set -l remote_url (command git config --get remote.origin.url 2>/dev/null)
@@ -120,16 +254,9 @@ function __tide_report_github_context --description "Resolve repo/cache metadata
     set -l cache_key "$owner-$repo"
     set -l cache_dir "$HOME/.cache/tide-report/github"
     set -l cache_file "$cache_dir/$cache_key.json"
-    set -l branch (command git branch --show-current 2>/dev/null; or echo "")
-    set -l branch_safe detached
-    if test -n "$branch"
-        set branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
-    end
-    set -l ci_cache_file "$cache_dir/$cache_key-$branch_safe-ci.json"
 
-    set -g __tide_report_github_context_pwd "$PWD"
-    set -g __tide_report_github_context_expires (math "$now + 2")
-    set -g __tide_report_github_context_values "$api_slug" "$cache_key" "$cache_dir" "$cache_file" "$branch" "$ci_cache_file"
+    set -g __tide_report_github_context_repo_root "$repo_root"
+    set -g __tide_report_github_context_values "$api_slug" "$cache_key" "$cache_dir" "$cache_file" "$repo_root" "$git_dir"
     printf "%s\n" $__tide_report_github_context_values
 end
 
@@ -214,7 +341,7 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
     if set -q argv[2]; and test -n "$argv[2]"
         set line $argv[2]
     else
-        set line (command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' "$cache_file" 2>/dev/null)
+        set line (__tide_report_github_read_stats_line "$cache_file" | string collect)
     end
     set -l ci_cache_file ""
     set -q argv[3]; and test -n "$argv[3]"; and set ci_cache_file "$argv[3]"
@@ -239,23 +366,9 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
 
     # Extract CI state from cache when show_ci is enabled
     set -l ci_state "none"
-    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"; and test -f "$ci_cache_file"
-        # Empty array (no workflows) yields no output; do not show any CI icon
-        set -l first (command jq -r 'if length > 0 then (.[0] | "\(.status) \(.conclusion)") else "" end' "$ci_cache_file" 2>/dev/null)
-        if test -n "$first"; and test "$first" != "null null"
-            set -l parts (string split " " "$first")
-            set -l run_status "$parts[1]"
-            set -l conclusion "$parts[2]"
-            if test "$run_status" = "completed"
-                if test "$conclusion" = "success"
-                    set ci_state "pass"
-                else
-                    set ci_state "fail"
-                end
-            else
-                set ci_state "pending"
-            end
-        end
+    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"
+        set -l parsed_ci_state (__tide_report_github_read_ci_state "$ci_cache_file" | string collect)
+        test -n "$parsed_ci_state"; and set ci_state "$parsed_ci_state"
     end
 
     set -l out (__tide_report_render_github "$stars" "$forks" "$watchers" "$issues" "$prs" "$ci_state")
@@ -272,15 +385,24 @@ function __tide_report_fetch_github --description "Fetch GitHub repo stats with 
     end
 
     set -l temp_file "$cache_file.$fish_pid.tmp"
+    set -l stats_file (__tide_report_github_stats_file "$cache_file")
+    set -l stats_temp "$stats_file.$fish_pid.tmp"
 
     # Fetch data and store in temp file
     set -l json_data (gh repo view "$api_slug" --json 'nameWithOwner,stargazerCount,forkCount,issues,pullRequests,watchers' 2>/dev/null)
+    set -l stats_line ""
+    if test $status -eq 0; and test -n "$json_data"
+        set stats_line (printf "%s" "$json_data" | command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' 2>/dev/null)
+    end
 
     # Check if fetch was successful
-    if test $status -eq 0; and test -n "$json_data"
-        echo "$json_data" >"$temp_file"
+    if test $status -eq 0; and test -n "$json_data"; and __tide_report_github_stats_line_valid "$stats_line"
+        printf "%s\n" "$json_data" >"$temp_file"
+        printf "%s\n" "$stats_line" >"$stats_temp"
         command mv -f "$temp_file" "$cache_file"
+        command mv -f "$stats_temp" "$stats_file"
     else
+        command rm -f "$temp_file" "$stats_temp" 2>/dev/null
         functions -q __tide_report_log_expected && __tide_report_log_expected github "fetch failed (check gh auth and network)"
     end
 end
@@ -292,10 +414,20 @@ function __tide_report_fetch_github_ci --description "Fetch latest workflow run 
     end
 
     set -l temp_file "$ci_cache_file.$fish_pid.tmp"
+    set -l state_file (__tide_report_github_state_file "$ci_cache_file")
+    set -l state_temp "$state_file.$fish_pid.tmp"
     set -l json_data (gh run list -R "$api_slug" -b "$branch" -L 1 --json status,conclusion,name 2>/dev/null)
-
+    set -l ci_state ""
     if test $status -eq 0; and test -n "$json_data"
-        echo "$json_data" >"$temp_file"
+        set ci_state (printf "%s" "$json_data" | command jq -r 'if length == 0 then "none" else (.[0] | if .status == "completed" then (if .conclusion == "success" then "pass" else "fail" end) else "pending" end) end' 2>/dev/null)
+    end
+
+    if test $status -eq 0; and test -n "$json_data"; and __tide_report_github_ci_state_valid "$ci_state"
+        printf "%s\n" "$json_data" >"$temp_file"
+        printf "%s\n" "$ci_state" >"$state_temp"
         command mv -f "$temp_file" "$ci_cache_file"
+        command mv -f "$state_temp" "$state_file"
+    else
+        command rm -f "$temp_file" "$state_temp" 2>/dev/null
     end
 end
