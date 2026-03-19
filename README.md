@@ -201,15 +201,14 @@ This project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for testi
 **CI:** GitHub Actions runs the test suite on **Ubuntu** (GNU `date`) and **macOS** (BSD `date`) on every push and PR so that date-formatting and cache logic stay compatible with both.
 
 ```fish
-fisher install jorgebucaran/fishtape
-fishtape test/unit/*.fish test/unit/*/*.fish test/integration/*.fish test/integration/*/*.fish
-# Extended tests (deterministic SunCalc fixture + optional live checks when RUN_NETWORK_TESTS=1):
-set -x RUN_NETWORK_TESTS 1; and fishtape test/network/*.fish
+fish --no-config scripts/run_tests_isolated.fish
+# Optional live network checks:
+set -x RUN_NETWORK_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
 # To regenerate the canonical SunCalc moon fixture:
 fish scripts/fetch_moon_phase_fixture.fish
 ```
 
-**Local isolation:** The VS Code **Test** task and the optional pre-push hook both run tests through `scripts/run_tests_isolated.fish`, which uses a temporary `HOME` / `XDG_CONFIG_HOME` so any `set -U` inside tests (including within `fishtape` itself) does **not** modify your real Fish universals or prompt configuration.
+The VS Code **Test** task and the optional pre-push hook also run tests through `scripts/run_tests_isolated.fish`, which uses a temporary `HOME` / `XDG_CONFIG_HOME` so any `set -U` inside tests does **not** modify your real Fish universals or prompt configuration.
 
 **Pre-push hook (gated check-in):** To run the test suite automatically before pushing to `main` or `master`, install the pre-push hook from the repo root:
 

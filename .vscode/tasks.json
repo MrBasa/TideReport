@@ -19,7 +19,7 @@
       "label": "Test",
       "type": "shell",
       "command": "fish",
-      "args": ["scripts/run_tests_isolated.fish"],
+      "args": ["--no-config", "scripts/run_tests_isolated.fish"],
       "group": "test",
       "presentation": {
         "reveal": "always",
