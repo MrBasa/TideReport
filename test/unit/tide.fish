@@ -5,7 +5,6 @@ set -l fixtures (dirname (dirname (status filename)))/fixtures
 ## Stub _tide_print_item so tide parser tests can load plugin code without Tide.
 function _tide_print_item --description "Stub Tide's _tide_print_item for tide unit tests"
 end
-source "$root/_tide_item_weather.fish"
 source "$root/_tide_item_tide.fish"
 
 set -g tide_time_format "%H:%M"

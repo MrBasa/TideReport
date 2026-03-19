@@ -2,6 +2,10 @@
 ##
 ## This is the main function that Tide calls to display the weather.
 
+if not functions -q __tide_report_format_unix_time
+    source (status filename | path dirname)/_tide_report_time_helpers.fish
+end
+
 function _tide_item_weather --description "Displays weather, fetches asynchronously from JSON"
     set -l item_name "weather"
     set -l cache_file "$HOME/.cache/tide-report/weather.json"
@@ -49,31 +53,36 @@ function __tide_report_render_weather --description "Render weather segment from
         set output (string replace -a -- $pairs[$i] $pairs[$j] $output)
     end
 
-    # Symbol coloring
-    # List of single-color text symbols (Nerd Font, Unicode)
-    set -l colorable_symbols \
-        # Sunrise/Sunset
-         󰖚 󰖛 󰖜  \
-        # Wind Direction
-        ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
-        # Simple Arrows
-        ↑ ↓ → ← ▴ ▾     \
-        # Temperature
-             🌡 󰔅 󰔄 \
-        # Humidity
-         󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
-        # UV
-        🕶 󰓠    󰖙  󰖨 \
-        # Wind
-           󱪈 󱪉 󰖝 󱗺 \
-        # Feel like
-         
-    # Apply symbol color
-    set -l symbol_color (set_color $tide_report_weather_symbol_color)
-    set -l text_color (set_color $tide_weather_color)
-    set -l pattern (string join '|' -- $colorable_symbols)
-    set output (string replace -a -r "($pattern)" "$symbol_color\$1$text_color" "$output")
+    __tide_report_weather_render_init
+    set -l symbol_color $__tide_report_weather_symbol_color_code
+    set -l text_color $__tide_report_weather_text_color_code
+    set output (string replace -a -r "($__tide_report_weather_symbol_pattern)" "$symbol_color\$1$text_color" "$output")
     echo "$output"
+end
+
+function __tide_report_weather_render_init --description "Cache weather render helpers for the session"
+    if not set -q __tide_report_weather_symbol_pattern
+        set -l colorable_symbols \
+             󰖚 󰖛 󰖜  \
+            ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
+            ↑ ↓ → ← ▴ ▾     \
+                 🌡 󰔅 󰔄 \
+             󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
+            🕶 󰓠    󰖙  󰖨 \
+               󱪈 󱪉 󰖝 󱗺 \
+             
+        set -g __tide_report_weather_symbol_pattern (string join '|' -- $colorable_symbols)
+    end
+
+    if not set -q __tide_report_cached_weather_symbol_color_name; or test "$__tide_report_cached_weather_symbol_color_name" != "$tide_report_weather_symbol_color"
+        set -g __tide_report_cached_weather_symbol_color_name "$tide_report_weather_symbol_color"
+        set -g __tide_report_weather_symbol_color_code (set_color $tide_report_weather_symbol_color)
+    end
+
+    if not set -q __tide_report_cached_weather_text_color_name; or test "$__tide_report_cached_weather_text_color_name" != "$tide_weather_color"
+        set -g __tide_report_cached_weather_text_color_name "$tide_weather_color"
+        set -g __tide_report_weather_text_color_code (set_color $tide_weather_color)
+    end
 end
 
 ## --- Parser Function (reads normalized weather.json) ---
@@ -146,92 +155,5 @@ function __tide_report_get_wind_arrow --description "Convert wttr.in wind direct
         case "WSW" "W"; echo "➡"   # from W → to E
         case "WNW" "NW" "NNW"; echo "⬊"   # from NW/NNW → to SE
         case "*"; echo "" # Default
-    end
-end
-
-## --- Parse "07:30 AM" (today local) to Unix timestamp ---
-function __tide_report_time_string_to_unix --description "Parse a local time string like \"07:30 AM\" to a Unix timestamp" --argument-names time_str
-    if test -z "$time_str"
-        echo ""
-        return
-    end
-    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
-    set -l clean_time (string trim -- $time_str)
-    if test -n "$gnu_date_cmd"
-        $gnu_date_cmd -d "today $clean_time" +%s 2>/dev/null
-    else
-        set -l today (command date +%Y-%m-%d)
-        command date -j -f "%Y-%m-%d %I:%M %p" "$today $clean_time" +%s 2>/dev/null
-    end
-end
-
-## --- Return GNU date command name (gdate or date) or empty for BSD ---
-function __tide_report_gnu_date_cmd --description "Detect GNU date command name (gdate/date) or echo nothing on BSD"
-    if command -q gdate
-        echo gdate
-    else if command date --version 2>/dev/null >/dev/null
-        echo date
-    end
-end
-
-## --- Format Unix timestamp for display ---
-function __tide_report_format_unix_time --description "Format a Unix timestamp using the given time format" --argument-names epoch_str time_format
-    if test -z "$epoch_str"; or test "$epoch_str" = "null"
-        echo ""
-        return
-    end
-    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
-    set -l formatted_time
-    if test -n "$gnu_date_cmd"
-        set formatted_time ($gnu_date_cmd -d @$epoch_str +$time_format 2>/dev/null)
-    else
-        set formatted_time (command date -r $epoch_str +$time_format 2>/dev/null)
-    end
-    if test -n "$formatted_time"
-        echo "$formatted_time"
-    else
-        echo ""
-    end
-end
-
-## --- Re-format wttr.in time strings (legacy; used only if needed) ---
-function __tide_report_format_wttr_time --description "Re-format wttr.in time strings using the given time format" --argument-names time_str time_format
-    if test -z "$time_str"
-        echo ""
-        return
-    end
-
-    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
-
-    # Strip leading/trailing whitespace
-    set -l clean_time (string trim -- $time_str)
-    set -l epoch_time
-
-    # Parse time string to epoch
-    if test -n "$gnu_date_cmd"
-        # GNU date
-        set epoch_time ($gnu_date_cmd -d "$clean_time" +%s 2>/dev/null)
-    else
-        # BSD date
-        set epoch_time (command date -j -f "%I:%M %p" "$clean_time" +%s 2>/dev/null)
-    end
-
-    if test $status -ne 0; or test -z "$epoch_time"
-        echo "$clean_time" # Fallback: return original string on error
-        return
-    end
-
-    # Re-format epoch to desired format
-    set -l formatted_time
-    if test -n "$gnu_date_cmd"
-        set formatted_time ($gnu_date_cmd -d @$epoch_time +$time_format 2>/dev/null)
-    else
-        set formatted_time (command date -r $epoch_time +$time_format 2>/dev/null)
-    end
-
-    if test $status -eq 0; and test -n "$formatted_time"
-        echo "$formatted_time"
-    else
-        echo "$clean_time" # Fallback
     end
 end

@@ -1,6 +1,6 @@
 ## Optional network validation: local moon model vs timeanddate primary phases.
 
-if not set -q RUN_NETWORK_TESTS
+if not set -q RUN_NETWORK_TESTS; or test "$RUN_NETWORK_TESTS" != "1"
     exit 0
 end
 

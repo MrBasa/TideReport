@@ -43,7 +43,7 @@ end
 ## Write a normalized moon.json using the offline local moon phase model.
 function __tide_report_provider_moon_local --description "Write normalized moon.json using offline local moon phase model" --argument-names moon_cache timeout_sec lock_var
     function _remove_lock_moon --description "Clear local moon provider lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        set -e $lock_var
+        __tide_report_lock_release "$lock_var"
     end
 
     set -l now (command date +%s)
@@ -57,4 +57,3 @@ function __tide_report_provider_moon_local --description "Write normalized moon.
     set -l moon_temp "$moon_cache.$fish_pid.tmp"
     printf "%s" "$moon_json" > "$moon_temp" && command mv -f "$moon_temp" "$moon_cache"
 end
-

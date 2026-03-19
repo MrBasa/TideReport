@@ -1,6 +1,10 @@
 ## TideReport :: wttr.in weather provider
 ## One j1 request fills weather.json + moon.json. Requires __tide_report_time_string_to_unix (from weather item).
 
+if not functions -q __tide_report_time_string_to_unix
+    source (status filename | path dirname)/_tide_report_time_helpers.fish
+end
+
 function __tide_report_provider_wttr --description "Fetch weather and moon data from wttr.in and normalize to JSON caches" --argument-names weather_cache timeout_sec lock_var
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
     set -l fetched_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")

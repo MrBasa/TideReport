@@ -1,17 +1,14 @@
 ## TideReport :: Default Configuration
 
+source (status filename | path dirname | path dirname)/functions/_tide_report_defaults.fish
+
 ## Plugin version (single source of truth for display and API client string)
 set -g _tide_report_version "1.6.1"
-set -q tide_report_user_agent || set -U tide_report_user_agent "tide-report/$_tide_report_version"
-set -q tide_report_log_expected || set -U tide_report_log_expected 1
+__tide_report_set_if_missing U tide_report_user_agent "tide-report/$_tide_report_version"
+__tide_report_set_if_missing U tide_report_log_expected 1
 
 # Moon phase math constants (used by __tide_report_moon_* helpers, session-scoped globals)
-set -q __tide_report_moon_PI           || set -g __tide_report_moon_PI (math --scale=max "acos(-1)")
-set -q __tide_report_moon_rad          || set -g __tide_report_moon_rad (math --scale=max "$__tide_report_moon_PI / 180")
-set -q __tide_report_moon_day_seconds  || set -g __tide_report_moon_day_seconds 86400
-set -q __tide_report_moon_J1970        || set -g __tide_report_moon_J1970 2440588
-set -q __tide_report_moon_J2000        || set -g __tide_report_moon_J2000 2451545
-set -q __tide_report_moon_obliquity    || set -g __tide_report_moon_obliquity (math --scale=max "$__tide_report_moon_rad * 23.4397")
+__tide_report_init_moon_constants g
 
 ## If user has prompt item lists set globally (e.g. in config.fish), inform them and show copy-paste lines.
 ## Arguments: left_list and right_list as space-separated strings (the lists we just wrote). Either may be empty.

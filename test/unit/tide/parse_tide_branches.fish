@@ -1,5 +1,4 @@
 source (dirname (dirname (status filename)))/../helpers/setup.fish
-source "$REPO_ROOT/functions/_tide_item_weather.fish"
 source "$REPO_ROOT/functions/_tide_item_tide.fish"
 
 set -l fixture "$REPO_ROOT/test/fixtures/tide/predictions.json"

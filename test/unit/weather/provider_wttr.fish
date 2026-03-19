@@ -1,5 +1,4 @@
 source (dirname (dirname (status filename)))/../helpers/setup.fish
-source "$REPO_ROOT/functions/_tide_item_weather.fish"
 source "$REPO_ROOT/functions/_tide_report_provider_weather_wttr.fish"
 
 set -l fakebin "$REPO_ROOT/test/helpers/fake_bin"

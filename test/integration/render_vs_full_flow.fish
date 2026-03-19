@@ -16,10 +16,10 @@ set -g TIDE_REPORT_TEST 1
     __tide_report_test_reset_print_capture
     __tide_report_parse_github "$cache"
     set -l flow (_strip_ansi "$_tide_print_item_last_argv[2]" | string trim)
-    set -l render (__tide_report_render_github 42 3 10 2 1 none | string collect | _strip_ansi | string trim)
+    set -l render (_strip_ansi (__tide_report_render_github 42 3 10 2 1 none | string collect) | string trim)
     command rm -rf "$tmp"
-    test -n "$render"; or true
-    echo 0
+    test "$flow" = "$render"
+    echo $status
 ) -eq 0
 
 @test "moon parse equals emoji helper for fixture phase" (

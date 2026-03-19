@@ -2,6 +2,10 @@
 ## Resolved location can come from: env TIDE_REPORT_RESOLVED_LOCATION (lat,lon),
 ## IP geo when location empty, lat,lon pattern in tide_report_weather_location, or geocoding API.
 
+if not functions -q __tide_report_iso8601_to_unix
+    source (status filename | path dirname)/_tide_report_time_helpers.fish
+end
+
 function __tide_report_provider_openmeteo --description "Fetch weather from Open-Meteo, normalize, and write weather.json" --argument-names weather_cache timeout_sec lock_var
     set -l lat ""
     set -l lon ""
@@ -154,23 +158,5 @@ function __tide_report_degrees_to_16point --description "Convert wind direction 
         case 14; echo "NW"
         case 15; echo "NNW"
         case '*'; echo "N"
-    end
-end
-
-## --- ISO8601 string → Unix timestamp ---
-function __tide_report_iso8601_to_unix --description "Convert ISO8601 date-time string to Unix timestamp" --argument-names iso
-    if test -z "$iso"
-        echo ""
-        return
-    end
-    if command -q gdate
-        gdate -d "$iso" +%s 2>/dev/null
-    else if command date --version 2>/dev/null >/dev/null
-        command date -d "$iso" +%s 2>/dev/null
-    else
-        set -l parts (string split 'T' -- $iso)
-        if test (count $parts) -ge 2
-            command date -j -f "%Y-%m-%dT%H:%M" "$parts[1]T$parts[2]" +%s 2>/dev/null
-        end
     end
 end

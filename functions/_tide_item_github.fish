@@ -2,47 +2,23 @@
 ##
 ## This is the main function that Tide calls to display GitHub data. 
 
+if not functions -q __tide_report_lock_acquire
+    source (status filename | path dirname)/_tide_report_lock_helpers.fish
+end
+
 function _tide_item_github --description "Displays GitHub stats"
-    ## --- Quick Checks ---
-    # Verify we are in a git repo (suppress git's fatal message when not in a repo)
-    if not command git rev-parse --is-inside-work-tree 2>/dev/null >/dev/null
-        return 0 # Not git dir
-    end
+    set -l context (__tide_report_github_context)
+    test (count $context) -ge 6; or return 0
 
-    # Get the remote URL to determine the Repo Identity
-    set -l remote_url (command git config --get remote.origin.url 2>/dev/null)
-    if test -z "$remote_url"
-        return 0 # No remote 'origin' found
-    end
-
-    # Only show this item when origin is a GitHub remote
-    if not string match -qr 'github\.com[/:]' "$remote_url"
-        return 0
-    end
-
-    # Parse Owner and Repo Name
-    # Handles: https://github.com/Owner/Repo.git and git@github.com:Owner/Repo.git
-    set -l repo_parts (echo "$remote_url" | string replace -r '^.*[:/]([^/]+)/([^/]+?)(\.git)?$' '$1\n$2')
-    set -l owner (string trim -- $repo_parts[1])
-    set -l repo (string trim -- $repo_parts[2])
-
-    if test -z "$owner"; or test -z "$repo"
-        return 0 # Could not parse owner/repo
-    end
-
-    set -l api_slug "$owner/$repo" # Format for gh command: "Owner/Repo"
-    set -l cache_key "$owner-$repo" # Format for filename: "Owner-Repo"
-
-    set -l cache_dir "$HOME/.cache/tide-report/github"
-    set -l cache_file "$cache_dir/$cache_key.json"
+    set -l api_slug $context[1]
+    set -l cache_key $context[2]
+    set -l cache_dir $context[3]
+    set -l cache_file $context[4]
+    set -l branch $context[5]
+    set -l ci_cache_file $context[6]
     set -l refresh_seconds $tide_report_github_refresh_seconds
     set -l ci_refresh_seconds $tide_report_github_ci_refresh_seconds
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
-
-    set -l branch (command git branch --show-current 2>/dev/null; or echo "")
-    set -l branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
-    test -z "$branch_safe" && set branch_safe "detached"
-    set -l ci_cache_file "$cache_dir/$cache_key-$branch_safe-ci.json"
 
     ## --- Async Logic ---
     set -l trigger_fetch false
@@ -80,16 +56,8 @@ function _tide_item_github --description "Displays GitHub stats"
     # Trigger background fetch if needed
     set -l clean_key (string replace -a -r '[^a-zA-Z0-9_]' '_' "$cache_key")
     if test "$trigger_fetch" = true
-        set -l lock_var "_tide_report_gh_lock_$clean_key"
-
-        set -l lock_time 0
-        if set -q $lock_var
-            set lock_time $$lock_var
-        end
-
-        # Only fetch if lock is old (> 120s) or non-existent
-        if test (math $now - $lock_time) -gt 120
-            set -U $lock_var $now
+        set -l lock_var "github_$clean_key"
+        if __tide_report_lock_acquire "$lock_var" "$now" 120
             mkdir -p "$cache_dir"
             __tide_report_fetch_github "$api_slug" "$cache_file" "$timeout_sec" "$lock_var" &
             disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
@@ -98,13 +66,9 @@ function _tide_item_github --description "Displays GitHub stats"
 
     # Trigger CI fetch if needed (skip when branch is empty, e.g. detached HEAD)
     if test "$trigger_ci_fetch" = true; and test -n "$branch"
-        set -l ci_lock_var "_tide_report_gh_ci_lock_"$clean_key"_"(string replace -a -r '[^a-zA-Z0-9_]' '_' "$branch_safe")
-        set -l ci_lock_time 0
-        if set -q $ci_lock_var
-            set ci_lock_time $$ci_lock_var
-        end
-        if test (math $now - $ci_lock_time) -gt 120
-            set -U $ci_lock_var $now
+        set -l branch_safe (string replace -a -r '[^a-zA-Z0-9_]' '_' "$branch")
+        set -l ci_lock_var "github_ci_"$clean_key"_"$branch_safe
+        if __tide_report_lock_acquire "$ci_lock_var" "$now" 120
             mkdir -p "$cache_dir"
             __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$ci_lock_var" &
             disown 2>/dev/null
@@ -122,6 +86,51 @@ function _tide_item_github --description "Displays GitHub stats"
         # Data is missing, display loading message
         _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
     end
+end
+
+function __tide_report_github_context --description "Resolve repo/cache metadata and cache it briefly per working directory"
+    set -l now (command date +%s)
+    if set -q __tide_report_github_context_pwd; and test "$__tide_report_github_context_pwd" = "$PWD"
+        if set -q __tide_report_github_context_expires; and test "$__tide_report_github_context_expires" -ge $now
+            printf "%s\n" $__tide_report_github_context_values
+            return
+        end
+    end
+
+    if not command git rev-parse --is-inside-work-tree 2>/dev/null >/dev/null
+        return 1
+    end
+
+    set -l remote_url (command git config --get remote.origin.url 2>/dev/null)
+    if test -z "$remote_url"
+        return 1
+    end
+    if not string match -qr 'github\.com[/:]' "$remote_url"
+        return 1
+    end
+
+    set -l repo_parts (string replace -r '^.*[:/]([^/]+)/([^/]+?)(\.git)?$' '$1\n$2' -- "$remote_url")
+    set -l owner (string trim -- $repo_parts[1])
+    set -l repo (string trim -- $repo_parts[2])
+    if test -z "$owner"; or test -z "$repo"
+        return 1
+    end
+
+    set -l api_slug "$owner/$repo"
+    set -l cache_key "$owner-$repo"
+    set -l cache_dir "$HOME/.cache/tide-report/github"
+    set -l cache_file "$cache_dir/$cache_key.json"
+    set -l branch (command git branch --show-current 2>/dev/null; or echo "")
+    set -l branch_safe detached
+    if test -n "$branch"
+        set branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
+    end
+    set -l ci_cache_file "$cache_dir/$cache_key-$branch_safe-ci.json"
+
+    set -g __tide_report_github_context_pwd "$PWD"
+    set -g __tide_report_github_context_expires (math "$now + 2")
+    set -g __tide_report_github_context_values "$api_slug" "$cache_key" "$cache_dir" "$cache_file" "$branch" "$ci_cache_file"
+    printf "%s\n" $__tide_report_github_context_values
 end
 
 ## --- Render: display inputs → formatted string (no I/O) ---
@@ -259,7 +268,7 @@ end
 function __tide_report_fetch_github --description "Fetch GitHub repo stats with gh and write cache JSON" --argument-names api_slug cache_file timeout_sec lock_var
     # Auto-cleanup lock
     function _remove_lock --description "Clear GitHub fetch lock when background worker exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        set -U -e $lock_var
+        __tide_report_lock_release "$lock_var"
     end
 
     set -l temp_file "$cache_file.$fish_pid.tmp"
@@ -279,7 +288,7 @@ end
 ## --- Fetch GitHub CI status (Background Worker) ---
 function __tide_report_fetch_github_ci --description "Fetch latest workflow run for branch and write CI cache JSON" --argument-names api_slug branch ci_cache_file lock_var
     function _remove_ci_lock --description "Clear GitHub CI fetch lock when background worker exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        set -U -e $lock_var
+        __tide_report_lock_release "$lock_var"
     end
 
     set -l temp_file "$ci_cache_file.$fish_pid.tmp"

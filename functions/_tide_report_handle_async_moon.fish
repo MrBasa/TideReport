@@ -29,13 +29,11 @@ function _tide_report_handle_async_moon --description "Manage moon.json cache va
     end
 
     if $trigger_fetch
-        set -l lock_var "_tide_report_moon_lock"
+        set -l lock_var "moon"
         if test "$provider" = "wttr"; and test "$tide_report_weather_provider" = "wttr"
-            set lock_var "_tide_report_wttr_lock"
+            set lock_var "weather"
         end
-        set -l lock_time (set -q $lock_var; and echo $$lock_var; or echo 0)
-        if test (math $now - $lock_time) -gt 120
-            set -U $lock_var $now
+        if __tide_report_lock_acquire "$lock_var" "$now" 120
             if test "$provider" = "wttr"; and test "$tide_report_weather_provider" = "wttr"
                 set -l weather_cache "$HOME/.cache/tide-report/weather.json"
                 __tide_report_fetch_weather "$weather_cache" "$timeout_sec" "$lock_var" &

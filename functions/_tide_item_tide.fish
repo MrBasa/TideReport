@@ -10,6 +10,13 @@
 ##    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
 ## ]}
 
+if not functions -q __tide_report_gnu_date_cmd
+    source (status filename | path dirname)/_tide_report_time_helpers.fish
+end
+if not functions -q __tide_report_lock_acquire
+    source (status filename | path dirname)/_tide_report_lock_helpers.fish
+end
+
 function _tide_item_tide --description "Fetches and displays next high or low tide"
     if not set -q tide_report_tide_station_id
         set -l output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text!stationID"
@@ -53,14 +60,9 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
     end
 
     if $trigger_fetch
-        set -l lock_var "_tide_report_tide_lock"
-        set -l lock_time 0
-        if set -q $lock_var
-            set lock_time $$lock_var
-        end
-        if test (math $now - $lock_time) -gt 120
-            set -U $lock_var $now
-            __tide_report_fetch_tide "$url" "$cache_file" "$lock_var" &
+        set -l lock_name "tide"
+        if __tide_report_lock_acquire "$lock_name" "$now" 120
+            __tide_report_fetch_tide "$url" "$cache_file" "$lock_name" &
             disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
         end
     end
@@ -151,7 +153,7 @@ end
 ## --- Fetch Tide Data ---
 function __tide_report_fetch_tide --description "Fetch tide predictions from NOAA and update tide.json cache" --argument url cache_file lock_var
     function _remove_lock --description "Clear tide fetch lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        set -e $lock_var
+        __tide_report_lock_release "$lock_var"
     end
     set -l tide_data (curl -s -A "$tide_report_user_agent" --max-time 3 "$url")
     set -l curl_status $status

@@ -3,7 +3,7 @@
 
 function __tide_report_provider_moon_wttr --description "Fetch moon phase from wttr.in and write normalized moon.json" --argument-names moon_cache timeout_sec lock_var
     function _remove_lock_moon --description "Clear wttr.in moon provider lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        set -e $lock_var
+        __tide_report_lock_release "$lock_var"
     end
 
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
