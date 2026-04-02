@@ -191,6 +191,7 @@ Computes moon phase. Defaults to an offline astronomical model.
 
 ## 🚑 Troubleshooting
 - **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set `tide_report_weather_location` explicitly.
+- **Emoji alignment changed after Fish 4.6:** Fish 4.6 changed the default emoji width from `1` to `2`. This usually improves alignment on modern terminals, but if moon/weather symbols look offset on older environments, run `set -U fish_emoji_width 1` and restart the shell.
 - **Re-configure via Wizard:** If you want to change your units, toggle modules, or update your weather location, you can re-run the setup wizard at any time. Just run `fisher update MrBasa/TideReport@v1` in your terminal.
 - **Persistent Unavailable Symbols (`…`, `🌊…`):** If a module gets stuck showing an unavailable state, check the diagnostic log located at `$XDG_STATE_HOME/tide-report/tide-report.log`. This usually indicates a missing dependency (like `jq` or `gh`), an API timeout, or bad credentials.
 - **Clean Reinstall:** If things get weird and a regular update doesn't fix it, run `fisher remove MrBasa/TideReport`, optionally restart your shell, and run `fisher install MrBasa/TideReport@v1` for a completely fresh start.
