@@ -101,8 +101,10 @@ Displays stats for the current repository. **Requires `gh` CLI to be authenticat
 |---|---|
 |`★` / `⑂` / ``|Stars / Forks / Watchers|
 |`!` / `PR`|Open Issues / Open Pull Requests|
-|`✓` / `✗` / `⋯`|Latest CI run: pass / fail / pending|
+|`✔` / `✗` / `⏳`|Latest workflow run on the current branch: pass / fail / in progress (or queued)|
 |`!auth`|`gh` CLI is not authenticated|
+
+CI status comes from `gh run list` (latest run on your current branch). GitHub reports in-progress runs as `in_progress`, not the word `running`. Data is cached in the background so the prompt never blocks; while a fetch is running, a stale pass/fail icon may briefly switch to `⏳`. After a completed run, the icon can stay on the last result for up to `tide_report_github_ci_refresh_seconds` (default 60s) until the next background refresh. While a run is active (cached `pending` or a CI fetch in progress), refresh uses `tide_report_github_ci_running_refresh_seconds` (default 5s) so the hourglass updates sooner. If no CI cache exists yet, no CI icon is shown until the first fetch succeeds.
 
 |**Variable**|**Description**|**Default**|
 |---|---|---|
@@ -111,10 +113,11 @@ Displays stats for the current repository. **Requires `gh` CLI to be authenticat
 |`tide_report_github_icon_*`|Icons for `stars`, `forks`, `watchers`, `issues`, `prs`.|`★`, `⑂`, ``, `!`, `PR`|
 |`tide_report_github_color_*`|Colors for `stars`, `forks`, `watchers`, `issues`, `prs`.|`yellow`|
 |`tide_report_github_show_ci`|Show latest workflow run for the current branch.|`true`|
-|`tide_report_github_icon_ci_*`|Icons for CI states: `pass`, `fail`, `pending`.|`✔`, `✗`, `⋯`|
+|`tide_report_github_icon_ci_*`|Icons for CI states: `pass`, `fail`, `pending`.|`✔`, `✗`, `⏳`|
 |`tide_report_github_color_ci_*`|Colors for CI states: `pass`, `fail`, `pending`.|`green`, `red`, `yellow`|
 |`tide_report_github_refresh_seconds`|Cache lifespan for repository stats.|`30`|
-|`tide_report_github_ci_refresh_seconds`|Cache lifespan for CI workflow status.|`60`|
+|`tide_report_github_ci_refresh_seconds`|Cache lifespan for CI workflow status when the last result is pass or fail.|`60`|
+|`tide_report_github_ci_running_refresh_seconds`|Cache lifespan while CI is pending or a background CI fetch is in progress.|`5`|
 |`tide_report_github_unavailable_text`|Text displayed when data is unavailable.|`…`|
 |`tide_report_github_unavailable_color`|Color for unavailable text.|`red`|
 

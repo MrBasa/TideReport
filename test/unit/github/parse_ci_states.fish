@@ -28,7 +28,7 @@ set -g TIDE_REPORT_TEST 1
     echo '[{"status":"in_progress","conclusion":null}]' > "$ci"
     __tide_report_test_reset_print_capture
     __tide_report_parse_github "$cache" "" "$ci"
-    string match -q '*⋯*' "$_tide_print_item_last_argv[2]"
+    string match -q '*⏳*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0
 

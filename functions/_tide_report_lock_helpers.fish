@@ -42,3 +42,8 @@ end
 function __tide_report_lock_release --description "Release a cache lock" --argument-names lock_name
     command rm -rf (__tide_report_lock_path "$lock_name") 2>/dev/null
 end
+
+function __tide_report_lock_held --description "Return success when a cache lock directory exists" --argument-names lock_name
+    test -n "$lock_name"
+    test -d (__tide_report_lock_path "$lock_name")
+end

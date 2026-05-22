@@ -43,6 +43,23 @@ function __tide_report_github_ci_state_valid --description "Validate normalized 
     contains -- "$ci_state" pass fail pending none
 end
 
+function __tide_report_github_ci_effective_refresh --description "Return CI cache refresh interval based on state and in-flight fetch" --argument-names cached_ci_state ci_lock_var
+    set -q tide_report_github_ci_refresh_seconds; or set -l tide_report_github_ci_refresh_seconds 60
+    set -q tide_report_github_ci_running_refresh_seconds; or set -l tide_report_github_ci_running_refresh_seconds 5
+
+    if test "$cached_ci_state" = pending
+        echo $tide_report_github_ci_running_refresh_seconds
+        return 0
+    end
+
+    if test -n "$ci_lock_var"; and __tide_report_lock_held "$ci_lock_var"
+        echo $tide_report_github_ci_running_refresh_seconds
+        return 0
+    end
+
+    echo $tide_report_github_ci_refresh_seconds
+end
+
 function __tide_report_github_ci_cache_file --description "Return CI cache path for cache key and branch" --argument-names cache_dir cache_key branch
     set -l branch_safe detached
     if test -n "$branch"
@@ -141,13 +158,24 @@ function _tide_item_github --description "Displays GitHub stats"
     set -l branch (__tide_report_github_branch_from_head "$git_dir" | string collect)
     set -l ci_cache_file (__tide_report_github_ci_cache_file "$cache_dir" "$cache_key" "$branch")
     set -l refresh_seconds $tide_report_github_refresh_seconds
-    set -l ci_refresh_seconds $tide_report_github_ci_refresh_seconds
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
+    set -l clean_key (string replace -a -r '[^a-zA-Z0-9_]' '_' "$cache_key")
+    set -l ci_lock_var ""
+    if test -n "$branch"
+        set -l branch_safe (string replace -a -r '[^a-zA-Z0-9_]' '_' "$branch")
+        set ci_lock_var "github_ci_"$clean_key"_"$branch_safe
+    end
 
     ## --- Async Logic ---
     set -l trigger_fetch false
     set -l trigger_ci_fetch false
     set -l output_valid false
+    set -l cached_ci_state none
+    if test "$tide_report_github_show_ci" = true; and test -f "$ci_cache_file"
+        set cached_ci_state (__tide_report_github_read_ci_state "$ci_cache_file" | string collect)
+        test -n "$cached_ci_state"; or set cached_ci_state none
+    end
+    set -l ci_refresh_seconds (__tide_report_github_ci_effective_refresh "$cached_ci_state" "$ci_lock_var")
 
     # Check cache status
     if test -f "$cache_file"
@@ -179,7 +207,6 @@ function _tide_item_github --description "Displays GitHub stats"
     end
 
     # Trigger background fetch if needed
-    set -l clean_key (string replace -a -r '[^a-zA-Z0-9_]' '_' "$cache_key")
     if test "$trigger_fetch" = true
         set -l lock_var "github_$clean_key"
         if __tide_report_lock_acquire "$lock_var" "$now" 120
@@ -191,8 +218,6 @@ function _tide_item_github --description "Displays GitHub stats"
 
     # Trigger CI fetch if needed (skip when branch is empty, e.g. detached HEAD)
     if test "$trigger_ci_fetch" = true; and test -n "$branch"
-        set -l branch_safe (string replace -a -r '[^a-zA-Z0-9_]' '_' "$branch")
-        set -l ci_lock_var "github_ci_"$clean_key"_"$branch_safe
         if __tide_report_lock_acquire "$ci_lock_var" "$now" 120
             mkdir -p "$cache_dir"
             __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$ci_lock_var" &
@@ -200,10 +225,19 @@ function _tide_item_github --description "Displays GitHub stats"
         end
     end
 
+    set -l ci_fetch_in_flight false
+    if test "$tide_report_github_show_ci" = true; and test -n "$ci_lock_var"
+        __tide_report_lock_held "$ci_lock_var"; and set ci_fetch_in_flight true
+    end
+
     if test "$output_valid" = true
         # Cache is valid (or stale but usable), parse and print
         if test "$tide_report_github_show_ci" = true
-            __tide_report_parse_github "$cache_file" "" "$ci_cache_file"
+            if test "$ci_fetch_in_flight" = true
+                __tide_report_parse_github "$cache_file" "" "$ci_cache_file" true
+            else
+                __tide_report_parse_github "$cache_file" "" "$ci_cache_file"
+            end
         else
             __tide_report_parse_github "$cache_file"
         end
@@ -307,7 +341,7 @@ function __tide_report_render_github --description "Render GitHub segment from s
     if test "$tide_report_github_show_ci" = true; and test -n "$ci_state"; and test "$ci_state" != "none"
         set -q tide_report_github_icon_ci_pass; or set -l tide_report_github_icon_ci_pass "✔"
         set -q tide_report_github_icon_ci_fail; or set -l tide_report_github_icon_ci_fail "✗"
-        set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⋯"
+        set -q tide_report_github_icon_ci_pending; or set -l tide_report_github_icon_ci_pending "⏳"
         set -q tide_report_github_color_ci_pass; or set -l tide_report_github_color_ci_pass "green"
         set -q tide_report_github_color_ci_fail; or set -l tide_report_github_color_ci_fail "red"
         set -q tide_report_github_color_ci_pending; or set -l tide_report_github_color_ci_pending "yellow"
@@ -372,6 +406,12 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
     if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"
         set -l parsed_ci_state (__tide_report_github_read_ci_state "$ci_cache_file" | string collect)
         test -n "$parsed_ci_state"; and set ci_state "$parsed_ci_state"
+    end
+
+    set -l ci_fetch_in_flight false
+    set -q argv[4]; and test "$argv[4]" = true; and set ci_fetch_in_flight true
+    if test "$ci_fetch_in_flight" = true; and contains -- "$ci_state" pass fail none
+        set ci_state pending
     end
 
     set -l out (__tide_report_render_github "$stars" "$forks" "$watchers" "$issues" "$prs" "$ci_state")
