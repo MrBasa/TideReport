@@ -3,7 +3,7 @@
 source (status filename | path dirname | path dirname)/functions/_tide_report_defaults.fish
 
 ## Plugin version (single source of truth for display and API client string)
-set -g _tide_report_version "1.6.1"
+set -g _tide_report_version "1.7.0"
 __tide_report_set_if_missing U tide_report_user_agent "tide-report/$_tide_report_version"
 __tide_report_set_if_missing U tide_report_log_expected 1
 

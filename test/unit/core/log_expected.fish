@@ -5,7 +5,7 @@ set -l tmp (mktemp -d)
 set -g HOME "$tmp/home"
 set -g XDG_STATE_HOME "$tmp/state"
 mkdir -p "$HOME" "$XDG_STATE_HOME"
-set -g _tide_report_version "1.6.1"
+set -g _tide_report_version "1.7.0"
 
 @test "log_expected writes one line when enabled" (
     set -g tide_report_log_expected 1
