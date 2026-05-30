@@ -1,0 +1,7 @@
+When Cursor auto-generates a Git commit message for this repository (including the Source Control sparkle button), use this format:
+
+1. Subject: imperative, ≤140 chars, high-level summary; optional `feat:` / `fix:` / `chore:` / `docs:` prefix.
+2. Blank line, then bullet changeset: one bullet per logical change; paths in backticks; plain-language what changed.
+3. Blank line, then one closing sentence on why/impact ("These changes aim to …").
+
+Staged changes only. No secrets or `.env*` contents. No Co-authored-by.
