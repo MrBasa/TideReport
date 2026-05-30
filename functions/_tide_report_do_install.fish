@@ -1,7 +1,11 @@
-source (status filename | path dirname)/_tide_report_defaults.fish
-source (status filename | path dirname)/_tide_report_prompt_helpers.fish
-
 function _tide_report_do_install --description "Install TideReport defaults and prompt items (called by install event)"
+    if not functions -q __tide_report_apply_defaults
+        source (status filename | path dirname)/_tide_report_defaults.fish
+    end
+    if not functions -q _tide_report_install_show_preview
+        source (status filename | path dirname)/_tide_report_prompt_helpers.fish
+    end
+
     set -l default_color $tide_time_color
     set -l default_bg_color $tide_time_bg_color
     ## --- Check for Dev Branch Install ---

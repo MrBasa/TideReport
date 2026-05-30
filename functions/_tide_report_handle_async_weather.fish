@@ -6,14 +6,25 @@
 ##   condition_text, wind_speed_kmh, wind_speed_mph, wind_dir_16 (N, NE, ...), humidity, uv_index,
 ##   sunrise_utc, sunset_utc (Unix timestamps)
 
-## Source provider implementations
-set -l _tr_weather_dir (status filename | path dirname)
-source "$_tr_weather_dir/_tide_report_provider_weather_wttr.fish"
-source "$_tr_weather_dir/_tide_report_provider_weather_openmeteo.fish"
-source "$_tr_weather_dir/_tide_report_lock_helpers.fish"
+function __tide_report_weather_load_lock --description "Lazy-load weather lock helpers"
+    if not functions -q __tide_report_lock_acquire
+        source (status filename | path dirname)/_tide_report_lock_helpers.fish
+    end
+end
+
+function __tide_report_weather_load_providers --description "Lazy-load weather provider implementations"
+    set -l _dir (status filename | path dirname)
+    if not functions -q __tide_report_provider_wttr
+        source "$_dir/_tide_report_provider_weather_wttr.fish"
+    end
+    if not functions -q __tide_report_provider_openmeteo
+        source "$_dir/_tide_report_provider_weather_openmeteo.fish"
+    end
+end
 
 ## --- Main async handler for the weather cache (used by weather item only) ---
 function _tide_report_handle_async_weather --description "Manage weather.json cache validity and trigger provider fetches" --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
+    __tide_report_weather_load_lock
     set -l now (command date +%s)
     set -l trigger_fetch false
     set -l cache_valid false
@@ -69,6 +80,8 @@ end
 
 ## --- Dispatch by provider ---
 function __tide_report_fetch_weather --description "Dispatch to configured weather provider to refresh weather.json" --argument-names weather_cache timeout_sec lock_var
+    __tide_report_weather_load_lock
+    __tide_report_weather_load_providers
     function _remove_lock --description "Clear weather provider lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         __tide_report_lock_release "$lock_var"
     end

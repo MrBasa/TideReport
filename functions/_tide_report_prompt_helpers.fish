@@ -1,5 +1,17 @@
 ## TideReport :: Prompt mutation and preview helpers
 
+function _tide_report_warn_global_prompt_items --description "Warn when a global shadows; show session fix and config.fish line" --argument-names left_list right_list
+    set -q left_list || set left_list ""
+    set -q right_list || set right_list ""
+    set -q -g tide_left_prompt_items; or set -q -g tide_right_prompt_items; or return 0
+    echo (set_color bryellow)"You have tide_left_prompt_items and/or tide_right_prompt_items set globally (e.g. in config.fish), which overrides the list we just updated."(set_color normal)
+    echo (set_color brwhite)"To see the change in this session, run:"(set_color normal)
+    echo (set_color cyan)"  set -e -g tide_left_prompt_items ; set -e -g tide_right_prompt_items ; tide reload"(set_color normal)
+    echo (set_color brwhite)"To make it permanent, update the corresponding line(s) in your config.fish. Example:"(set_color normal)
+    test -n "$left_list" && echo (set_color cyan)"  set -g tide_left_prompt_items $left_list"(set_color normal)
+    test -n "$right_list" && echo (set_color cyan)"  set -g tide_right_prompt_items $right_list"(set_color normal)
+end
+
 function _tide_report_install_show_preview --description "Echo sample output for one item or all items with separators" --argument-names which_item weather_format default_bg_color
     set -q which_item || set which_item all
     set -q weather_format || set weather_format medium

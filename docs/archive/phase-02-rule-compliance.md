@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-05-30 |
+| **Completed** | 2026-05-30 |
 | **Depends on** | [phase-01-critical-bugs.md](phase-01-critical-bugs.md) (recommended) |
 
 ---
@@ -30,25 +30,25 @@ Align with [.cursor/rules/fish-functions-no-top-level-execution.mdc](../../.curs
 
 ### Required
 
-- [ ] **2.1** **Remove top-level moon init call**
+- [x] **2.1** **Remove top-level moon init call**
   - Delete line 103 (`__tide_report_moon_init_constants`) from [`functions/_tide_report_moon_math.fish`](../functions/_tide_report_moon_math.fish).
   - Rely on [`conf.d/tide_report.fish`](../conf.d/tide_report.fish) → `__tide_report_init_moon_constants g` only.
 
-- [ ] **2.2** **Unify moon constant init naming**
+- [x] **2.2** **Unify moon constant init naming**
   - Consolidate `__tide_report_init_moon_constants` (defaults/conf) vs `__tide_report_moon_init_constants` (moon_math)—one name, one implementation.
   - Ensure `set_if_missing` / non-destructive behavior where appropriate.
 
-- [ ] **2.3** **Move top-level `source` chains into function bodies**
+- [x] **2.3** **Move top-level `source` chains into function bodies**
   - [`functions/_tide_report_handle_async_weather.fish`](../functions/_tide_report_handle_async_weather.fish) lines 10–13
   - [`functions/_tide_report_handle_async_moon.fish`](../functions/_tide_report_handle_async_moon.fish) lines 6–10
   - [`functions/_tide_report_do_install.fish`](../functions/_tide_report_do_install.fish) lines 1–2
   - Pattern: lazy `if not functions -q …; source …; end` inside the function that needs deps (as in [`functions/_tide_item_weather.fish`](../functions/_tide_item_weather.fish)).
 
-- [ ] **2.4** **Conditional moon → weather stack loading**
+- [x] **2.4** **Conditional moon → weather stack loading**
   - Only source weather async + wttr/openmeteo providers when `moon=wttr && weather=wttr` (shared fetch) or when moon provider is wttr and needs wttr provider file.
   - Default `moon=local` must not load entire weather stack on moon handler autoload.
 
-- [ ] **2.5** **Verify module independence tests**
+- [x] **2.5** **Verify module independence tests**
   - Run/update [`test/unit/core/module_independence.fish`](../test/unit/core/module_independence.fish) if load paths change.
 
 ### Optional (include if low cost during phase)
@@ -58,7 +58,7 @@ Align with [.cursor/rules/fish-functions-no-top-level-execution.mdc](../../.curs
   - Optional one-time `_tide_report_install` invoke at end of [`conf.d/tide_report.fish`](../conf.d/tide_report.fish) if production installs confirm missed events.
   - Document trade-off (double-run guard).
 
-- [ ] **2.7** **Move `_tide_report_warn_global_prompt_items` to `functions/`**
+- [x] **2.7** **Move `_tide_report_warn_global_prompt_items` to `functions/`**
   - Keep thin `--on-event` stubs in conf.d only.
   - File: [`conf.d/tide_report.fish`](../conf.d/tide_report.fish), [`functions/_tide_report_prompt_helpers.fish`](../functions/_tide_report_prompt_helpers.fish).
 
@@ -78,4 +78,9 @@ Align with [.cursor/rules/fish-functions-no-top-level-execution.mdc](../../.curs
 
 ## Done notes
 
-_(Fill when completed.)_
+- Removed duplicate `__tide_report_moon_init_constants`; `__tide_report_init_moon_constants` in `_tide_report_defaults.fish` is the single init path (conf.d + tests).
+- Weather async handler lazy-loads lock helpers and providers via `__tide_report_weather_load_*` inside function bodies.
+- Moon async handler lazy-loads deps via `__tide_report_moon_load_deps` based on provider config; local moon never pulls weather stack.
+- Install/uninstall lazy-load prompt helpers when needed; `_tide_report_warn_global_prompt_items` moved to `_tide_report_prompt_helpers.fish`.
+- Added module-independence tests for moon autoload isolation. Updated integration tests to source prompt helpers directly.
+- Optional 2.6 (Fisher event fallback) deferred—no production evidence of missed install events.

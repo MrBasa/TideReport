@@ -5,7 +5,7 @@ set -g HOME "$tmp/home"
 set -g XDG_CONFIG_HOME "$tmp/config"
 mkdir -p "$HOME" "$XDG_CONFIG_HOME"
 source (dirname (dirname (status filename)))/../helpers/setup.fish
-source "$REPO_ROOT/conf.d/tide_report.fish"
+source "$REPO_ROOT/functions/_tide_report_prompt_helpers.fish"
 
 @test "warn_global_prompt_items emits guidance when globals are set" (
     functions -q _tide_report_warn_global_prompt_items

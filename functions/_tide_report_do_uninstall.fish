@@ -42,6 +42,9 @@ function _tide_report_do_uninstall --description "Remove TideReport items, vars,
         end
         set -U tide_left_prompt_items $new_left
     end
+    if not functions -q _tide_report_warn_global_prompt_items
+        source (status filename | path dirname)/_tide_report_prompt_helpers.fish
+    end
     _tide_report_warn_global_prompt_items (string join " " $new_left) (string join " " $new_right)
 
     # Erase all universal variables we create. Intentionally leave tide_time_format (Tide core).

@@ -5,7 +5,7 @@ set -g HOME "$tmp/home"
 set -g XDG_CONFIG_HOME "$tmp/config"
 mkdir -p "$HOME" "$XDG_CONFIG_HOME"
 source (dirname (dirname (status filename)))/../helpers/setup.fish
-source "$REPO_ROOT/functions/_tide_report_do_install.fish"
+source "$REPO_ROOT/functions/_tide_report_prompt_helpers.fish"
 
 set -U tide_left_prompt_items git pwd
 set -U tide_right_prompt_items time

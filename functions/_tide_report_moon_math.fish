@@ -10,16 +10,6 @@ function __tide_report_moon_eval --description "Evaluate moon math expression at
     math --scale=max "$expression"
 end
 
-## Ensure moon constants are initialized with high precision.
-function __tide_report_moon_init_constants --description "Initialize moon math constants with high precision"
-    set -g __tide_report_moon_PI (__tide_report_moon_eval "acos(-1)")
-    set -g __tide_report_moon_rad (__tide_report_moon_eval "$__tide_report_moon_PI / 180")
-    set -q __tide_report_moon_day_seconds; or set -g __tide_report_moon_day_seconds 86400
-    set -q __tide_report_moon_J1970; or set -g __tide_report_moon_J1970 2440588
-    set -q __tide_report_moon_J2000; or set -g __tide_report_moon_J2000 2451545
-    set -g __tide_report_moon_obliquity (__tide_report_moon_eval "$__tide_report_moon_rad * 23.4397")
-end
-
 ## Convert Unix time (seconds) to days since J2000 epoch.
 function __tide_report_moon_to_days --description "Convert Unix time to days since J2000 epoch" --argument-names unix_time
     set -l jd (__tide_report_moon_eval "$unix_time / $__tide_report_moon_day_seconds - 0.5 + $__tide_report_moon_J1970")
@@ -99,5 +89,3 @@ function __tide_report_moon_illumination_from_unix --description "Compute moon i
     end
     __tide_report_moon_eval "(1 - cos(2 * $__tide_report_moon_PI * $phase_fraction)) / 2 * 100"
 end
-
-__tide_report_moon_init_constants
