@@ -18,3 +18,21 @@ source "$REPO_ROOT/functions/_tide_report_time_helpers.fish"
     test "$got" = "$expected"
     echo $status
 ) -eq 0
+
+@test "noaa_gmt_to_unix returns numeric epoch for NOAA GMT time" (
+    set -l out (__tide_report_noaa_gmt_to_unix "2030-06-15 00:18" | string collect)
+    string match -q -r '^[0-9]+$' "$out"; and test "$out" -gt 0
+    echo $status
+) -eq 0
+
+@test "noaa_gmt_to_unix matches GNU UTC parse" (
+    set -l gnu (__tide_report_gnu_date_cmd | string collect)
+    test -n "$gnu"; or begin
+        echo 0
+        exit 0
+    end
+    set -l expected ($gnu -d "2030-06-15 00:18 UTC" +%s 2>/dev/null | string collect)
+    set -l got (__tide_report_noaa_gmt_to_unix "2030-06-15 00:18" | string collect)
+    test "$got" = "$expected"
+    echo $status
+) -eq 0

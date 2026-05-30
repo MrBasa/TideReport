@@ -1,11 +1,13 @@
 # Phase 8 — Future & deferred
 
-| Field | Value |
-|-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+
+| Field          | Value                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------- |
+| **Status**     | `pending`                                                                             |
+| **Started**    | —                                                                                     |
+| **Completed**  | —                                                                                     |
 | **Depends on** | [phase-03-user-features.md](phase-03-user-features.md) (`tide-report` CLI foundation) |
+
 
 ---
 
@@ -30,7 +32,7 @@ Features explicitly deferred from phase 3+ and optional enhancements that need p
 
 ### CLI extensions
 
-- [ ] **8.1** **`tide-report bug-report` subcommand** _(recommended when filing issues becomes painful)_
+- **8.1** `**tide-report bug-report` subcommand** *(recommended when filing issues becomes painful)*
   - Mirror Tide's `_tide_sub_bug-report` flow.
   - Include in output:
     - `$_tide_report_version` / `tide_report_user_agent`
@@ -39,31 +41,28 @@ Features explicitly deferred from phase 3+ and optional enhancements that need p
     - `$XDG_STATE_HOME/tide-report/tide-report.log` tail (if exists)
     - Selected universals (refresh/expire, show_ci)
     - `$_fisher_plugins` line (Tide already prints this)
+    - URL to GitHub 'Create New Issue' - [https://github.com/MrBasa/TideReport/issues/new](https://github.com/MrBasa/TideReport/issues/new)
   - Add `_tide_report_sub_bug-report`; register in `tide-report` dispatcher.
   - Tests: help output + mocked env snapshot.
-
-- [ ] **8.2** **`tide-report reload` subcommand** _(optional — low value)_
+- **8.2** `**tide-report reload` subcommand** *(optional — low value)*
   - Only if user feedback shows confusion about `tide reload`.
   - Would thin-wrap `tide reload` with explanation—**not recommended** per phase 3 decision.
   - Skip unless explicitly requested.
 
 ### Product / UX optional
 
-- [ ] **8.3** **Selective cache clear on update**
+- **8.3** **Selective cache clear on update**
   - Instead of `rm -rf ~/.cache/tide-report` on every update, clear per-module or stale-only.
-
-- [ ] **8.4** **GitHub stats expire tier**
+- **8.4** **GitHub stats expire tier**
   - Currently refresh-only by design; add expire if stale stars/forks become a reported issue.
-
-- [ ] **8.5** **Reduce first-prompt git subprocess cost**
-  - [`__tide_report_github_context`](../functions/_tide_item_github.fish): 3× `git` on first repo visit; optional `.git` file reads only.
+- **8.5** **Reduce first-prompt git subprocess cost**
+  - `[__tide_report_github_context](../functions/_tide_item_github.fish)`: 3× `git` on first repo visit; optional `.git` file reads only.
 
 ### Review carry-over (optional)
 
-- [ ] **8.6** **Timing-based "never block prompt" integration test**
+- **8.6** **Timing-based "never block prompt" integration test**
   - Fake curl sleep; measure prompt return (may be flaky in CI—document).
-
-- [ ] **8.7** **Conf defaults exhaustive test matrix**
+- **8.7** **Conf defaults exhaustive test matrix**
   - Every README table row ↔ `__tide_report_apply_defaults`.
 
 ## Acceptance criteria
@@ -79,4 +78,4 @@ Features explicitly deferred from phase 3+ and optional enhancements that need p
 
 ## Done notes
 
-_(Fill when completed. OK to archive with many items still unchecked if team decides to close the phase as "won't do"—document that decision.)_
+*(Fill when completed. OK to archive with many items still unchecked if team decides to close the phase as "won't do"—document that decision.)*

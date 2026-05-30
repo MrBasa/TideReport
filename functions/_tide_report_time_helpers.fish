@@ -77,6 +77,20 @@ function __tide_report_format_wttr_time --description "Re-format wttr.in time st
     end
 end
 
+function __tide_report_noaa_gmt_to_unix --description "Parse NOAA prediction time (GMT) to Unix timestamp" --argument-names date_str
+    if test -z "$date_str"
+        echo ""
+        return
+    end
+
+    set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
+    if test -n "$gnu_date_cmd"
+        $gnu_date_cmd -d "$date_str UTC" +%s 2>/dev/null
+    else
+        command date -u -j -f "%Y-%m-%d %H:%M" "$date_str" +%s 2>/dev/null
+    end
+end
+
 function __tide_report_iso8601_to_unix --description "Convert ISO8601 date-time string to Unix timestamp" --argument-names iso
     if test -z "$iso"
         echo ""

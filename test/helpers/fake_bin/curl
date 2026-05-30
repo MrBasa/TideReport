@@ -4,8 +4,16 @@ set -l st 0
 set -l url ""
 set -l matched_specific false
 
-for arg in $argv
-    if string match -qr '^https?://' -- "$arg"
+for i in (seq (count $argv))
+    set -l arg $argv[$i]
+    if test "$arg" = --max-time
+        set -l next (math $i + 1)
+        if test $next -le (count $argv)
+            if set -q TIDE_REPORT_TEST_CURL_MAX_TIME_FILE
+                printf '%s' $argv[$next] > "$TIDE_REPORT_TEST_CURL_MAX_TIME_FILE"
+            end
+        end
+    else if string match -qr '^https?://' -- "$arg"
         set url "$arg"
     end
 end

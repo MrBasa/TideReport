@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-05-30 |
+| **Completed** | 2026-05-30 |
 | **Depends on** | none |
 
 ---
@@ -28,17 +28,17 @@ Fix correctness bugs with small, high-impact diffs before refactors. These affec
 
 ## Checklist
 
-- [ ] **1.1** **Tide UTC parsing on BSD/macOS**
+- [x] **1.1** **Tide UTC parsing on BSD/macOS**
   - **Problem:** [`functions/_tide_item_tide.fish`](../functions/_tide_item_tide.fish) lines 138–141: GNU branch parses NOAA GMT as `"$date_str UTC"`; BSD branch parses as **local** time → wrong tide display on macOS CI.
   - **Fix:** Use patterns from [`functions/_tide_report_time_helpers.fish`](../functions/_tide_report_time_helpers.fish) (`__tide_report_gnu_date_cmd`, epoch helpers) with explicit UTC on BSD.
   - **Tests:** Extend [`test/unit/tide/parse_tide_branches.fish`](../test/unit/tide/parse_tide_branches.fish) or integration [`test/integration/tide.fish`](../test/integration/tide.fish) with BSD-style date path (mock or conditional).
 
-- [ ] **1.2** **Atomic tide cache write**
+- [x] **1.2** **Atomic tide cache write**
   - **Problem:** [`__tide_report_fetch_tide`](../functions/_tide_item_tide.fish) ~line 165 writes directly with `printf > cache_file`; weather/moon use `$cache.$fish_pid.tmp` + `mv`.
   - **Fix:** Temp file + atomic `mv`; `mkdir -p` parent dir before write.
   - **Tests:** Existing [`test/unit/tide/fetch_tide.fish`](../test/unit/tide/fetch_tide.fish) should still pass.
 
-- [ ] **1.3** **Align tide fetch timeout with config**
+- [x] **1.3** **Align tide fetch timeout with config**
   - **Problem:** `--max-time 3` hardcoded; other modules use `tide_report_service_timeout_millis`.
   - **Fix:** Pass `timeout_sec` into `__tide_report_fetch_tide` (from item entry) and use in curl.
   - **Tests:** Optional unit assertion that timeout is propagated (mock curl env in fake_bin if needed).
@@ -58,4 +58,6 @@ Fix correctness bugs with small, high-impact diffs before refactors. These affec
 
 ## Done notes
 
-_(Fill when completed.)_
+- Added `__tide_report_noaa_gmt_to_unix` (GNU `-d "… UTC"`, BSD `date -u -j -f`) and wired `__tide_report_parse_tide` through `__tide_report_format_unix_time` for local display.
+- Tide fetch uses `$cache_file.$fish_pid.tmp` + `mv -f`; timeout comes from `tide_report_service_timeout_millis` via new `timeout_sec` argument on `__tide_report_fetch_tide`.
+- Tests: existing `test/unit/tide/parse_tide_utc.fish`; new `noaa_gmt_to_unix` cases in `test/unit/core/time_helpers.fish`; timeout propagation via `TIDE_REPORT_TEST_CURL_MAX_TIME_FILE` in fake curl.
