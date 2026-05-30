@@ -12,13 +12,13 @@ __tide_report_init_moon_constants g
 
 ## Install TideReport defaults and register prompt items on Fisher install event.
 function _tide_report_install --description "Install TideReport defaults and prompt items on fisher event" --on-event tide_report_install
-    _tide_report_do_install
+    _tide_report_do_install install
 end
 
 ## Handle Fisher update event: clear cache and re-run install logic.
 function _tide_report_update --description "Handle fisher update: clear TideReport cache and re-run install" --on-event tide_report_update
     command rm -rf ~/.cache/tide-report
-    _tide_report_do_install
+    _tide_report_do_install update
 end
 
 ## Uninstall TideReport: remove prompt items, variables, functions, and cache on Fisher uninstall.

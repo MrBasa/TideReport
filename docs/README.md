@@ -16,7 +16,7 @@ Actionable work items from the **TideReport code review** (May 2026), split into
 | 0 | [archive/phase-00-chores.md](archive/phase-00-chores.md) | Tooling & vendor updates (Fishtape) | `completed` |
 | 1 | [archive/phase-01-critical-bugs.md](archive/phase-01-critical-bugs.md) | Correctness bugs (tide UTC, cache races) | `completed` |
 | 2 | [archive/phase-02-rule-compliance.md](archive/phase-02-rule-compliance.md) | Fish `functions/` rules, lazy loading | `completed` |
-| 3 | [backlog/phase-03-user-features.md](backlog/phase-03-user-features.md) | CLI, wizard, GitHub CI/`!auth`, docs | `pending` |
+| 3 | [archive/phase-03-user-features.md](archive/phase-03-user-features.md) | CLI, wizard, GitHub CI/`!auth`, docs | `completed` |
 | 4 | [backlog/phase-04-shared-helpers.md](backlog/phase-04-shared-helpers.md) | Dedupe cache/geocoding/write helpers | `pending` |
 | 5 | [backlog/phase-05-performance.md](backlog/phase-05-performance.md) | Background-path optimizations | `pending` |
 | 6 | [backlog/phase-06-structure-tests.md](backlog/phase-06-structure-tests.md) | Module split, test coverage gaps | `pending` |

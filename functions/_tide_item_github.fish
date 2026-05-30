@@ -43,6 +43,55 @@ function __tide_report_github_ci_state_valid --description "Validate normalized 
     contains -- "$ci_state" pass fail pending none
 end
 
+function __tide_report_github_auth_ok --description "Return whether gh is authenticated for github.com (session-cached)"
+    if set -q __tide_report_github_auth_ok
+        test "$__tide_report_github_auth_ok" = 1
+        return $status
+    end
+    if gh auth status -h github.com 2>/dev/null
+        set -g __tide_report_github_auth_ok 1
+        return 0
+    end
+    set -g __tide_report_github_auth_ok 0
+    return 1
+end
+
+function __tide_report_github_unavailable_display --description "Unavailable segment text; appends !auth when gh is not authenticated"
+    set -l text $tide_report_github_unavailable_text
+    if not __tide_report_github_auth_ok
+        set text "$text!auth"
+    end
+    echo "$text"
+end
+
+function __tide_report_github_ci_display_state --description "Map CI cache age and fetch state to display state (pass|fail|pending|none)" --argument-names cached_ci_state ci_age ci_refresh_seconds ci_expire_seconds ci_fetch_in_flight
+    if test "$ci_fetch_in_flight" = true
+        echo pending
+        return 0
+    end
+    if test "$ci_age" -lt 0
+        echo none
+        return 0
+    end
+    if test "$ci_age" -gt $ci_expire_seconds
+        echo none
+        return 0
+    end
+    if test "$ci_age" -gt $ci_refresh_seconds
+        echo pending
+        return 0
+    end
+    echo "$cached_ci_state"
+end
+
+function __tide_report_run_gh --description "Run gh with optional timeout wrapper" --argument-names timeout_sec argv
+    if test -n "$timeout_sec"; and test "$timeout_sec" -gt 0; and command -q timeout
+        command timeout "$timeout_sec"s gh $argv
+    else
+        gh $argv
+    end
+end
+
 function __tide_report_github_ci_effective_refresh --description "Return CI cache refresh interval based on state and in-flight fetch" --argument-names cached_ci_state ci_lock_var
     set -q tide_report_github_ci_refresh_seconds; or set -l tide_report_github_ci_refresh_seconds 60
     set -q tide_report_github_ci_running_refresh_seconds; or set -l tide_report_github_ci_running_refresh_seconds 5
@@ -176,6 +225,13 @@ function _tide_item_github --description "Displays GitHub stats"
         test -n "$cached_ci_state"; or set cached_ci_state none
     end
     set -l ci_refresh_seconds (__tide_report_github_ci_effective_refresh "$cached_ci_state" "$ci_lock_var")
+    set -q tide_report_github_ci_expire_seconds; or set -l tide_report_github_ci_expire_seconds 180
+    set -l ci_age -1
+    if test "$tide_report_github_show_ci" = true; and test -f "$ci_cache_file"
+        set -l ci_mod (__tide_report_github_file_mtime "$ci_cache_file" | string collect)
+        test -n "$ci_mod"; or set ci_mod 0
+        set ci_age (math $now - $ci_mod)
+    end
 
     # Check cache status
     if test -f "$cache_file"
@@ -220,7 +276,7 @@ function _tide_item_github --description "Displays GitHub stats"
     if test "$trigger_ci_fetch" = true; and test -n "$branch"
         if __tide_report_lock_acquire "$ci_lock_var" "$now" 120
             mkdir -p "$cache_dir"
-            __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$ci_lock_var" &
+            __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$timeout_sec" "$ci_lock_var" &
             disown 2>/dev/null
         end
     end
@@ -231,19 +287,18 @@ function _tide_item_github --description "Displays GitHub stats"
     end
 
     if test "$output_valid" = true
-        # Cache is valid (or stale but usable), parse and print
+        set -l ci_display_state none
         if test "$tide_report_github_show_ci" = true
-            if test "$ci_fetch_in_flight" = true
-                __tide_report_parse_github "$cache_file" "" "$ci_cache_file" true
-            else
-                __tide_report_parse_github "$cache_file" "" "$ci_cache_file"
-            end
+            set ci_display_state (__tide_report_github_ci_display_state "$cached_ci_state" $ci_age $ci_refresh_seconds $tide_report_github_ci_expire_seconds $ci_fetch_in_flight | string collect)
+        end
+        if test "$tide_report_github_show_ci" = true
+            __tide_report_parse_github "$cache_file" - "$ci_cache_file" - "$ci_display_state"
         else
             __tide_report_parse_github "$cache_file"
         end
     else
-        # Data is missing, display loading message
-        _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
+        set -l unavail (__tide_report_github_unavailable_display | string collect)
+        _tide_print_item github (set_color $tide_report_github_unavailable_color)$unavail
     end
 end
 
@@ -372,16 +427,22 @@ function __tide_report_render_github --description "Render GitHub segment from s
 end
 
 ## --- Parser Function ---
-function __tide_report_parse_github --description "Parse cached GitHub repo stats JSON and print a formatted segment"
-    set -l cache_file $argv[1]
+function __tide_report_parse_github --description "Parse cached GitHub repo stats JSON and print a formatted segment" --argument-names cache_file stats_line ci_cache_file ci_fetch_in_flight ci_display_state
     set -l line ""
-    if set -q argv[2]; and test -n "$argv[2]"
-        set line $argv[2]
+    if set -q stats_line[1]; and test -n "$stats_line"; and test "$stats_line" != "-"
+        set line $stats_line
     else
         set line (__tide_report_github_read_stats_line "$cache_file" | string collect)
     end
-    set -l ci_cache_file ""
-    set -q argv[3]; and test -n "$argv[3]"; and set ci_cache_file "$argv[3]"
+    if test "$ci_cache_file" = "-"; or not set -q ci_cache_file[1]
+        set ci_cache_file ""
+    end
+    if test "$ci_display_state" = "-"; or not set -q ci_display_state[1]
+        set -e ci_display_state
+    end
+    if test "$ci_fetch_in_flight" = "-"
+        set ci_fetch_in_flight false
+    end
     set -l stars ""
     set -l forks ""
     set -l watchers ""
@@ -397,21 +458,22 @@ function __tide_report_parse_github --description "Parse cached GitHub repo stat
     end
 
     if test -z "$stars"
-        _tide_print_item github (set_color $tide_report_github_unavailable_color)$tide_report_github_unavailable_text
+        set -l unavail (__tide_report_github_unavailable_display | string collect)
+        _tide_print_item github (set_color $tide_report_github_unavailable_color)$unavail
         return
     end
 
-    # Extract CI state from cache when show_ci is enabled
     set -l ci_state "none"
-    if test "$tide_report_github_show_ci" = true; and test -n "$ci_cache_file"
-        set -l parsed_ci_state (__tide_report_github_read_ci_state "$ci_cache_file" | string collect)
-        test -n "$parsed_ci_state"; and set ci_state "$parsed_ci_state"
-    end
-
-    set -l ci_fetch_in_flight false
-    set -q argv[4]; and test "$argv[4]" = true; and set ci_fetch_in_flight true
-    if test "$ci_fetch_in_flight" = true; and contains -- "$ci_state" pass fail none
-        set ci_state pending
+    if test "$tide_report_github_show_ci" = true
+        if set -q ci_display_state; and test -n "$ci_display_state"; and test "$ci_display_state" != "-"
+            set ci_state "$ci_display_state"
+        else if test -n "$ci_cache_file"
+            set -l parsed_ci_state (__tide_report_github_read_ci_state "$ci_cache_file" | string collect)
+            test -n "$parsed_ci_state"; and set ci_state "$parsed_ci_state"
+            if test "$ci_fetch_in_flight" = true; and contains -- "$ci_state" pass fail none
+                set ci_state pending
+            end
+        end
     end
 
     set -l out (__tide_report_render_github "$stars" "$forks" "$watchers" "$issues" "$prs" "$ci_state")
@@ -431,27 +493,32 @@ function __tide_report_fetch_github --description "Fetch GitHub repo stats with 
     set -l stats_file (__tide_report_github_stats_file "$cache_file")
     set -l stats_temp "$stats_file.$fish_pid.tmp"
 
-    # Fetch data and store in temp file
-    set -l json_data (gh repo view "$api_slug" --json 'nameWithOwner,stargazerCount,forkCount,issues,pullRequests,watchers' 2>/dev/null)
+    set -l json_data (__tide_report_run_gh "$timeout_sec" repo view "$api_slug" --json 'nameWithOwner,stargazerCount,forkCount,issues,pullRequests,watchers' 2>/dev/null)
+    set -l fetch_status $status
     set -l stats_line ""
-    if test $status -eq 0; and test -n "$json_data"
+    if test $fetch_status -eq 0; and test -n "$json_data"
         set stats_line (printf "%s" "$json_data" | command jq -r '[.stargazerCount,.forkCount,.watchers.totalCount,.issues.totalCount,.pullRequests.totalCount]|join(" ")' 2>/dev/null)
     end
 
-    # Check if fetch was successful
-    if test $status -eq 0; and test -n "$json_data"; and __tide_report_github_stats_line_valid "$stats_line"
+    if test $fetch_status -eq 0; and test -n "$json_data"; and __tide_report_github_stats_line_valid "$stats_line"
         printf "%s\n" "$json_data" >"$temp_file"
         printf "%s\n" "$stats_line" >"$stats_temp"
         command mv -f "$temp_file" "$cache_file"
         command mv -f "$stats_temp" "$stats_file"
     else
         command rm -f "$temp_file" "$stats_temp" 2>/dev/null
-        functions -q __tide_report_log_expected && __tide_report_log_expected github "fetch failed (check gh auth and network)"
+        if functions -q __tide_report_log_expected
+            if not __tide_report_github_auth_ok
+                __tide_report_log_expected github "gh not authenticated"
+            else
+                __tide_report_log_expected github "fetch failed (network or gh error)"
+            end
+        end
     end
 end
 
 ## --- Fetch GitHub CI status (Background Worker) ---
-function __tide_report_fetch_github_ci --description "Fetch latest workflow run for branch and write CI cache JSON" --argument-names api_slug branch ci_cache_file lock_var
+function __tide_report_fetch_github_ci --description "Fetch latest workflow run for branch and write CI cache JSON" --argument-names api_slug branch ci_cache_file timeout_sec lock_var
     function _remove_ci_lock --description "Clear GitHub CI fetch lock when background worker exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
         __tide_report_lock_release "$lock_var"
     end
@@ -459,18 +526,26 @@ function __tide_report_fetch_github_ci --description "Fetch latest workflow run 
     set -l temp_file "$ci_cache_file.$fish_pid.tmp"
     set -l state_file (__tide_report_github_state_file "$ci_cache_file")
     set -l state_temp "$state_file.$fish_pid.tmp"
-    set -l json_data (gh run list -R "$api_slug" -b "$branch" -L 1 --json status,conclusion,name 2>/dev/null)
+    set -l json_data (__tide_report_run_gh "$timeout_sec" run list -R "$api_slug" -b "$branch" -L 1 --json status,conclusion,name 2>/dev/null)
+    set -l fetch_status $status
     set -l ci_state ""
-    if test $status -eq 0; and test -n "$json_data"
+    if test $fetch_status -eq 0; and test -n "$json_data"
         set ci_state (printf "%s" "$json_data" | command jq -r 'if length == 0 then "none" else (.[0] | if .status == "completed" then (if .conclusion == "success" then "pass" else "fail" end) else "pending" end) end' 2>/dev/null)
     end
 
-    if test $status -eq 0; and test -n "$json_data"; and __tide_report_github_ci_state_valid "$ci_state"
+    if test $fetch_status -eq 0; and test -n "$json_data"; and __tide_report_github_ci_state_valid "$ci_state"
         printf "%s\n" "$json_data" >"$temp_file"
         printf "%s\n" "$ci_state" >"$state_temp"
         command mv -f "$temp_file" "$ci_cache_file"
         command mv -f "$state_temp" "$state_file"
     else
         command rm -f "$temp_file" "$state_temp" 2>/dev/null
+        if functions -q __tide_report_log_expected
+            if not __tide_report_github_auth_ok
+                __tide_report_log_expected github "gh not authenticated (CI fetch)"
+            else
+                __tide_report_log_expected github "CI fetch failed (network or gh error)"
+            end
+        end
     end
 end

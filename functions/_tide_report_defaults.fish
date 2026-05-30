@@ -82,6 +82,7 @@ function __tide_report_apply_defaults --description "Apply TideReport defaults f
     __tide_report_set_if_missing "$scope" tide_report_github_color_ci_pending yellow
     __tide_report_set_if_missing "$scope" tide_report_github_refresh_seconds 30
     __tide_report_set_if_missing "$scope" tide_report_github_ci_refresh_seconds 60
+    __tide_report_set_if_missing "$scope" tide_report_github_ci_expire_seconds 180
     __tide_report_set_if_missing "$scope" tide_report_github_ci_running_refresh_seconds 5
     __tide_report_set_if_missing "$scope" tide_report_github_unavailable_text "…"
     __tide_report_set_if_missing "$scope" tide_report_github_unavailable_color red

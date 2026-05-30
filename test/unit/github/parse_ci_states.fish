@@ -11,7 +11,7 @@ set -g TIDE_REPORT_TEST 1
 @test "parse_github renders pass icon for successful CI" (
     echo '[{"status":"completed","conclusion":"success"}]' > "$ci"
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci"
+    __tide_report_parse_github "$cache" - "$ci"
     string match -q '*✔*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0
@@ -19,7 +19,7 @@ set -g TIDE_REPORT_TEST 1
 @test "parse_github renders fail icon for failed CI" (
     echo '[{"status":"completed","conclusion":"failure"}]' > "$ci"
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci"
+    __tide_report_parse_github "$cache" - "$ci"
     string match -q '*✗*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0
@@ -27,7 +27,7 @@ set -g TIDE_REPORT_TEST 1
 @test "parse_github renders pending icon for in-progress CI" (
     echo '[{"status":"in_progress","conclusion":null}]' > "$ci"
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci"
+    __tide_report_parse_github "$cache" - "$ci"
     string match -q '*⏳*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0

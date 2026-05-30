@@ -36,6 +36,33 @@ mkdir -p "$home/.cache/tide-report/locks"
     echo "$out"
 ) = 60
 
+@test "ci_display_state shows pending when cache is stale but not expired" (
+    set -l out (__tide_report_github_ci_display_state pass 90 60 180 false | string collect)
+    echo "$out"
+) = pending
+
+@test "ci_display_state hides CI when cache is expired" (
+    set -l out (__tide_report_github_ci_display_state pass 200 60 180 false | string collect)
+    echo "$out"
+) = none
+
+@test "ci_display_state shows fresh pass when within refresh window" (
+    set -l out (__tide_report_github_ci_display_state pass 30 60 180 false | string collect)
+    echo "$out"
+) = pass
+
+@test "parse_github omits pass icon when CI display state is none" (
+    set -l cache "$tmp/repo.json"
+    set -l ci "$tmp/ci-expired.json"
+    cp "$REPO_ROOT/test/fixtures/github/repo.json" "$cache"
+    printf '%s\n' pass > "$ci.state"
+    set -g tide_report_github_show_ci true
+    set -g TIDE_REPORT_TEST 1
+    __tide_report_test_reset_print_capture
+    __tide_report_parse_github "$cache" - "$ci" - none
+    string match -q '*✔*' "$_tide_print_item_last_argv[2]"; and echo 1; or echo 0
+) -eq 0
+
 @test "parse_github shows pending while CI fetch is in flight over stale pass" (
     set -l cache "$tmp/repo.json"
     set -l ci "$tmp/ci.json"
@@ -45,7 +72,7 @@ mkdir -p "$home/.cache/tide-report/locks"
     set -g tide_report_github_icon_ci_pending "⏳"
     set -g TIDE_REPORT_TEST 1
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci" true
+    __tide_report_parse_github "$cache" - "$ci" true -
     string match -q '*⏳*' "$_tide_print_item_last_argv[2]"
     string match -q '*✔*' "$_tide_print_item_last_argv[2]"; and echo 1; or echo 0
 ) -eq 0

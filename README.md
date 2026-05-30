@@ -18,7 +18,7 @@ TideReport provides rich prompt items that display **Weather**, **Moon Phase**, 
 ## ⚡ Quick Start
 ### 1. Requirements
 Before installing, make sure you have the following available on your system:
-- **`curl`**: Required by the `weather`, `moon`, and `tide` modules.
+- **`curl`**: Required by the `weather` and `tide` modules. The default `moon` provider (`local`) does not use the network; `curl` is only needed if you set `tide_report_moon_provider` to `wttr`.
 - **`jq`**: **Required by all modules** for parsing JSON data.
 - **`gh`**: The [GitHub CLI](https://cli.github.com/), only required if you want to use the `github` module. Remember to authenticate (`gh auth login`).
 - The latest version of [Fish](https://fishshell.com/) and the [Fisher](https://github.com/jorgebucaran/fisher) plugin manager.
@@ -45,7 +45,18 @@ The plugin automatically runs `tide reload` when finished, so your new prompt it
 
 _(Note: If you install non-interactively, or choose to skip the wizard, the plugin defaults to adding GitHub, Weather, and Moon with standard settings.)_
 
-### 3. Declarative Configuration (Dotfiles)
+### 3. `tide-report` CLI
+Re-run the configuration wizard or check the plugin version without reinstalling:
+
+```fish
+tide-report configure   # interactive wizard (same as install/update wizard)
+tide-report --help
+tide-report --version
+```
+
+On `fisher update`, the wizard prompt defaults to **no** (press Enter to skip). On first install it defaults to **yes**. After changing options with `set -U`, run `tide reload` so Tide picks up prompt layout changes.
+
+### 4. Declarative Configuration (Dotfiles)
 If you prefer to manage your plugins declaratively, you can add `MrBasa/TideReport@v1` to your `~/.config/fish/fish_plugins` file and run `fisher update`. The same interactive wizard will appear if you run this in an interactive session.
 
 ## 📦 Available Modules Overview
@@ -91,7 +102,8 @@ Expected issues (missing dependencies, bad GitHub credentials, API timeouts, inv
 |`tide_report_wttr_url`|URL for [wttr.in](https://wttr.in/), used for weather (wttr) and moon.|`https://wttr.in`|
 |`tide_report_weather_provider`|Weather backend: `wttr` or `openmeteo`.|`openmeteo`|
 |`tide_report_units`|Units for weather and tide: `m` (Metric), `u` (USCS)|`m`|
-|`tide_time_format`|Time format string for Tide Prompt times.|From Tide|
+|`tide_time_format`|Time format string for Tide prompt times (also used by tide items).|`"%H:%M"` when unset|
+|`tide_report_user_agent`|HTTP User-Agent sent to external APIs (includes plugin version).|`tide-report/<version>`|
 |`tide_report_log_expected`|Set to `0`, `false`, or `no` to disable diagnostic logging.|`1`|
 
 ## 🤖 GitHub Module (`github`)
@@ -104,12 +116,19 @@ Displays stats for the current repository. **Requires `gh` CLI to be authenticat
 |`✔` / `✗` / `⏳`|Latest workflow run on the current branch: pass / fail / in progress (or queued)|
 |`!auth`|`gh` CLI is not authenticated|
 
-CI status comes from `gh run list` (latest run on your current branch). GitHub reports in-progress runs as `in_progress`, not the word `running`. Data is cached in the background so the prompt never blocks; while a fetch is running, a stale pass/fail icon may briefly switch to `⏳`. After a completed run, the icon can stay on the last result for up to `tide_report_github_ci_refresh_seconds` (default 60s) until the next background refresh. While a run is active (cached `pending` or a CI fetch in progress), refresh uses `tide_report_github_ci_running_refresh_seconds` (default 5s) so the hourglass updates sooner. If no CI cache exists yet, no CI icon is shown until the first fetch succeeds.
+CI status comes from `gh run list` (latest run on your current branch). GitHub reports in-progress runs as `in_progress`, not the word `running`. Data is cached in the background so the prompt never blocks.
+
+- **Fresh** (age ≤ `tide_report_github_ci_refresh_seconds`, default 60s): show cached pass / fail / pending.
+- **Stale** (older than refresh but not expired) **or** while a CI fetch is running: show `⏳` only — not the last pass/fail.
+- **Expired** (older than `tide_report_github_ci_expire_seconds`, default 180s) with no fetch in progress, or no CI cache yet: **no CI icon** (repo stats still show).
+
+While a run is active (cached `pending` or a CI fetch in progress), refresh uses `tide_report_github_ci_running_refresh_seconds` (default 5s) so the hourglass updates sooner. Repository stats use `tide_report_github_refresh_seconds` only (no separate expire tier).
 
 |**Variable**|**Description**|**Default**|
 |---|---|---|
 |`tide_github_color`|Prompt item text color.|`white`|
 |`tide_github_bg_color`|Prompt item background color.|`(theme default)`|
+|`tide_report_github_icon`|Leading GitHub segment icon.|``|
 |`tide_report_github_icon_*`|Icons for `stars`, `forks`, `watchers`, `issues`, `prs`.|`★`, `⑂`, ``, `!`, `PR`|
 |`tide_report_github_color_*`|Colors for `stars`, `forks`, `watchers`, `issues`, `prs`.|`yellow`|
 |`tide_report_github_show_ci`|Show latest workflow run for the current branch.|`true`|
@@ -118,6 +137,7 @@ CI status comes from `gh run list` (latest run on your current branch). GitHub r
 |`tide_report_github_refresh_seconds`|Cache lifespan for repository stats.|`30`|
 |`tide_report_github_ci_refresh_seconds`|Cache lifespan for CI workflow status when the last result is pass or fail.|`60`|
 |`tide_report_github_ci_running_refresh_seconds`|Cache lifespan while CI is pending or a background CI fetch is in progress.|`5`|
+|`tide_report_github_ci_expire_seconds`|After this age, CI icon is hidden until a fresh fetch succeeds (stats unchanged).|`180`|
 |`tide_report_github_unavailable_text`|Text displayed when data is unavailable.|`…`|
 |`tide_report_github_unavailable_color`|Color for unavailable text.|`red`|
 
@@ -176,7 +196,7 @@ Computes moon phase. Defaults to an offline astronomical model.
 |`tide_report_moon_unavailable_color`|Color for unavailable text.|`red`|
 
 ## 🌊 Tide Module (`tide`)
-**Requires setting a Station ID.** Find your nearest US station on the [NOAA Tides and Currents Map](https://tidesandcurrents.noaa.gov/map/index.html). Ensure that the station has high and low tide predictions available.
+Uses a NOAA station ID (default `8443970`, Boston). Find your nearest US station on the [NOAA Tides and Currents Map](https://tidesandcurrents.noaa.gov/map/index.html) and set `tide_report_tide_station_id` if you want a different location. Ensure the station has high and low tide predictions available.
 
 |**Variable**|**Description**|**Default**|
 |---|---|---|
@@ -195,7 +215,7 @@ Computes moon phase. Defaults to an offline astronomical model.
 ## 🚑 Troubleshooting
 - **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set `tide_report_weather_location` explicitly.
 - **Emoji alignment changed after Fish 4.6:** Fish 4.6 changed the default emoji width from `1` to `2`. This usually improves alignment on modern terminals, but if moon/weather symbols look offset on older environments, run `set -U fish_emoji_width 1` and restart the shell.
-- **Re-configure via Wizard:** If you want to change your units, toggle modules, or update your weather location, you can re-run the setup wizard at any time. Just run `fisher update MrBasa/TideReport@v1` in your terminal.
+- **Re-configure via Wizard:** Run `tide-report configure`, or `fisher update MrBasa/TideReport@v1` and answer `y` at the wizard prompt.
 - **Persistent Unavailable Symbols (`…`, `🌊…`):** If a module gets stuck showing an unavailable state, check the diagnostic log located at `$XDG_STATE_HOME/tide-report/tide-report.log`. This usually indicates a missing dependency (like `jq` or `gh`), an API timeout, or bad credentials.
 - **Clean Reinstall:** If things get weird and a regular update doesn't fix it, run `fisher remove MrBasa/TideReport`, optionally restart your shell, and run `fisher install MrBasa/TideReport@v1` for a completely fresh start.
 

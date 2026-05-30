@@ -1,4 +1,13 @@
 #!/usr/bin/env fish
+if contains -- auth $argv; and contains -- status $argv
+    if set -q TIDE_REPORT_TEST_GH_AUTH_FAIL
+        exit 1
+    end
+    printf '%s\n' "github.com"
+    printf '%s\n' "  ✓ Logged in to github.com account test (keyring)"
+    exit 0
+end
+
 set -l response "$TIDE_REPORT_TEST_GH_RESPONSE"
 set -l st 0
 if set -q TIDE_REPORT_TEST_GH_STATUS

@@ -20,7 +20,7 @@ set -g TIDE_REPORT_TEST 1
     printf '%s\n' 'pass' > "$ci.state"
     set -g tide_report_github_show_ci true
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci"
+    __tide_report_parse_github "$cache" - "$ci"
     string match -q '*✔*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0
@@ -31,7 +31,7 @@ set -g TIDE_REPORT_TEST 1
     command rm -f "$cache.stats" "$ci.state"
     set -g tide_report_github_show_ci true
     __tide_report_test_reset_print_capture
-    __tide_report_parse_github "$cache" "" "$ci"
+    __tide_report_parse_github "$cache" - "$ci"
     string match -q '*★42*' "$_tide_print_item_last_argv[2]"; and string match -q '*✔*' "$_tide_print_item_last_argv[2]"
     echo $status
 ) -eq 0

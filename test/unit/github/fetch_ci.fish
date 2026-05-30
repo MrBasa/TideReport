@@ -10,7 +10,7 @@ set -l state "$cache.state"
 @test "fetch_github_ci writes cache on success" (
     set -gx TIDE_REPORT_TEST_GH_STATUS 0
     set -gx TIDE_REPORT_TEST_GH_RESPONSE '[{"status":"completed","conclusion":"success"}]'
-    __tide_report_fetch_github_ci MrBasa/TideReport main "$cache" _lock
+    __tide_report_fetch_github_ci MrBasa/TideReport main "$cache" 5 _lock
     test -f "$cache"; and test -f "$state"
     echo $status
 ) -eq 0
@@ -19,7 +19,7 @@ set -l state "$cache.state"
     set -gx TIDE_REPORT_TEST_GH_STATUS 1
     set -gx TIDE_REPORT_TEST_GH_RESPONSE ''
     command rm -f "$cache" "$state"
-    __tide_report_fetch_github_ci MrBasa/TideReport main "$cache" _lock
+    __tide_report_fetch_github_ci MrBasa/TideReport main "$cache" 5 _lock
     test -f "$cache"; or test -f "$state"; and echo 1; or echo 0
 ) -eq 0
 

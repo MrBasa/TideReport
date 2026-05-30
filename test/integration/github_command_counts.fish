@@ -11,7 +11,14 @@ function __tide_report_test_write_exec_wrapper --argument-names wrapper_path lab
     chmod +x "$wrapper_path"
 end
 
+function __tide_report_test_reset_github_context --description "Clear session GitHub context between tests"
+    set -e __tide_report_github_context_repo_root 2>/dev/null
+    set -e __tide_report_github_context_values 2>/dev/null
+    set -e __tide_report_github_auth_ok 2>/dev/null
+end
+
 function __tide_report_test_seed_github_repo --argument-names tmp_dir
+    __tide_report_test_reset_github_context
     mkdir -p "$tmp_dir/home/.config/fish" "$tmp_dir/home/.cache/tide-report/github" "$tmp_dir/bin" "$tmp_dir/repo"
 
     __tide_report_test_write_exec_wrapper "$tmp_dir/bin/git" git "$__tide_report_test_real_git" "$tmp_dir/calls.log"
@@ -19,14 +26,18 @@ function __tide_report_test_seed_github_repo --argument-names tmp_dir
 
     cp "$REPO_ROOT/test/fixtures/github/repo.json" "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport.json"
     printf '%s\n' '42 3 10 2 1' > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport.json.stats"
-    printf '%s\n' '[{"status":"completed","conclusion":"success"}]' > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-main-ci.json"
-    printf '%s\n' pass > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-main-ci.json.state"
-    printf '%s\n' '[{"status":"completed","conclusion":"failure"}]' > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-feature_demo-ci.json"
-    printf '%s\n' fail > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-feature_demo-ci.json.state"
-
     cd "$tmp_dir/repo"
     command "$__tide_report_test_real_git" init >/dev/null 2>&1
     command "$__tide_report_test_real_git" remote add origin "https://github.com/MrBasa/TideReport.git"
+    set -l branch (command "$__tide_report_test_real_git" branch --show-current 2>/dev/null | string collect)
+    test -n "$branch"; or set branch detached
+    set -l branch_safe (string replace -a -r '[^a-zA-Z0-9._-]' '_' "$branch")
+    set -l ci_base "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-$branch_safe-ci.json"
+    command rm -f "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-main-ci.json" "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-main-ci.json.state" 2>/dev/null
+    printf '%s\n' '[{"status":"completed","conclusion":"success"}]' > "$ci_base"
+    printf '%s\n' pass > "$ci_base.state"
+    printf '%s\n' '[{"status":"completed","conclusion":"failure"}]' > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-feature_demo-ci.json"
+    printf '%s\n' fail > "$tmp_dir/home/.cache/tide-report/github/MrBasa-TideReport-feature_demo-ci.json.state"
     cd "$REPO_ROOT"
 end
 
