@@ -1,11 +1,13 @@
-# Exclude from release source archives (zip/tar.gz)
-# Keep only runtime plugin files (conf.d/, functions/) and top-level README/LICENSE.
+# Exclude from release source archives (zip/tar.gz) and Fisher remote installs.
+# Fisher fetches GitHub tarballs, which honor export-ignore. Keep runtime plugin files
+# (conf.d/, functions/) and top-level README/LICENSE only.
 
 # Non-runtime metadata and dev tooling
 .cursor/ export-ignore
 .github/ export-ignore
 .vscode/ export-ignore
 .gitattributes export-ignore
+docs/ export-ignore
 
 # Tests, fixtures, and test cache/home
 scripts/ export-ignore

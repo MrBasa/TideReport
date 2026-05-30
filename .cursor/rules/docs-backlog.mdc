@@ -1,0 +1,42 @@
+---
+description: Maintain docs/backlog phase documents—update status and archive when complete
+alwaysApply: true
+---
+
+# Docs backlog maintenance
+
+Implementation work is tracked in phased documents under `docs/backlog/`. The index is [docs/README.md](../docs/README.md).
+
+## When working from a backlog phase
+
+1. Set the phase document **Status** to `in_progress` and **Started** date when you begin.
+2. Check off items (`- [ ]` → `- [x]`) as they ship.
+3. Run `fish scripts/run_tests_isolated.fish` after substantive changes (per project rules).
+
+## When a phase is fully complete
+
+Every required checkbox in that phase doc is done and tests pass:
+
+1. Set **Status** to `completed` and **Completed** to today's date (`YYYY-MM-DD`).
+2. Fill the **Done notes** section (PR/commit refs, deviations, follow-ups).
+3. Update the phase **Status** column in [docs/README.md](../docs/README.md).
+4. Move the file to archive (preserve history):
+   ```fish
+   git mv docs/backlog/phase-NN-name.md docs/archive/phase-NN-name.md
+   ```
+5. Do **not** delete archived phase documents.
+
+## Partial completion
+
+- Do not archive a phase with open required items.
+- Optional items may remain unchecked; note them in **Done notes** or move to [phase-08-future-deferred.md](../docs/backlog/phase-08-future-deferred.md).
+
+## New work
+
+- Do not add ad-hoc TODO files at repo root.
+- Add items to the appropriate phase doc, or create a new phased doc and index row in `docs/README.md`.
+- Use [docs/backlog/_TEMPLATE.md](../docs/backlog/_TEMPLATE.md) for new phases.
+
+## Agents
+
+When the user asks to implement review/backlog work, read `docs/README.md` first and pick the lowest-numbered non-completed phase unless directed otherwise.
