@@ -24,6 +24,16 @@ set -l out "$HOME/.cache/tide-report/weather.json"
     test -f "$out"; and echo 1; or echo 0
 ) -eq 0
 
+@test "provider_wttr preserves quotes and special chars in condition text" (
+    set -gx TIDE_REPORT_TEST_CURL_STATUS 0
+    set -gx TIDE_REPORT_TEST_CURL_RESPONSE "$REPO_ROOT/test/fixtures/weather/wttr_special_chars.json"
+    command rm -f "$out"
+    __tide_report_provider_wttr "$out" 5 _lock
+    set -l ct (jq -r '.condition_text' "$out")
+    test "$ct" = 'Light "drizzle" & fog'
+    echo $status
+) -eq 0
+
 set -e TIDE_REPORT_TEST_CURL_STATUS
 set -e TIDE_REPORT_TEST_CURL_RESPONSE
 command rm -rf "$tmp"

@@ -14,10 +14,11 @@ function __tide_report_github_path_within --description "Return success when pat
     string match -q -- "$repo_root/*" "$candidate"
 end
 
-function __tide_report_github_file_mtime --description "Return file mtime using Fish builtins" --argument-names file_path
-    set -l stamp (path mtime -- "$file_path" 2>/dev/null | string collect | string trim)
-    string match -qr '^[0-9]+$' -- "$stamp"; or return 1
-    echo "$stamp"
+function __tide_report_github_file_mtime --description "Return file mtime using Fish builtins (alias of __tide_report_file_mtime)" --argument-names file_path
+    if not functions -q __tide_report_file_mtime
+        source (status filename | path dirname)/_tide_report_cache_helpers.fish
+    end
+    __tide_report_file_mtime "$file_path"
 end
 
 function __tide_report_github_stats_file --description "Return stats sidecar file for repo cache" --argument-names cache_file

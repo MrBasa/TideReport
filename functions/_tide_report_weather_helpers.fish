@@ -131,14 +131,32 @@ function __tide_report_openmeteo_wizard_ip_line --description "Build wizard disp
 end
 
 function __tide_report_build_weather_normalized_json --description "Build normalized weather.json object via jq" --argument-names tc tf fc ff cc ct wk wm wd hu uv su sv
-    set -l ct_safe (string replace '\\' '\\\\' -- $ct)
-    set ct_safe (string replace '"' '\\"' -- $ct_safe)
     set -l su_trim (string trim -- $su)
     set -l sv_trim (string trim -- $sv)
     jq -n \
         --argjson tc $tc --argjson tf $tf --argjson fc $fc --argjson ff $ff \
-        --argjson cc $cc --arg ct "$ct_safe" --argjson wk $wk --argjson wm $wm \
+        --argjson cc $cc --arg ct "$ct" --argjson wk $wk --argjson wm $wm \
         --arg wd "$wd" --argjson hu $hu --argjson uv $uv \
         --arg su "$su_trim" --arg sv "$sv_trim" \
         '{temp_c:$tc,temp_f:$tf,feels_like_c:$fc,feels_like_f:$ff,condition_code:$cc,condition_text:$ct,wind_speed_kmh:$wk,wind_speed_mph:$wm,wind_dir_16:$wd,humidity:$hu,uv_index:$uv,sunrise_utc:(if $su=="" then null else ($su|tonumber) end),sunset_utc:(if $sv=="" then null else ($sv|tonumber) end)}'
+end
+
+function __tide_report_build_weather_normalized_json_from_wttr_extract --description "Build normalized weather.json from wttr j1 extract object" --argument-names extracted_json sunrise_utc sunset_utc
+    printf "%s" "$extracted_json" | jq -c \
+        --arg su "$sunrise_utc" --arg sv "$sunset_utc" \
+        '{
+            temp_c: (.tc | tonumber),
+            temp_f: (.tf | tonumber),
+            feels_like_c: (.fc | tonumber),
+            feels_like_f: (.ff | tonumber),
+            condition_code: (.cc | tonumber),
+            condition_text: .ct,
+            wind_speed_kmh: (.wk | tonumber),
+            wind_speed_mph: (.wm | tonumber),
+            wind_dir_16: .wd,
+            humidity: (.hu | tonumber),
+            uv_index: (.uv | tonumber),
+            sunrise_utc: (if $su == "" then null else ($su | tonumber) end),
+            sunset_utc: (if $sv == "" then null else ($sv | tonumber) end)
+        }'
 end
