@@ -1,0 +1,228 @@
+---
+description: Fish ≠ Bash footguns for agents; general language + TideReport tests; extend when new mistakes appear
+globs: "**/*.fish"
+alwaysApply: false
+---
+
+# Fish — agent pitfalls & living lessons
+
+Agents often write **Bash-shaped Fish**. Fish is not POSIX: different parsing, variables, and builtins. This rule applies when editing any `**/*.fish` file in this repo.
+
+**Related (do not duplicate here):**
+
+- [tide-report.mdc](tide-report.mdc) — project conventions, `set_color`, Fisher events, prompt rules
+- [fish-scripts-lint.mdc](fish-scripts-lint.mdc) — run `fish -n` before done
+- [fish-functions-no-top-level-execution.mdc](fish-functions-no-top-level-execution.mdc) — `functions/*.fish` must be definitions only
+
+**Official references:** [Fish tutorial](https://fishshell.com/docs/current/tutorial.html), [Fish language](https://fishshell.com/docs/current/language.html).
+
+---
+
+## Rule to make rules (required)
+
+When you **fix or discover** a recurring Fish mistake while working on `.fish` files in this project:
+
+1. Add a short entry under **General (Fish ≠ Bash)** or **TideReport & tests**, with symptom, cause, bad vs good.
+2. Keep entries actionable — one paragraph + minimal code.
+3. Do this in the **same change** that fixes the bug or test, before marking the task done.
+4. Do not duplicate entries or [tide-report.mdc](tide-report.mdc) bullets; merge if the lesson already exists.
+
+---
+
+## General (Fish ≠ Bash)
+
+### Assignment and export
+
+**Cause:** Fish has no `VAR=value` or `export`.
+
+**Bad:** `FOO=bar`, `export FOO=bar`
+
+**Good:**
+
+```fish
+set -l FOO bar           # function-local
+set -gx FOO bar          # global exported (like export in other shells)
+set -U tide_report_units m   # universal (user config in this project)
+```
+
+### Exit status
+
+**Bad:** `if [ $? -eq 0 ]`, `echo $?`
+
+**Good:** `if test $status -eq 0` immediately after the command, or `set -l st $status` right after `command ...`
+
+### Conditionals and tests
+
+**Bad:** `[[ -f "$f" ]]`, `[ -n "$x" ]` (external `[` is slower and non-idiomatic)
+
+**Good:** `test -f "$f"`, `test -n "$x"`, `string length -q -- "$x"`
+
+Combine with Fish keywords: `cmd; and test $status -eq 0; and echo ok` (Fish 3.0+ also allows `&&` / `||` in many contexts; prefer `test` + `and`/`or` in this repo for clarity).
+
+### Arithmetic
+
+**Bad:** `count=$((a + 1))`, `$(( ... ))`
+
+**Good:** `set count (math $a + 1)`, `math "$x * 2"`
+
+### Redirection
+
+**Bad:** `&>/dev/null`, `2>&1 >/dev/null` bash-isms copied blindly
+
+**Good:** `command cmd 2>/dev/null`, `command cmd ^/dev/null` (Fish also supports `&>` but stay consistent with `2>/dev/null` in this repo per [tide-report.mdc](tide-report.mdc))
+
+### Variables are lists (no word splitting)
+
+**Cause:** Every variable is a **list** of elements. Unquoted `$var` expands to multiple argv words. There is no Bash-style word splitting on spaces inside one element.
+
+**Bad:** `set PATH "$PATH:/new"` (one wrong element), iterating `$str` as if it were a string of words
+
+**Good:**
+
+```fish
+set -l parts (string split ":" -- $some_path_var)   # when you control a string
+fish_add_path /new/dir                             # for PATH-like vars
+contains -- item $my_list
+```
+
+PATH-like vars ending in `PATH` split on `:` automatically; prefer `fish_add_path` over manual colon strings.
+
+### Command substitution and quoting
+
+**Bad:** `` output=`cmd` ``, `${var}` (syntax error in Fish)
+
+**Good:** `set output (cmd)`, `$var` or `"$var"` (Fish does not split on spaces inside quotes the same way Bash does; quote when you need one argument or a single string with spaces)
+
+### Scope: local, global, universal
+
+**Bad:** Assuming undeclared variables are local; using `-g` for user-facing defaults that should persist
+
+**Good:**
+
+```fish
+set -l tmp 0                    # function-local
+set -g __session_cache 1        # session global (careful in tests — see TideReport section)
+set -q var; or set -U var val   # universal default once (this project's install pattern)
+set -e var                      # erase
+set -q var                      # existence (variable, not function — see below)
+```
+
+### Reassigning a local inside `if` / `while`
+
+**Cause:** `set -l name value` **inside** a block creates a **new** inner local; outer binding unchanged.
+
+**Bad:**
+
+```fish
+set -l state none
+if condition
+    set -l state (compute)   # outer still none
+end
+```
+
+**Good:** `set state (compute)` without `-l` on reassignment (outer was created with `set -l state`).
+
+### Empty positional arguments are dropped
+
+**Cause:** Fish **omits** `""` from `$argv`. Optional positional APIs break silently.
+
+**Bad:** `foo "$a" "" "$b" "" "$c"` with `--argument-names` (mis-aligned slots)
+
+**Good:** Sentinel this repo uses: `-` (normalize in callee), or fewer positionals / separate functions
+
+```fish
+__parse "$cache" - "$ci_cache" - "$display_state"
+# Callee: test "$arg" = "-"; or not set -q arg[1]; and treat as omitted
+```
+
+### Function name must match filename (autoload)
+
+**Bad:** `functions/my-helper.fish` containing `function my_helper`
+
+**Good:** `functions/my_helper.fish` with `function my_helper` (Fisher/Tide autoload by name). See [fish-functions-no-top-level-execution.mdc](fish-functions-no-top-level-execution.mdc).
+
+### Use Fish builtins, not Bash helpers
+
+**Prefer:** `string`, `path`, `math`, `test`, `contains`, `count`, `argparse`, `command` (explicit PATH for externals)
+
+**Bad:** `echo "$var" | grep`, `$(wc -l)`, `sed` for simple string ops Fish can do natively
+
+**Good:** `string match -q '*pat*' -- "$var"`, `path basename "$f"`
+
+### Dependencies and optional tools
+
+**Good:**
+
+```fish
+if command -v jq >/dev/null 2>&1
+    ...
+end
+# or
+command -q gh; and gh version
+```
+
+### Interactive-only features
+
+**Cause:** Abbreviations and some `read` UX do nothing in non-interactive Fisher install / CI.
+
+**Good:** `if status is-interactive` before wizard `read`; never rely on abbreviations in `functions/` or `scripts/`.
+
+### Syntax check does not catch semantics
+
+Run `fish -n path/to/file.fish` on every touched file ([fish-scripts-lint.mdc](fish-scripts-lint.mdc)). It will **not** catch dropped `""` args, wrong locals, or test pollution — run targeted tests.
+
+---
+
+## TideReport & tests (project)
+
+### Branch-scoped cache paths must match real `git` state
+
+**Symptom:** “Warm second render” tests fail; background CI fetch; wrong `...-main-ci.json` vs `...-master-ci.json`.
+
+**Good:** After `git init` in fixtures, seed CI cache using `git branch --show-current` (see `test/integration/github_command_counts.fish`).
+
+### Session globals leak across Fishtape tests
+
+**Symptom:** Test passes alone, fails in full suite.
+
+**Cause:** Globals like `__tide_report_github_context_repo_root`, `$__tide_report_github_auth_ok` persist in one Fish process.
+
+**Good:** `__tide_report_test_reset_github_context` before GitHub perf tests; `set -e __tide_report_github_auth_ok` after auth tests.
+
+### Fishtape tests and subprocess noise
+
+**Symptom:** Help text merged into `test` expression.
+
+**Good:** `tide-report nosuch >/dev/null 2>/dev/null`; assert `$status`, not uncontrolled stdout.
+
+### Background work vs “no I/O on second call”
+
+**Symptom:** `jq`/`git` in log after clearing between two synchronous calls.
+
+**Cause:** Background fetch from wrong/missing cache path or held lock under `~/.cache/tide-report/locks/`.
+
+**Good:** Fix branch/path/policy first; do not assume only foreground code runs.
+
+---
+
+## Quick checklist for agents
+
+**Fish ≠ Bash**
+
+- [ ] `set` / `set -gx` / `set -U` — not `VAR=` or `export`
+- [ ] `$status` — not `$?`
+- [ ] `test` / `string` / `math` — not `[[ ]]`, `$(( ))`
+- [ ] Redirects: `2>/dev/null` (or project-consistent form)
+- [ ] Lists: `fish_add_path`, `contains`, `string split` — not Bash PATH strings
+- [ ] `(command)` substitution — not backticks; no `${var}`
+- [ ] Reassign locals: `set x`, not `set -l x` inside nested blocks
+- [ ] Optional positionals: `-` sentinel, not `""`
+- [ ] `functions/name.fish` defines `function name` only at top level
+- [ ] `fish -n` on all modified `.fish` files
+
+**TideReport**
+
+- [ ] GitHub tests reset session context globals when asserting zero subprocesses
+- [ ] CI/cache fixtures use actual branch after `git init`
+- [ ] CLI tests redirect stdout when checking exit codes
+- [ ] New footgun this session → entry added above (rule to make rules)
