@@ -93,6 +93,28 @@ PATH-like vars ending in `PATH` split on `:` automatically; prefer `fish_add_pat
 
 **Good:** `set output (cmd)`, `$var` or `"$var"` (Fish does not split on spaces inside quotes the same way Bash does; quote when you need one argument or a single string with spaces)
 
+### Concatenating `$var` with text or `(cmd)`
+
+**Symptom:** Tide render shows `:18` instead of `20:18`, or tests pass in CI (`TERM=dumb`) but fail in a real terminal (`TERM=xterm-256color`).
+
+**Cause:** Fish glues `$name` to following alphanumerics as one variable name (`$sc20` → `$sc20`, not `$sc` + `20`). `$name(cmd)` is a **list index**, not concatenation with command output.
+
+**Bad:**
+
+```fish
+set -l arrow (set_color white)$arrow_symbol(set_color $bg)
+set -l text "⇞$sc20:18"
+```
+
+**Good:**
+
+```fish
+set -l c1 (set_color white)
+set -l c2 (set_color $bg)
+set -l arrow "$c1$arrow_symbol$c2"
+set -l text "prefix$sc"suffix
+```
+
 ### Scope: local, global, universal
 
 **Bad:** Assuming undeclared variables are local; using `-g` for user-facing defaults that should persist

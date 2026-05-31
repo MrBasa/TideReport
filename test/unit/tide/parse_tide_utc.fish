@@ -14,7 +14,7 @@ set -g tide_report_tide_show_level false
 
 function __tide_report_test_tide_time_only --argument-names parse_out
     set -l plain (string replace -r '\e\[[0-9;]*m' '' -- "$parse_out")
-    string replace -a -r ' .*' '' -- "$plain"
+    string match -r '[0-9]{1,2}:[0-9]{2}' -- "$plain"
 end
 
 @test "parse_tide converts NOAA GMT to America/New_York local time" (

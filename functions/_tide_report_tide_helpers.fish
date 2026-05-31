@@ -25,7 +25,9 @@ function __tide_report_render_tide --description "Render tide segment from type 
 
     set -l arrow_symbol
     test "$type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
-    set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
+    set -l symbol_color (set_color $tide_report_tide_symbol_color)
+    set -l segment_color (set_color $tide_tide_color)
+    set -l arrow "$symbol_color$arrow_symbol$segment_color"
     set -l output_string "$arrow$time_str"
 
     if test "$show_level" = "true"; and test -n "$value_metric"
