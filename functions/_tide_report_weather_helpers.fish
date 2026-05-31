@@ -20,9 +20,9 @@ function __tide_report_read_ip_location_cache --description "Read cached IP geol
     echo "$line[2],$line[3]"
 end
 
-function __tide_report_openmeteo_fetch_ip_geo --description "Fetch lat/lon (and optional display fields) from ip-api.com" --argument-names timeout_sec fields
+function __tide_report_openmeteo_fetch_ip_geo --description "Fetch lat/lon (and optional display fields) via HTTPS IP geolocation" --argument-names timeout_sec fields
     set -q fields; or set fields "lat,lon"
-    set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "http://ip-api.com/json/?fields=$fields")
+    set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "https://ipapi.co/json/")
     if test $status -ne 0; or test -z "$ip_data"
         return 1
     end
@@ -82,8 +82,8 @@ function __tide_report_openmeteo_resolve_location --description "Resolve lat, lo
     else if test -z "$location"
         set -l ip_json (__tide_report_openmeteo_fetch_ip_geo "$timeout_sec" "lat,lon")
         if test $status -eq 0; and test -n "$ip_json"
-            set lat (printf "%s" "$ip_json" | jq -r '.lat // empty')
-            set lon (printf "%s" "$ip_json" | jq -r '.lon // empty')
+            set lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
+            set lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty')
             if test "$write_ip_cache" = true; and test -n "$lat"; and test -n "$lon"
                 if set -q TIDE_REPORT_PARENT_PID; and test -n "$TIDE_REPORT_PARENT_PID"
                     set -l ip_file "$HOME/.cache/tide-report/ip-location"
@@ -118,14 +118,14 @@ function __tide_report_openmeteo_wizard_ip_line --description "Build wizard disp
     if test $status -ne 0; or test -z "$ip_json"
         return 1
     end
-    set -l lat (printf "%s" "$ip_json" | jq -r '.lat // empty')
-    set -l lon (printf "%s" "$ip_json" | jq -r '.lon // empty')
+    set -l lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
+    set -l lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty')
     if test -z "$lat"; or test -z "$lon"
         return 1
     end
     set -l city (printf "%s" "$ip_json" | jq -r '.city // empty')
-    set -l region (printf "%s" "$ip_json" | jq -r '.regionName // empty')
-    set -l country (printf "%s" "$ip_json" | jq -r '.country // empty')
+    set -l region (printf "%s" "$ip_json" | jq -r '.region // .regionName // empty')
+    set -l country (printf "%s" "$ip_json" | jq -r '.country_name // .country // empty')
     set -l parts $city $region $country
     printf "%s (%s, %s)\n" (string join ", " $parts) "$lat" "$lon"
 end

@@ -13,4 +13,26 @@ source "$repo_root/conf.d/tide_report.fish"
     echo $status
 ) -eq 0
 
+# Sample defaults from __tide_report_apply_defaults — values must match README tables.
+set -e tide_report_service_timeout_millis
+set -e tide_report_weather_provider
+set -e tide_report_units
+set -e tide_report_weather_refresh_seconds
+set -e tide_report_weather_expire_seconds
+set -e tide_report_moon_provider
+set -e tide_report_github_refresh_seconds
+set -e tide_report_github_ci_refresh_seconds
+set -e tide_report_tide_station_id
+__tide_report_apply_defaults g white normal
+
+@test "defaults match README tide_report_service_timeout_millis" "$tide_report_service_timeout_millis" = 6000
+@test "defaults match README tide_report_weather_provider" "$tide_report_weather_provider" = openmeteo
+@test "defaults match README tide_report_units" "$tide_report_units" = m
+@test "defaults match README tide_report_weather_refresh_seconds" "$tide_report_weather_refresh_seconds" = 300
+@test "defaults match README tide_report_weather_expire_seconds" "$tide_report_weather_expire_seconds" = 900
+@test "defaults match README tide_report_moon_provider" "$tide_report_moon_provider" = local
+@test "defaults match README tide_report_github_refresh_seconds" "$tide_report_github_refresh_seconds" = 30
+@test "defaults match README tide_report_github_ci_refresh_seconds" "$tide_report_github_ci_refresh_seconds" = 60
+@test "defaults match README tide_report_tide_station_id" "$tide_report_tide_station_id" = 8443970
+
 command rm -rf "$tmp"

@@ -109,7 +109,7 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
                 break
             end
             echo (set_color brcyan)"Retrieving location..."(set_color normal)
-            set -l resolved (__tide_report_validate_weather_location "$manual")
+            set -l resolved (_tide_report_validate_weather_location "$manual")
             set -l val_status $status
             set resolved (string trim -- $resolved)
             if test $val_status -eq 0

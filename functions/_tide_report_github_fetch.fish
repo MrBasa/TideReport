@@ -41,11 +41,11 @@ function __tide_report_fetch_github --description "Fetch GitHub repo stats with 
         command mv -f "$stats_temp" "$stats_file"
     else
         command rm -f "$temp_file" "$stats_temp" 2>/dev/null
-        if functions -q __tide_report_log_expected
+        if functions -q _tide_report_log_expected
             if not __tide_report_github_auth_ok
-                __tide_report_log_expected github "gh not authenticated"
+                _tide_report_log_expected github "gh not authenticated"
             else
-                __tide_report_log_expected github "fetch failed (network or gh error)"
+                _tide_report_log_expected github "fetch failed (network or gh error)"
             end
         end
     end
@@ -83,11 +83,11 @@ function __tide_report_fetch_github_ci --description "Fetch latest workflow run 
         command mv -f "$state_temp" "$state_file"
     else
         command rm -f "$temp_file" "$state_temp" 2>/dev/null
-        if functions -q __tide_report_log_expected
+        if functions -q _tide_report_log_expected
             if not __tide_report_github_auth_ok
-                __tide_report_log_expected github "gh not authenticated (CI fetch)"
+                _tide_report_log_expected github "gh not authenticated (CI fetch)"
             else
-                __tide_report_log_expected github "CI fetch failed (network or gh error)"
+                _tide_report_log_expected github "CI fetch failed (network or gh error)"
             end
         end
     end

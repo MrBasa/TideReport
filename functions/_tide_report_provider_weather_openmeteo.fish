@@ -12,9 +12,9 @@ if not functions -q __tide_report_write_json_cache
     source (status filename | path dirname)/_tide_report_cache_helpers.fish
 end
 
-function __tide_report_provider_openmeteo --description "Fetch weather from Open-Meteo, normalize, and write weather.json" --argument-names weather_cache timeout_sec lock_var
+function __tide_report_provider_weather_openmeteo --description "Fetch weather from Open-Meteo, normalize, and write weather.json" --argument-names weather_cache timeout_sec lock_var
     if not set resolved (__tide_report_openmeteo_resolve_location "$tide_report_weather_location" "$timeout_sec" true)
-        functions -q __tide_report_log_expected && __tide_report_log_expected weather "geocoding failed or invalid location"
+        functions -q _tide_report_log_expected && _tide_report_log_expected weather "geocoding failed or invalid location"
         return
     end
     set -l lat $resolved[1]
@@ -25,11 +25,11 @@ function __tide_report_provider_openmeteo --description "Fetch weather from Open
     set -l forecast_url "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,apparent_temperature&daily=sunrise,sunset&timezone=$tz_escaped"
     set -l forecast_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$forecast_url")
     if test $status -ne 0; or test -z "$forecast_data"
-        functions -q __tide_report_log_expected && __tide_report_log_expected weather "API unavailable or invalid response"
+        functions -q _tide_report_log_expected && _tide_report_log_expected weather "API unavailable or invalid response"
         return
     end
     if not printf "%s" "$forecast_data" | jq -e '.current.temperature_2m != null' 2>/dev/null >/dev/null
-        functions -q __tide_report_log_expected && __tide_report_log_expected weather "API unavailable or invalid response"
+        functions -q _tide_report_log_expected && _tide_report_log_expected weather "API unavailable or invalid response"
         return
     end
     set -l tc (printf "%s" "$forecast_data" | jq -r '.current.temperature_2m')

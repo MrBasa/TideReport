@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-05-31 |
+| **Completed** | 2026-05-31 |
 | **Depends on** | [phase-03-user-features.md](phase-03-user-features.md), [phase-06-structure-tests.md](../archive/phase-06-structure-tests.md) (recommended) |
 
 ---
@@ -30,26 +30,26 @@ Remaining reliability gaps, install/uninstall polish, security/network hardening
 
 ### Install & uninstall
 
-- [ ] **7.1** **Remove or shorten dev-branch `sleep 3`**
+- [x] **7.1** **Remove or shorten dev-branch `sleep 3`**
   - [`functions/_tide_report_do_install.fish`](../functions/_tide_report_do_install.fish) line 23.
   - Replace with immediate warning only, or shorter delay; avoid blocking Fisher install.
 
-- [ ] **7.2** **Uninstall: erase `_tide_item_*` functions**
+- [x] **7.2** **Uninstall: erase `_tide_item_*` functions**
   - Extend regex in [`functions/_tide_report_do_uninstall.fish`](../functions/_tide_report_do_uninstall.fish) line 54, or document that session restart is required.
   - Update [`test/integration/uninstall.fish`](../test/integration/uninstall.fish) / uninstall runner.
 
-- [ ] **7.3** **Document update cache wipe**
+- [x] **7.3** **Document update cache wipe**
   - [`conf.d/tide_report.fish`](../conf.d/tide_report.fish) update handler `rm -rf ~/.cache/tide-report` is aggressive but intentional.
   - README note: update clears all module caches.
   - **Optional:** selective cache clear (weather only, etc.)—defer if complex.
 
-- [ ] **7.4** **Wizard on update behavior**
+- [x] **7.4** **Wizard on update behavior**
   - After phase 3, confirm interactive update default-no is documented.
   - **Optional:** skip wizard question entirely on update (only `tide-report configure`)—only if product decision changes.
 
 ### Network & security
 
-- [ ] **7.5** **HTTPS for IP geolocation**
+- [x] **7.5** **HTTPS for IP geolocation**
   - Replace `http://ip-api.com` with HTTPS endpoint or alternative provider in:
     - [`functions/_tide_report_provider_weather_openmeteo.fish`](../functions/_tide_report_provider_weather_openmeteo.fish)
     - Install/wizard IP display
@@ -57,30 +57,30 @@ Remaining reliability gaps, install/uninstall polish, security/network hardening
 
 ### GitHub & logging
 
-- [ ] **7.6** **GitHub CI fetch failure logging**
+- [x] **7.6** **GitHub CI fetch failure logging**
   - Add `__tide_report_log_expected` to [`__tide_report_fetch_github_ci`](../functions/_tide_item_github.fish) (mirror repo fetch).
 
-- [ ] **7.7** **`date -Iseconds` in log helper (BSD)**
+- [x] **7.7** **`date -Iseconds` in log helper (BSD)**
   - [`functions/__tide_report_log_expected.fish`](../functions/__tide_report_log_expected.fish): GNU-only `-Iseconds`; use portable timestamp or fallback (logging only).
 
 ### Naming & files (optional)
 
-- [ ] **7.8** **Rename `__`-prefixed function files**
+- [x] **7.8** **Rename `__`-prefixed function files**
   - [`functions/__tide_report_log_expected.fish`](../functions/__tide_report_log_expected.fish), [`functions/__tide_report_validate_weather_location.fish`](../functions/__tide_report_validate_weather_location.fish) → `_tide_report_*` naming (`git mv`).
 
-- [ ] **7.9** **Provider naming consistency**
+- [x] **7.9** **Provider naming consistency**
   - `__tide_report_provider_wttr` vs `__tide_report_provider_moon_wttr` vs `__tide_report_provider_openmeteo`.
 
 ### Testing (carried from Phase 6)
 
-- [ ] **7.11** **Non-blocking prompt timing test** _(deferred from [phase-06-structure-tests.md](../archive/phase-06-structure-tests.md) §6.8)_
+- [x] **7.11** **Non-blocking prompt timing test** _(deferred from [phase-06-structure-tests.md](../archive/phase-06-structure-tests.md) §6.8)_
   - Extend [`test/helpers/fake_bin/curl`](../test/helpers/fake_bin/curl) with a controllable sleep (e.g. env var).
   - Integration test: expired/missing cache triggers background fetch; assert prompt item returns before fetch completes.
   - Keep timing generous enough for Ubuntu/macOS CI; prefer “prompt returned + lock held” over tight wall-clock thresholds where possible.
 
 ### Conf init tests
 
-- [ ] **7.10** **README defaults vs code test**
+- [x] **7.10** **README defaults vs code test**
   - Extend [`test/unit/core/conf_init_defaults.fish`](../test/unit/core/conf_init_defaults.fish) to assert key defaults match README tables (sample set from `__tide_report_apply_defaults`).
 
 ## Acceptance criteria
@@ -98,4 +98,13 @@ Remaining reliability gaps, install/uninstall polish, security/network hardening
 
 ## Done notes
 
-_(Fill when completed.)_
+- Removed dev-branch `sleep 3`; warning-only on non-`@version` Fisher installs.
+- Uninstall now erases `_tide_item_{github,weather,moon,tide}` in addition to `_tide_report_*` helpers; integration runner preloads items before uninstall.
+- README documents full cache wipe on `fisher update` and update wizard default-no behavior.
+- IP geolocation moved to HTTPS `ipapi.co` with jq fallbacks for legacy ip-api field names; fake-curl + fixture test added.
+- **7.6** was already implemented in `_tide_report_github_fetch.fish` (CI + repo fetch logging); verified unchanged.
+- Renamed `__tide_report_log_expected` / `__tide_report_validate_weather_location` files and functions to `_tide_report_*` (autoload-friendly).
+- Weather providers renamed: `__tide_report_provider_weather_wttr`, `__tide_report_provider_weather_openmeteo` (aligned with `__tide_report_provider_moon_wttr`).
+- Log timestamps use portable `date -u +%Y-%m-%dT%H:%M:%SZ`.
+- **7.11:** `test/integration/prompt_nonblocking.fish` gated behind `RUN_SLOW_TESTS=1` (lock-held + missing cache; no wall-clock threshold in default CI run).
+- Weather background refresh now uses detached `fish` subprocess spawn (`_tide_report_spawn_helpers.fish`) because Fish 4.x does not return promptly from `function &` / `begin; end &`.

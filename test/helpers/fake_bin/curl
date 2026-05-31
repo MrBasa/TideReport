@@ -4,6 +4,10 @@ set -l st 0
 set -l url ""
 set -l matched_specific false
 
+if set -q TIDE_REPORT_TEST_CURL_SLEEP_SECONDS
+    sleep $TIDE_REPORT_TEST_CURL_SLEEP_SECONDS
+end
+
 for i in (seq (count $argv))
     set -l arg $argv[$i]
     if test "$arg" = --max-time
@@ -19,7 +23,13 @@ for i in (seq (count $argv))
 end
 
 if test -n "$url"
-    if string match -q '*ip-api.com*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_RESPONSE
+    if string match -q '*ipapi.co*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_RESPONSE
+        set matched_specific true
+        set response "$TIDE_REPORT_TEST_CURL_IP_RESPONSE"
+        if set -q TIDE_REPORT_TEST_CURL_IP_STATUS
+            set st $TIDE_REPORT_TEST_CURL_IP_STATUS
+        end
+    else if string match -q '*ip-api.com*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_RESPONSE
         set matched_specific true
         set response "$TIDE_REPORT_TEST_CURL_IP_RESPONSE"
         if set -q TIDE_REPORT_TEST_CURL_IP_STATUS

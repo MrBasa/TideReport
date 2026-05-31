@@ -54,7 +54,10 @@ function _tide_report_do_uninstall --description "Remove TideReport items, vars,
     end
 
     # Erase our functions (init handlers, item entry points, helpers)
-    builtin functions --erase (builtin functions --all | string match --entire -r '^_*tide_report')
+    set -l tide_report_funcs (builtin functions --all | string match --entire -r '^(_*tide_report|_tide_item_(github|weather|moon|tide))')
+    if test (count $tide_report_funcs) -gt 0
+        builtin functions --erase $tide_report_funcs
+    end
 
     # Remove cache
     command rm -rf ~/.cache/tide-report

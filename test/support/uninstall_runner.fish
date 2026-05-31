@@ -24,6 +24,10 @@ touch $HOME/.cache/tide-report/foo
 set -g fish_function_path $root/functions $fish_function_path
 
 source $root/conf.d/tide_report.fish
+# Preload prompt item entry points so uninstall must erase them from the session.
+for _item in github weather moon tide
+    functions -q _tide_item_$_item; or source $root/functions/_tide_item_$_item.fish
+end
 _tide_report_uninstall
 
 switch $test_name
@@ -47,6 +51,10 @@ switch $test_name
         if functions -q _tide_report_uninstall; exit 1; end
         if functions -q _tide_report_install; exit 1; end
         if functions -q _tide_report_apply_prompt_items; exit 1; end
+        if functions -q _tide_item_github; exit 1; end
+        if functions -q _tide_item_weather; exit 1; end
+        if functions -q _tide_item_moon; exit 1; end
+        if functions -q _tide_item_tide; exit 1; end
     case "*"
         echo "Unknown test: $test_name" >&2
         exit 2

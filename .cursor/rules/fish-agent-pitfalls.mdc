@@ -257,6 +257,30 @@ Run `fish -n path/to/file.fish` on every touched file ([fish-scripts-lint.mdc](f
 
 **Good:** Fix branch/path/policy first; do not assume only foreground code runs.
 
+### `function &` does not background network fetches (Fish 4.x)
+
+**Symptom:** Prompt hangs for several seconds on missing/stale cache when fake `curl`/`gh` sleeps; `_tide_item_*` takes as long as the fetch.
+
+**Cause:** Fish documents that **functions cannot be started in the background**; `my_function &` and `begin; …; end &` run synchronously. `disown` may report “no suitable jobs”.
+
+**Bad:**
+
+```fish
+__tide_report_fetch_github "$slug" "$cache" $timeout "$lock" &
+disown 2>/dev/null
+```
+
+**Good:** Use spawn helpers or an external fish subprocess:
+
+```fish
+__tide_report_spawn_github_fetch "$slug" "$cache" $timeout "$lock"
+# or: command fish $spawn_script >/dev/null 2>&1 &
+```
+
+**Exception:** `__tide_report_provider_moon_local` (offline, no network) may run inline on the prompt path.
+
+**Reference:** [Fish job control](https://fishshell.com/docs/current/language.html#job-control); [`functions/_tide_report_spawn_helpers.fish`](functions/_tide_report_spawn_helpers.fish).
+
 ---
 
 ## Quick checklist for agents
@@ -279,4 +303,5 @@ Run `fish -n path/to/file.fish` on every touched file ([fish-scripts-lint.mdc](f
 - [ ] GitHub tests reset session context globals when asserting zero subprocesses
 - [ ] CI/cache fixtures use actual branch after `git init`
 - [ ] CLI tests redirect stdout when checking exit codes
+- [ ] Network fetch on prompt path uses `__tide_report_spawn_*`, not `function &`
 - [ ] New footgun this session → entry added above (rule to make rules)

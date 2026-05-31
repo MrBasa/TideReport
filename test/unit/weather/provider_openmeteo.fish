@@ -23,7 +23,7 @@ set -l max_time_file "$tmp/curl_max_time"
     set -gx TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE "$REPO_ROOT/test/fixtures/weather/openmeteo_forecast.json"
     set -gx TIDE_REPORT_TEST_CURL_FORECAST_STATUS 0
     command rm -f "$out"
-    __tide_report_provider_openmeteo "$out" 7 weather
+    __tide_report_provider_weather_openmeteo "$out" 7 weather
     set -l ok 0
     test -f "$out"; and jq -e '.temp_c == 12' "$out" >/dev/null; or set ok 1
     echo $ok
@@ -34,7 +34,7 @@ set -l max_time_file "$tmp/curl_max_time"
     set -gx TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE "$REPO_ROOT/test/fixtures/weather/openmeteo_forecast.json"
     set -gx TIDE_REPORT_TEST_CURL_MAX_TIME_FILE "$max_time_file"
     command rm -f "$max_time_file" "$out"
-    __tide_report_provider_openmeteo "$out" 9 weather
+    __tide_report_provider_weather_openmeteo "$out" 9 weather
     test (command cat "$max_time_file") = 9
     echo $status
 ) -eq 0
@@ -44,12 +44,22 @@ set -l max_time_file "$tmp/curl_max_time"
     set -gx TIDE_REPORT_TEST_CURL_FORECAST_STATUS 1
     set -gx TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE ''
     command rm -f "$out"
-    __tide_report_provider_openmeteo "$out" 5 weather
+    __tide_report_provider_weather_openmeteo "$out" 5 weather
     test -f "$out"; and echo 1; or echo 0
+) -eq 0
+
+@test "openmeteo_fetch_ip_geo uses HTTPS and parses ipapi.co response" (
+    source "$REPO_ROOT/functions/_tide_report_weather_helpers.fish"
+    set -gx TIDE_REPORT_TEST_CURL_IP_RESPONSE "$REPO_ROOT/test/fixtures/weather/ipapi_co.json"
+    set -l ip_json (__tide_report_openmeteo_fetch_ip_geo 5 | string collect)
+    set -l lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
+    test "$lat" = 52.52
+    echo $status
 ) -eq 0
 
 set -e TIDE_REPORT_RESOLVED_LOCATION
 set -e TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE
 set -e TIDE_REPORT_TEST_CURL_FORECAST_STATUS
 set -e TIDE_REPORT_TEST_CURL_MAX_TIME_FILE
+set -e TIDE_REPORT_TEST_CURL_IP_RESPONSE
 command rm -rf "$tmp"

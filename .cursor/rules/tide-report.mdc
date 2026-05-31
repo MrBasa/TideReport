@@ -11,7 +11,9 @@ This project is a **Fish shell** plugin for [Tide][] that adds configurable prom
 
 **Critical:** Prompt items must **never** block or delay the prompt. Prefer showing no data or stale data over any delay.
 
-- Fetch data in the **background** (e.g. `&` at end of fetch command). Never await network or slow I/O on the main prompt path.
+- Fetch data in the **background** via [`__tide_report_spawn_*`](functions/_tide_report_spawn_helpers.fish) helpers (detached `command fish $script &`). Never await network or slow I/O on the main prompt path.
+- **Do not** use `my_function &` or `begin; …; end &` for network/cache workers — Fish cannot reliably background shell functions (see [fish-agent-pitfalls.mdc](fish-agent-pitfalls.mdc)).
+- **Exception:** offline providers with no I/O (moon `local`) may run synchronously on the prompt path.
 - Use **file-based or variable-based cache**. On prompt run: read cache only; if cache is missing or expired, show the configured "unavailable" text and trigger a background refresh.
 - Two timers: **refresh** (show stale data, refresh in background) and **expire** (show unavailable, refresh in background). Never block while fetching.
 

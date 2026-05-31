@@ -16,6 +16,9 @@ function __tide_report_tide_load_deps --description "Lazy-load tide async depend
     if not functions -q __tide_report_parse_tide
         source "$_dir/_tide_report_tide_helpers.fish"
     end
+    if not functions -q __tide_report_spawn_tide_fetch
+        source "$_dir/_tide_report_spawn_helpers.fish"
+    end
 end
 
 function _tide_report_handle_async_tide --description "Manage tide.json cache, trigger fetch, return formatted output" --argument-names cache_file now refresh_seconds expire_seconds gnu_date_cmd unavailable_text unavailable_color parse_failed_suffix timeout_sec url
@@ -43,8 +46,7 @@ function _tide_report_handle_async_tide --description "Manage tide.json cache, t
     if $trigger_fetch
         set -l lock_name "tide"
         if __tide_report_lock_acquire "$lock_name" "$now" 120
-            __tide_report_fetch_tide "$url" "$cache_file" "$lock_name" "$timeout_sec" &
-            disown 2>/dev/null
+            __tide_report_spawn_tide_fetch "$url" "$cache_file" "$lock_name" "$timeout_sec"
         end
     end
 

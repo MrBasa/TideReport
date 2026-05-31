@@ -54,7 +54,9 @@ tide-report --help
 tide-report --version
 ```
 
-On `fisher update`, the wizard prompt defaults to **no** (press Enter to skip). On first install it defaults to **yes**. After changing options with `set -U`, run `tide reload` so Tide picks up prompt layout changes.
+On `fisher update`, TideReport **clears all module caches** under `~/.cache/tide-report/` (weather, moon, tide, GitHub, IP location, and lock files) before re-running install logic. This avoids stale schema or bad cache files after an upgrade but means modules may show unavailable briefly until background fetches complete.
+
+The update wizard prompt defaults to **no** (press Enter to skip re-configuration). On first install it defaults to **yes**. Run `tide-report configure` anytime to re-run the wizard. After changing options with `set -U`, run `tide reload` so Tide picks up prompt layout changes.
 
 ### 4. Declarative Configuration (Dotfiles)
 If you prefer to manage your plugins declaratively, you can add `MrBasa/TideReport@v1` to your `~/.config/fish/fish_plugins` file and run `fisher update`. The same interactive wizard will appear if you run this in an interactive session.
@@ -228,6 +230,8 @@ This project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for testi
 fish --no-config scripts/run_tests_isolated.fish
 # Optional live network checks:
 set -x RUN_NETWORK_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
+# Optional non-blocking prompt timing tests (fake curl/gh sleep; weather, github, tide, moon-wttr):
+set -x RUN_SLOW_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
 # To regenerate the canonical SunCalc moon fixture:
 fish scripts/fetch_moon_phase_fixture.fish
 ```

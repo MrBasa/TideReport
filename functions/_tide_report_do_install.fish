@@ -26,7 +26,6 @@ function _tide_report_do_install --description "Install TideReport defaults and 
     if test "$_is_dev_install" = true
         echo (set_color --bold bryellow)"WARNING: This is a development branch! Please install from a release tag:"(set_color normal)
         echo "  fisher install MrBasa/TideReport"(set_color cyan --bold)"@v1"(set_color normal)
-        sleep 3
     end
 
     echo (set_color --bold brwhite)"Installing TideReport v$_tide_report_version..."(set_color normal)
@@ -34,15 +33,15 @@ function _tide_report_do_install --description "Install TideReport defaults and 
     ## --- Check dependencies ---
     if ! command -v "gh" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
-        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "gh not installed"
+        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "gh not installed"
     end
     if ! command -v "jq" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
-        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "jq not installed"
+        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "jq not installed"
     end
     if ! command -v "curl" 2>/dev/null >/dev/null
         echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
-        functions -q __tide_report_log_expected && __tide_report_log_expected dependency "curl not installed"
+        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "curl not installed"
     end
 
     set -U tide_report_user_agent "tide-report/$_tide_report_version"

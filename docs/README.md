@@ -20,7 +20,7 @@ Actionable work items from the **TideReport code review** (May 2026), split into
 | 4 | [archive/phase-04-shared-helpers.md](archive/phase-04-shared-helpers.md) | Dedupe cache/geocoding/write helpers | `completed` |
 | 5 | [archive/phase-05-performance.md](archive/phase-05-performance.md) | Background-path optimizations | `completed` |
 | 6 | [archive/phase-06-structure-tests.md](archive/phase-06-structure-tests.md) | Module split, test coverage gaps | `completed` |
-| 7 | [backlog/phase-07-robustness-polish.md](backlog/phase-07-robustness-polish.md) | Install/uninstall, naming, misc polish | `pending` |
+| 7 | [archive/phase-07-robustness-polish.md](archive/phase-07-robustness-polish.md) | Install/uninstall, naming, misc polish | `completed` |
 | 8 | [backlog/phase-08-future-deferred.md](backlog/phase-08-future-deferred.md) | Future CLI & optional enhancements | `pending` |
 
 **Recommended order:** 0 (can run anytime) → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8.

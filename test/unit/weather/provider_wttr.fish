@@ -11,7 +11,7 @@ set -l out "$HOME/.cache/tide-report/weather.json"
 @test "provider_wttr writes normalized weather and moon cache" (
     set -gx TIDE_REPORT_TEST_CURL_STATUS 0
     set -gx TIDE_REPORT_TEST_CURL_RESPONSE "$REPO_ROOT/test/fixtures/weather/wttr.json"
-    __tide_report_provider_wttr "$out" 5 _lock
+    __tide_report_provider_weather_wttr "$out" 5 _lock
     test -f "$out"; and test -f "$HOME/.cache/tide-report/moon.json"
     echo $status
 ) -eq 0
@@ -20,7 +20,7 @@ set -l out "$HOME/.cache/tide-report/weather.json"
     set -gx TIDE_REPORT_TEST_CURL_STATUS 1
     set -gx TIDE_REPORT_TEST_CURL_RESPONSE ''
     command rm -f "$out"
-    __tide_report_provider_wttr "$out" 5 _lock
+    __tide_report_provider_weather_wttr "$out" 5 _lock
     test -f "$out"; and echo 1; or echo 0
 ) -eq 0
 
@@ -28,7 +28,7 @@ set -l out "$HOME/.cache/tide-report/weather.json"
     set -gx TIDE_REPORT_TEST_CURL_STATUS 0
     set -gx TIDE_REPORT_TEST_CURL_RESPONSE "$REPO_ROOT/test/fixtures/weather/wttr_special_chars.json"
     command rm -f "$out"
-    __tide_report_provider_wttr "$out" 5 _lock
+    __tide_report_provider_weather_wttr "$out" 5 _lock
     set -l ct (jq -r '.condition_text' "$out")
     test "$ct" = 'Light "drizzle" & fog'
     echo $status

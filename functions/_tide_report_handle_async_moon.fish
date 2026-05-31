@@ -16,11 +16,20 @@ function __tide_report_moon_load_deps --description "Lazy-load moon async depend
             if not functions -q __tide_report_fetch_weather
                 source "$_dir/_tide_report_handle_async_weather.fish"
             end
+            if not functions -q __tide_report_spawn_weather_fetch
+                source "$_dir/_tide_report_spawn_helpers.fish"
+            end
         else if not functions -q __tide_report_provider_moon_wttr
             source "$_dir/_tide_report_provider_moon_wttr.fish"
         end
     else if not functions -q __tide_report_provider_moon_local
         source "$_dir/_tide_report_provider_moon_local.fish"
+    end
+end
+
+function __tide_report_moon_load_spawn --description "Lazy-load detached spawn helpers for moon network fetches"
+    if not functions -q __tide_report_spawn_moon_wttr_fetch
+        source (status filename | path dirname)/_tide_report_spawn_helpers.fish
     end
 end
 
@@ -43,14 +52,15 @@ function _tide_report_handle_async_moon --description "Manage moon.json cache va
         if __tide_report_lock_acquire "$lock_var" "$now" 120
             if test "$provider" = "wttr"; and test "$tide_report_weather_provider" = "wttr"
                 set -l weather_cache "$HOME/.cache/tide-report/weather.json"
-                __tide_report_fetch_weather "$weather_cache" "$timeout_sec" "$lock_var" &
+                set -l parent_pid "$fish_pid"
+                __tide_report_spawn_weather_fetch "$weather_cache" "$timeout_sec" "$lock_var" "$parent_pid" ""
             else if test "$provider" = "wttr"
-                __tide_report_provider_moon_wttr "$cache_file" "$timeout_sec" "$lock_var" &
+                __tide_report_moon_load_spawn
+                __tide_report_spawn_moon_wttr_fetch "$cache_file" "$timeout_sec" "$lock_var"
             else
-                # Default and fallback: local offline provider.
-                __tide_report_provider_moon_local "$cache_file" "$timeout_sec" "$lock_var" &
+                # Local offline provider: no network I/O; run synchronously on the prompt path.
+                __tide_report_provider_moon_local "$cache_file" "$timeout_sec" "$lock_var"
             end
-            disown 2>/dev/null
         end
     end
 

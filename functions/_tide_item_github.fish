@@ -15,6 +15,12 @@ if not functions -q __tide_report_fetch_github
     source (status filename | path dirname)/_tide_report_github_fetch.fish
 end
 
+function __tide_report_github_load_spawn --description "Lazy-load detached spawn helpers for GitHub fetches"
+    if not functions -q __tide_report_spawn_github_fetch
+        source (status filename | path dirname)/_tide_report_spawn_helpers.fish
+    end
+end
+
 function _tide_item_github --description "Displays GitHub stats"
     set -l now (command date +%s)
     set -l context (__tide_report_github_context)
@@ -82,16 +88,16 @@ function _tide_item_github --description "Displays GitHub stats"
         set -l lock_var "github_$clean_key"
         if __tide_report_lock_acquire "$lock_var" "$now" 120
             mkdir -p "$cache_dir"
-            __tide_report_fetch_github "$api_slug" "$cache_file" "$timeout_sec" "$lock_var" &
-            disown 2>/dev/null
+            __tide_report_github_load_spawn
+            __tide_report_spawn_github_fetch "$api_slug" "$cache_file" "$timeout_sec" "$lock_var"
         end
     end
 
     if test "$trigger_ci_fetch" = true; and test -n "$branch"
         if __tide_report_lock_acquire "$ci_lock_var" "$now" 120
             mkdir -p "$cache_dir"
-            __tide_report_fetch_github_ci "$api_slug" "$branch" "$ci_cache_file" "$timeout_sec" "$ci_lock_var" &
-            disown 2>/dev/null
+            __tide_report_github_load_spawn
+            __tide_report_spawn_github_ci_fetch "$api_slug" "$branch" "$ci_cache_file" "$timeout_sec" "$ci_lock_var"
         end
     end
 

@@ -10,6 +10,9 @@ function __tide_report_weather_load_lock --description "Lazy-load weather lock h
     if not functions -q __tide_report_lock_acquire
         source (status filename | path dirname)/_tide_report_lock_helpers.fish
     end
+    if not functions -q __tide_report_spawn_weather_fetch
+        source (status filename | path dirname)/_tide_report_spawn_helpers.fish
+    end
 end
 
 function __tide_report_weather_load_cache --description "Lazy-load shared cache helpers"
@@ -20,10 +23,10 @@ end
 
 function __tide_report_weather_load_providers --description "Lazy-load weather provider implementations"
     set -l _dir (status filename | path dirname)
-    if not functions -q __tide_report_provider_wttr
+    if not functions -q __tide_report_provider_weather_wttr
         source "$_dir/_tide_report_provider_weather_wttr.fish"
     end
-    if not functions -q __tide_report_provider_openmeteo
+    if not functions -q __tide_report_provider_weather_openmeteo
         source "$_dir/_tide_report_provider_weather_openmeteo.fish"
     end
 end
@@ -51,12 +54,7 @@ function _tide_report_handle_async_weather --description "Manage weather.json ca
                 set resolved (__tide_report_read_ip_location_cache "$now" 86400)
             end
             set -l parent_pid "$fish_pid"
-            begin
-                set -gx TIDE_REPORT_PARENT_PID "$parent_pid"
-                test -n "$resolved"; and set -gx TIDE_REPORT_RESOLVED_LOCATION "$resolved"
-                __tide_report_fetch_weather "$cache_file" "$timeout_sec" "$lock_var"
-            end &
-            disown 2>/dev/null
+            __tide_report_spawn_weather_fetch "$cache_file" "$timeout_sec" "$lock_var" "$parent_pid" "$resolved"
         end
     end
 
@@ -78,11 +76,11 @@ function __tide_report_fetch_weather --description "Dispatch to configured weath
 
     switch "$tide_report_weather_provider"
         case wttr
-            __tide_report_provider_wttr "$weather_cache" "$timeout_sec" "$lock_var"
+            __tide_report_provider_weather_wttr "$weather_cache" "$timeout_sec" "$lock_var"
         case openmeteo
-            __tide_report_provider_openmeteo "$weather_cache" "$timeout_sec" "$lock_var"
+            __tide_report_provider_weather_openmeteo "$weather_cache" "$timeout_sec" "$lock_var"
         case '*'
-            __tide_report_provider_wttr "$weather_cache" "$timeout_sec" "$lock_var"
+            __tide_report_provider_weather_wttr "$weather_cache" "$timeout_sec" "$lock_var"
     end
 end
 

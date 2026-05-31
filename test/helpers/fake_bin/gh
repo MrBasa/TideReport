@@ -1,4 +1,8 @@
 #!/usr/bin/env fish
+if set -q TIDE_REPORT_TEST_GH_SLEEP_SECONDS
+    sleep $TIDE_REPORT_TEST_GH_SLEEP_SECONDS
+end
+
 if contains -- auth $argv; and contains -- status $argv
     if set -q TIDE_REPORT_TEST_GH_AUTH_FAIL
         exit 1

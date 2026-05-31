@@ -1,10 +1,10 @@
 source (dirname (dirname (status filename)))/../helpers/setup.fish
 source "$REPO_ROOT/functions/_tide_report_handle_async_weather.fish"
 
-function __tide_report_provider_wttr
+function __tide_report_provider_weather_wttr
     echo wttr
 end
-function __tide_report_provider_openmeteo
+function __tide_report_provider_weather_openmeteo
     echo openmeteo
 end
 

@@ -1,7 +1,7 @@
 ## TideReport :: Diagnostic log for expected issues (missing dep, API failure, etc.)
 ## Writes to $XDG_STATE_HOME/tide-report/tide-report.log (fallback ~/.local/state).
 
-function __tide_report_log_expected --description "Append one line (timestamp, version, category, message) to the TideReport diagnostic log" --argument-names category message
+function _tide_report_log_expected --description "Append one line (timestamp, version, category, message) to the TideReport diagnostic log" --argument-names category message
     set -q tide_report_log_expected || return
     set -l v "$tide_report_log_expected"
     string match -q -r '^(0|false|no|off)$' (string lower -- "$v") && return
@@ -13,7 +13,7 @@ function __tide_report_log_expected --description "Append one line (timestamp, v
     set -l log_dir "$state/tide-report"
     set -l log_file "$log_dir/tide-report.log"
 
-    set -l ts (command date -Iseconds 2>/dev/null; or echo "")
+    set -l ts (command date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null; or echo "")
     set -l ver ""
     if set -q _tide_report_version; and string length -q "$_tide_report_version"
         set ver "$_tide_report_version"

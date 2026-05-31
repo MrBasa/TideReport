@@ -11,11 +11,11 @@ if not functions -q __tide_report_write_json_cache
     source (status filename | path dirname)/_tide_report_cache_helpers.fish
 end
 
-function __tide_report_provider_wttr --description "Fetch weather and moon data from wttr.in and normalize to JSON caches" --argument-names weather_cache timeout_sec lock_var
+function __tide_report_provider_weather_wttr --description "Fetch weather and moon data from wttr.in and normalize to JSON caches" --argument-names weather_cache timeout_sec lock_var
     set -l url "$tide_report_wttr_url/$tide_report_weather_location?format=j1&lang=$tide_report_weather_language"
     set -l fetched_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")
     if test $status -ne 0; or test -z "$fetched_data"
-        functions -q __tide_report_log_expected && __tide_report_log_expected weather "wttr.in unavailable or invalid response"
+        functions -q _tide_report_log_expected && _tide_report_log_expected weather "wttr.in unavailable or invalid response"
         return
     end
 
@@ -42,7 +42,7 @@ function __tide_report_provider_wttr --description "Fetch weather and moon data 
         end
     ' 2>/dev/null)
     if test $status -ne 0; or test -z "$extracted"
-        functions -q __tide_report_log_expected && __tide_report_log_expected weather "wttr.in unavailable or invalid response"
+        functions -q _tide_report_log_expected && _tide_report_log_expected weather "wttr.in unavailable or invalid response"
         return
     end
 

@@ -6,7 +6,7 @@ if not functions -q __tide_report_openmeteo_resolve_location
     source (status filename | path dirname)/_tide_report_weather_helpers.fish
 end
 
-function __tide_report_validate_weather_location --description "Validate location via Open-Meteo; on success echo resolved display string" --argument-names input
+function _tide_report_validate_weather_location --description "Validate location via Open-Meteo; on success echo resolved display string" --argument-names input
     set -l raw (string trim -- "$input")
     if test -z "$raw"
         return 1
