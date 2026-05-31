@@ -237,7 +237,7 @@ This project uses [Fishtape](https://github.com/jorgebucaran/fishtape) for testi
 fish --no-config scripts/run_tests_isolated.fish
 # Optional live network checks:
 set -x RUN_NETWORK_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
-# Optional non-blocking prompt timing tests (fake curl/gh sleep; weather, github, tide, moon-wttr):
+# Optional non-blocking prompt timing tests (fake curl/gh sleep 3s; prompt must return in ≤1s):
 set -x RUN_SLOW_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
 # To regenerate the canonical SunCalc moon fixture:
 fish scripts/fetch_moon_phase_fixture.fish

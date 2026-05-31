@@ -46,26 +46,19 @@ Includes a **configuration health** track: detect when enabled TideReport prompt
     - URL to GitHub 'Create New Issue' - [https://github.com/MrBasa/TideReport/issues/new](https://github.com/MrBasa/TideReport/issues/new)
   - Add `_tide_report_sub_bug-report`; register in `tide-report` dispatcher.
   - Tests: help output + mocked env snapshot.
-- **8.2** `**tide-report reload` subcommand** *(optional — low value)*
-  - Only if user feedback shows confusion about `tide reload`.
-  - Would thin-wrap `tide reload` with explanation—**not recommended** per phase 3 decision.
-  - Skip unless explicitly requested.
+- **8.2–8.4, 8.7** moved to [phase-11-optional-future.md](../backlog/phase-11-optional-future.md) (optional backlog).
 
 ### Product / UX optional
 
-- **8.3** **Selective cache clear on update**
-  - Instead of `rm -rf ~/.cache/tide-report` on every update, clear per-module or stale-only.
-- **8.4** **GitHub stats expire tier**
-  - Currently refresh-only by design; add expire if stale stars/forks become a reported issue.
-- **8.5** **Reduce first-prompt git subprocess cost**
-  - `[__tide_report_github_context](../functions/_tide_item_github.fish)`: 3× `git` on first repo visit; optional `.git` file reads only.
+- [x] **8.5** **Reduce first-prompt git subprocess cost**
+  - `__tide_report_github_discover_repo`, `__tide_report_github_origin_from_config`, and `__tide_report_github_context_resolve` read `.git` / `config` before falling back to `git`.
+  - Integration: first `_tide_item_github` visit logs zero `git`/`jq` subprocesses when wrappers are used (`test/integration/github_command_counts.fish`).
 
 ### Review carry-over (optional)
 
-- **8.6** **Timing-based "never block prompt" integration test**
-  - Fake curl sleep; measure prompt return (may be flaky in CI—document).
-- **8.7** **Conf defaults exhaustive test matrix**
-  - Every README table row ↔ `__tide_report_apply_defaults`.
+- [x] **8.6** **Timing-based "never block prompt" integration test**
+  - Extended `test/integration/prompt_nonblocking.fish` (`RUN_SLOW_TESTS=1`): fake 3s curl/gh sleep + **≤1s** wall-clock on prompt path; flakiness documented in test header and README.
+  - Moon-local fast path test always runs without `RUN_SLOW_TESTS`.
 
 ### Configuration health (`tide-report doctor`)
 
@@ -206,5 +199,6 @@ Shared rules for **8.8–8.19**:
 - Shipped `tide-report doctor`, `tide-report bug-report`, and `_tide_report_health_checks.fish` (H-1–H-12). Doctor writes to **stderr**; bug-report embeds a health summary on **stdout**. With no TideReport items in prompt lists, doctor prints one INFO line (documented in README).
 - Install/update and wizard call `_tide_report_run_health_checks` instead of unconditional `gh`/`jq`/`curl` warnings.
 - Tests: `test/unit/core/health_checks.fish`, extended `test/integration/cli/tide_report_cli.fish`. Use `TIDE_REPORT_TEST_SKIP_DOCTOR_NETWORK` and `set -g` overrides in tests when setup applies `-g` defaults.
-- **Deferred (left open):** 8.2 reload wrapper, 8.3 selective cache on update, 8.4 GitHub stats expire, 8.5 git subprocess reduction, 8.6 timing integration test, 8.7 README↔defaults matrix. Revisit if user feedback or a new phase doc is needed.
+- **8.5–8.6** shipped in a follow-up pass (2026-05-31): file-based GitHub context discovery; slow prompt tests gain wall-clock threshold under `RUN_SLOW_TESTS=1`.
+- **8.2, 8.3, 8.4, 8.7** moved to [phase-11-optional-future.md](../backlog/phase-11-optional-future.md).
 - **Follow-up phases:** Prompt preview image automation → [phase-09-prompt-preview-images.md](../backlog/phase-09-prompt-preview-images.md) (9.1). Worldwide tide exploration → [phase-10-worldwide-tides.md](../backlog/phase-10-worldwide-tides.md) (10.1).

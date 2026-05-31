@@ -24,8 +24,9 @@ Actionable work items from the **TideReport code review** (May 2026), split into
 | 8 | [archive/phase-08-future-deferred.md](archive/phase-08-future-deferred.md) | Future CLI & optional enhancements | `completed` |
 | 9 | [backlog/phase-09-prompt-preview-images.md](backlog/phase-09-prompt-preview-images.md) | Prompt preview image generation (repo-only script) | `pending` |
 | 10 | [backlog/phase-10-worldwide-tides.md](backlog/phase-10-worldwide-tides.md) | Worldwide tide predictions — research & direction | `pending` |
+| 11 | [backlog/phase-11-optional-future.md](backlog/phase-11-optional-future.md) | Optional backlog (reload, cache, stats expire, defaults matrix) | `pending` |
 
-**Recommended order:** 0 (can run anytime) → 1 → … → 8 → 9 and/or 10 (independent).
+**Recommended order:** 0 (can run anytime) → 1 → … → 8 → 9 and/or 10 (independent). Phase 11 is pick-up work only.
 
 ## Archive
 

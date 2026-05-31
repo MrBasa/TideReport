@@ -41,6 +41,30 @@ function __tide_report_test_seed_github_repo --argument-names tmp_dir
     cd "$REPO_ROOT"
 end
 
+@test "github first context resolution performs no git or jq calls" (
+    set -l tmp (mktemp -d)
+    __tide_report_test_seed_github_repo "$tmp"
+
+    set -lx HOME "$tmp/home"
+    set -lx XDG_CONFIG_HOME "$tmp/home/.config"
+    set -lx PATH "$tmp/bin" $PATH
+    cd "$REPO_ROOT"
+    source test/helpers/setup.fish
+    cd "$tmp/repo"
+    set -g TIDE_REPORT_TEST 1
+    set -g tide_report_github_show_ci false
+    set -g tide_report_github_refresh_seconds 99999
+
+    __tide_report_test_reset_print_capture
+    _tide_item_github >/dev/null
+
+    set -l ok 1
+    test -s "$tmp/calls.log" && set ok 0
+    cd "$REPO_ROOT"
+    command rm -rf "$tmp"
+    echo $ok
+) -eq 1
+
 @test "github warm cache second render performs no git or jq calls" (
     set -l tmp (mktemp -d)
     __tide_report_test_seed_github_repo "$tmp"

@@ -1,4 +1,5 @@
 source (dirname (dirname (status filename)))/../helpers/setup.fish
+source "$REPO_ROOT/functions/_tide_report_github_discover.fish"
 source "$REPO_ROOT/functions/_tide_item_github.fish"
 
 set -l tmp (mktemp -d)
@@ -31,6 +32,28 @@ set -l tmp (mktemp -d)
     echo '[]' > "$tmp/ci-empty.json"
     __tide_report_github_ci_state_from_json "$tmp/ci-empty.json"
 ) = "none"
+
+@test "github_origin_from_config reads origin url" (
+    mkdir -p "$tmp/git"
+    printf '%s\n' \
+        '[remote "origin"]' \
+        '	url = https://github.com/MrBasa/TideReport.git' \
+        > "$tmp/git/config"
+    __tide_report_github_origin_from_config "$tmp/git"
+) = "https://github.com/MrBasa/TideReport.git"
+
+@test "github_discover_repo finds directory git from nested path" (
+    mkdir -p "$tmp/repo/src" "$tmp/repo/.git/refs/heads"
+    printf '%s\n' 'ref: refs/heads/main' > "$tmp/repo/.git/HEAD"
+    printf '%s\n' \
+        '[remote "origin"]' \
+        '	url = https://github.com/MrBasa/TideReport.git' \
+        > "$tmp/repo/.git/config"
+    set -l found (__tide_report_github_discover_repo "$tmp/repo/src")
+    test (count $found) -eq 2
+    and test (path normalize "$found[1]") = (path normalize "$tmp/repo")
+    echo $status
+) -eq 0
 
 @test "github_branch_from_head reads branch ref from HEAD file" (
     mkdir -p "$tmp/git/refs/heads"

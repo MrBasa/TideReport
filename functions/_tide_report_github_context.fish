@@ -120,6 +120,7 @@ function __tide_report_github_branch_from_head --description "Read branch name f
     end
 end
 
+
 function __tide_report_github_context --description "Resolve repo/cache metadata and cache it per repo root"
     if set -q __tide_report_github_context_repo_root
         set -l current_dir (path resolve "$PWD" 2>/dev/null | string collect)
@@ -130,25 +131,16 @@ function __tide_report_github_context --description "Resolve repo/cache metadata
         end
     end
 
-    set -l repo_root (command git rev-parse --show-toplevel 2>/dev/null)
-    if test -z "$repo_root"
+    if not functions -q __tide_report_github_context_resolve
+        source (status filename | path dirname)/_tide_report_github_discover.fish
+    end
+    set -l resolved (__tide_report_github_context_resolve "$PWD")
+    if test (count $resolved) -lt 3
         return 1
     end
-    set repo_root (path resolve "$repo_root" 2>/dev/null | string collect)
-    test -n "$repo_root"; or set repo_root (path normalize "$repo_root")
-
-    set -l git_dir (command git rev-parse --git-dir 2>/dev/null)
-    if test -z "$git_dir"
-        return 1
-    end
-    if not string match -q '/*' -- "$git_dir"
-        set git_dir (path normalize "$PWD/$git_dir")
-    end
-
-    set -l remote_url (command git config --get remote.origin.url 2>/dev/null)
-    if test -z "$remote_url"
-        return 1
-    end
+    set -l repo_root $resolved[1]
+    set -l git_dir $resolved[2]
+    set -l remote_url $resolved[3]
     if not string match -qr 'github\.com[/:]' "$remote_url"
         return 1
     end

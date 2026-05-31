@@ -1,6 +1,9 @@
 ## Integration: prompt items return before slow background fetches complete.
-## RUN_SLOW_TESTS=1: weather, github, tide, moon-wttr (lock-held + missing cache).
+## RUN_SLOW_TESTS=1: weather, github, tide, moon-wttr (lock-held + missing cache + wall-clock).
 ## Moon local fast test always runs (offline provider is intentionally synchronous).
+##
+## Wall-clock checks use a 1s threshold with fake curl/gh sleep of 3s. May be flaky on
+## overloaded CI hosts; skip with default test run or retry locally when tuning spawn paths.
 
 source (dirname (dirname (status filename)))/helpers/setup.fish
 
@@ -49,7 +52,9 @@ if test "$RUN_SLOW_TESTS" = 1
         command rm -f "$weather_cache"
         command rm -rf "$HOME/.cache/tide-report/locks"
         __tide_report_test_reset_print_capture
+        set -l t0 (command date +%s)
         _tide_item_weather
+        set -l elapsed (math (command date +%s) - $t0)
         set -l lock_held 0
         test -d "$HOME/.cache/tide-report/locks/weather.lock"; and set lock_held 1
         set -l cache_missing 0
@@ -57,7 +62,7 @@ if test "$RUN_SLOW_TESTS" = 1
         set -l printed 0
         set -q _tide_print_item_calls; and test (count $_tide_print_item_calls) -ge 1; and set printed 1
         command rm -rf "$HOME/.cache/tide-report/locks"
-        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1
+        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1; and test $elapsed -le 1
         echo $status
     ) -eq 0
 
@@ -83,7 +88,9 @@ if test "$RUN_SLOW_TESTS" = 1
         command git remote add origin "https://github.com/MrBasa/TideReport.git"
         __tide_report_test_reset_github_context
         __tide_report_test_reset_print_capture
+        set -l t0 (command date +%s)
         _tide_item_github
+        set -l elapsed (math (command date +%s) - $t0)
         popd >/dev/null
         set -l lock_held 0
         test -d "$HOME/.cache/tide-report/locks/github_MrBasa_TideReport.lock"; and set lock_held 1
@@ -92,7 +99,7 @@ if test "$RUN_SLOW_TESTS" = 1
         set -l printed 0
         set -q _tide_print_item_calls; and test (count $_tide_print_item_calls) -ge 1; and set printed 1
         command rm -rf "$HOME/.cache/tide-report/locks"
-        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1
+        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1; and test $elapsed -le 1
         echo $status
     ) -eq 0
 
@@ -113,7 +120,9 @@ if test "$RUN_SLOW_TESTS" = 1
         command rm -f "$tide_cache"
         command rm -rf "$HOME/.cache/tide-report/locks"
         __tide_report_test_reset_print_capture
+        set -l t0 (command date +%s)
         _tide_item_tide
+        set -l elapsed (math (command date +%s) - $t0)
         set -l lock_held 0
         test -d "$HOME/.cache/tide-report/locks/tide.lock"; and set lock_held 1
         set -l cache_missing 0
@@ -121,7 +130,7 @@ if test "$RUN_SLOW_TESTS" = 1
         set -l printed 0
         set -q _tide_print_item_calls; and test (count $_tide_print_item_calls) -ge 1; and set printed 1
         command rm -rf "$HOME/.cache/tide-report/locks"
-        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1
+        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1; and test $elapsed -le 1
         echo $status
     ) -eq 0
 
@@ -142,7 +151,9 @@ if test "$RUN_SLOW_TESTS" = 1
         command rm -f "$moon_cache"
         command rm -rf "$HOME/.cache/tide-report/locks"
         __tide_report_test_reset_print_capture
+        set -l t0 (command date +%s)
         _tide_item_moon
+        set -l elapsed (math (command date +%s) - $t0)
         set -l lock_held 0
         test -d "$HOME/.cache/tide-report/locks/moon.lock"; and set lock_held 1
         set -l cache_missing 0
@@ -150,7 +161,7 @@ if test "$RUN_SLOW_TESTS" = 1
         set -l printed 0
         set -q _tide_print_item_calls; and test (count $_tide_print_item_calls) -ge 1; and set printed 1
         command rm -rf "$HOME/.cache/tide-report/locks"
-        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1
+        test $lock_held -eq 1; and test $cache_missing -eq 1; and test $printed -eq 1; and test $elapsed -le 1
         echo $status
     ) -eq 0
 
