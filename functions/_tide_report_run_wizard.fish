@@ -187,4 +187,9 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
     type -q tide && tide reload 2>/dev/null; or true
     echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     echo (set_color brwhite)"To reconfigure TideReport later, run "(set_color cyan)"tide-report configure"(set_color brwhite)" or "(set_color cyan)"fisher update MrBasa/TideReport@v1"(set_color brwhite)" and answer yes at the wizard prompt."(set_color normal)
+
+    if not functions -q _tide_report_run_health_checks
+        source (status filename | path dirname)/_tide_report_health_checks.fish
+    end
+    _tide_report_run_health_checks
 end

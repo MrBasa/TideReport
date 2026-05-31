@@ -23,7 +23,9 @@ function _tide_report_help --description "Print tide-report usage"
         '  -h or --help     print this help message' \
         '' \
         'Subcommands:' \
-        '  configure   run interactive configuration wizard' \
+        '  configure    run interactive configuration wizard' \
+        '  doctor       check enabled items for missing deps or bad config (stderr)' \
+        '  bug-report   print environment snapshot for GitHub issues (stdout)' \
         '' \
         'See also: After manual `set -U` changes, run `tide reload`.'
 end

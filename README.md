@@ -49,10 +49,16 @@ _(Note: If you install non-interactively, or choose to skip the wizard, the plug
 Re-run the configuration wizard or check the plugin version without reinstalling:
 
 ```fish
-tide-report configure   # interactive wizard (same as install/update wizard)
+tide-report configure    # interactive wizard (same as install/update wizard)
+tide-report doctor       # check enabled items for missing tools or bad config (stderr)
+tide-report bug-report   # copy-friendly snapshot for GitHub issues (stdout)
 tide-report --help
 tide-report --version
 ```
+
+`doctor` and install/configure only run checks for TideReport items actually present in `tide_left_prompt_items` / `tide_right_prompt_items`. They never run on the live prompt path. Warnings go to **stderr**; exit status is `0` unless the command itself fails. Use `tide-report doctor --quiet` to omit informational lines (warnings only).
+
+Open-Meteo fixed locations are validated in `doctor` when `weather` is enabled; **wttr** locations are not validated in doctor v1.
 
 On `fisher update`, TideReport **clears all module caches** under `~/.cache/tide-report/` (weather, moon, tide, GitHub, IP location, and lock files) before re-running install logic. This avoids stale schema or bad cache files after an upgrade but means modules may show unavailable briefly until background fetches complete.
 
@@ -215,6 +221,7 @@ Uses a NOAA station ID (default `8443970`, Boston). Find your nearest US station
 |`tide_report_tide_unavailable_color`|Color for unavailable text.|`red`|
 
 ## 🚑 Troubleshooting
+- **Configuration check:** Run `tide-report doctor` to see warnings for enabled items (missing `jq`/`curl`/`gh`, invalid weather location, default Boston tide station, unknown provider typos, etc.). Install and `tide-report configure` run the same checks when finished.
 - **Weather shows as unavailable:** With the default provider (Open-Meteo) and empty location, the plugin detects your location from your IP. Wait a few seconds for the first fetch to complete, or open a new terminal to trigger a fresh lookup. You can also set `tide_report_weather_location` explicitly.
 - **Emoji alignment changed after Fish 4.6:** Fish 4.6 changed the default emoji width from `1` to `2`. This usually improves alignment on modern terminals, but if moon/weather symbols look offset on older environments, run `set -U fish_emoji_width 1` and restart the shell.
 - **Re-configure via Wizard:** Run `tide-report configure`, or `fisher update MrBasa/TideReport@v1` and answer `y` at the wizard prompt.

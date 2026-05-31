@@ -249,6 +249,24 @@ Run `fish -n path/to/file.fish` on every touched file ([fish-scripts-lint.mdc](f
 
 **Good:** `tide-report nosuch >/dev/null 2>/dev/null`; assert `$status`, not uncontrolled stdout.
 
+**Also:** `@test` blocks must end with **only** `echo $status` on stdout—no debug `echo` lines—or Fishtape mis-parses the assertion.
+
+### `printf` with an empty list still yields one command-substitution line
+
+**Symptom:** `_tide_report_enabled_items` looks non-empty when no items are enabled; `count (func)` is 1.
+
+**Cause:** `printf "%s\n" $empty_list` with no elements still produces a blank line in `( … )`.
+
+**Good:** `test (count $enabled) -gt 0; and printf "%s\n" $enabled`
+
+### Test setup `-g` defaults vs `set -U` in Fishtape
+
+**Symptom:** Doctor/health tests pass in a manual shell but fail under Fishtape; provider checks see `openmeteo` instead of `typo`.
+
+**Cause:** `test/helpers/setup.fish` applies defaults with `set -g`; a later `set -U` in the same process may not override what the check reads in a Fishtape subprocess.
+
+**Good:** In tests, `set -e -g/-U tide_report_*` then `set -g tide_report_*` to the value under test (see `test/unit/core/health_checks.fish`).
+
 ### Background work vs “no I/O on second call”
 
 **Symptom:** `jq`/`git` in log after clearing between two synchronous calls.

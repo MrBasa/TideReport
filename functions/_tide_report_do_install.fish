@@ -30,20 +30,6 @@ function _tide_report_do_install --description "Install TideReport defaults and 
 
     echo (set_color --bold brwhite)"Installing TideReport v$_tide_report_version..."(set_color normal)
 
-    ## --- Check dependencies ---
-    if ! command -v "gh" 2>/dev/null >/dev/null
-        echo (set_color bryellow)"WARNING: Required dependency 'gh' (GitHub CLI) is not installed. Required for github prompt item."(set_color normal)
-        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "gh not installed"
-    end
-    if ! command -v "jq" 2>/dev/null >/dev/null
-        echo (set_color bryellow)"WARNING: Required dependency 'jq' is not installed. Required for github, tide, weather, and moon items."(set_color normal)
-        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "jq not installed"
-    end
-    if ! command -v "curl" 2>/dev/null >/dev/null
-        echo (set_color bryellow)"WARNING: Required dependency 'curl' is not installed. Required for weather, moon, and tide prompt items."(set_color normal)
-        functions -q _tide_report_log_expected && _tide_report_log_expected dependency "curl not installed"
-    end
-
     set -U tide_report_user_agent "tide-report/$_tide_report_version"
     __tide_report_apply_defaults U "$default_color" "$default_bg_color"
 
@@ -107,4 +93,9 @@ function _tide_report_do_install --description "Install TideReport defaults and 
             _tide_report_run_wizard "$default_color" "$default_bg_color"
         end
     end
+
+    if not functions -q _tide_report_run_health_checks
+        source (status filename | path dirname)/_tide_report_health_checks.fish
+    end
+    _tide_report_run_health_checks
 end
