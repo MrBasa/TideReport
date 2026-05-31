@@ -22,9 +22,10 @@ Actionable work items from the **TideReport code review** (May 2026), split into
 | 6 | [archive/phase-06-structure-tests.md](archive/phase-06-structure-tests.md) | Module split, test coverage gaps | `completed` |
 | 7 | [archive/phase-07-robustness-polish.md](archive/phase-07-robustness-polish.md) | Install/uninstall, naming, misc polish | `completed` |
 | 8 | [archive/phase-08-future-deferred.md](archive/phase-08-future-deferred.md) | Future CLI & optional enhancements | `completed` |
-| 9 | [backlog/phase-09-docs-and-tides.md](backlog/phase-09-docs-and-tides.md) | Prompt preview assets & worldwide tides exploration | `pending` |
+| 9 | [backlog/phase-09-prompt-preview-images.md](backlog/phase-09-prompt-preview-images.md) | Prompt preview image generation (repo-only script) | `pending` |
+| 10 | [backlog/phase-10-worldwide-tides.md](backlog/phase-10-worldwide-tides.md) | Worldwide tide predictions — research & direction | `pending` |
 
-**Recommended order:** 0 (can run anytime) → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9.
+**Recommended order:** 0 (can run anytime) → 1 → … → 8 → 9 and/or 10 (independent).
 
 ## Archive
 

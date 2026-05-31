@@ -207,4 +207,4 @@ Shared rules for **8.8–8.19**:
 - Install/update and wizard call `_tide_report_run_health_checks` instead of unconditional `gh`/`jq`/`curl` warnings.
 - Tests: `test/unit/core/health_checks.fish`, extended `test/integration/cli/tide_report_cli.fish`. Use `TIDE_REPORT_TEST_SKIP_DOCTOR_NETWORK` and `set -g` overrides in tests when setup applies `-g` defaults.
 - **Deferred (left open):** 8.2 reload wrapper, 8.3 selective cache on update, 8.4 GitHub stats expire, 8.5 git subprocess reduction, 8.6 timing integration test, 8.7 README↔defaults matrix. Revisit if user feedback or a new phase doc is needed.
-- **Follow-up phase:** Prompt preview image automation and worldwide tide exploration moved to [phase-09-docs-and-tides.md](../backlog/phase-09-docs-and-tides.md) (items 9.1, 9.2).
+- **Follow-up phases:** Prompt preview image automation → [phase-09-prompt-preview-images.md](../backlog/phase-09-prompt-preview-images.md) (9.1). Worldwide tide exploration → [phase-10-worldwide-tides.md](../backlog/phase-10-worldwide-tides.md) (10.1).
