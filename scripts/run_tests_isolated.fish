@@ -62,18 +62,20 @@ fish --no-config -c "source \"$fishtape_path\"
     and if test \"\$RUN_NETWORK_TESTS\" = \"1\"
         fishtape test/network/*.fish
     end
-    set -l code \$status
-    echo ''
-    if test \$code -eq 0
-        echo '--- Testing completed: all passed ---'
-    else
-        echo \"--- Testing completed: FAILED (exit code \$code) ---\"
-    end
-    exit \$code
+    exit \$status
 " | tee "$tap_output"
 set -l code $pipestatus[1]
 if rg -q '^not ok ' "$tap_output"
     set code 1
+end
+if rg -q '^# fail [1-9]' "$tap_output"
+    set code 1
+end
+echo ''
+if test $code -eq 0
+    echo '--- Testing completed: all passed ---'
+else
+    echo "--- Testing completed: FAILED (exit code $code) ---"
 end
 command rm -rf "$tmp"
 exit $code

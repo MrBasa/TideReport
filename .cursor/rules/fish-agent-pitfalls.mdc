@@ -267,6 +267,14 @@ Run `fish -n path/to/file.fish` on every touched file ([fish-scripts-lint.mdc](f
 
 **Good:** In tests, `set -e -g/-U tide_report_*` then `set -g tide_report_*` to the value under test (see `test/unit/core/health_checks.fish`).
 
+### Fake `gh` sleep must not run on `auth status`
+
+**Symptom:** `prompt github returns before slow fetch completes` fails on `elapsed -le 1` while weather/tide pass.
+
+**Cause:** Missing-cache path calls `__tide_report_github_unavailable_display` → `__tide_report_github_auth_ok` → `gh auth status`. If [`test/helpers/fake_bin/gh`](../test/helpers/fake_bin/gh) sleeps before parsing argv, the prompt blocks for `TIDE_REPORT_TEST_GH_SLEEP_SECONDS`.
+
+**Good:** Handle `auth status` first (no sleep); apply `TIDE_REPORT_TEST_GH_SLEEP_SECONDS` only for fetch-shaped `gh` invocations (`repo view`, `run list`, etc.).
+
 ### Background work vs “no I/O on second call”
 
 **Symptom:** `jq`/`git` in log after clearing between two synchronous calls.
