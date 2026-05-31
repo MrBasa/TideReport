@@ -2,7 +2,7 @@
 ## Pins intended behavior for phase-1 BSD fix (see docs/backlog/phase-01-critical-bugs.md).
 
 source (dirname (dirname (status filename)))/../helpers/setup.fish
-source "$REPO_ROOT/functions/_tide_item_tide.fish"
+source "$REPO_ROOT/functions/_tide_report_tide_helpers.fish"
 
 set -l fixture "$REPO_ROOT/test/fixtures/tide/predictions.json"
 set -l now (command date +%s)

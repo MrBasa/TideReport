@@ -5,6 +5,9 @@
 
 function __tide_report_moon_load_deps --description "Lazy-load moon async dependencies based on configured provider" --argument-names provider
     set -l _dir (status filename | path dirname)
+    if not functions -q __tide_report_cache_state
+        source "$_dir/_tide_report_cache_helpers.fish"
+    end
     if not functions -q __tide_report_lock_acquire
         source "$_dir/_tide_report_lock_helpers.fish"
     end
@@ -26,21 +29,11 @@ function _tide_report_handle_async_moon --description "Manage moon.json cache va
     __tide_report_moon_load_deps "$provider"
 
     set -l now (command date +%s)
+    set -l _state (__tide_report_cache_state "$cache_file" "$now" $refresh_seconds $expire_seconds)
     set -l trigger_fetch false
     set -l cache_valid false
-
-    if test -f "$cache_file"
-        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
-        set -l cache_age (math $now - $mod_time)
-        if test $cache_age -le $expire_seconds
-            set cache_valid true
-            test $cache_age -gt $refresh_seconds && set trigger_fetch true
-        else
-            set trigger_fetch true
-        end
-    else
-        set trigger_fetch true
-    end
+    test "$_state[1]" = true; and set trigger_fetch true
+    test "$_state[2]" = true; and set cache_valid true
 
     if $trigger_fetch
         set -l lock_var "moon"

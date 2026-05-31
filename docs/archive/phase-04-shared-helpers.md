@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-05-30 |
+| **Completed** | 2026-05-30 |
 | **Depends on** | [phase-03-user-features.md](phase-03-user-features.md) (CI helper may reuse cache_state) |
 
 ---
@@ -30,7 +30,7 @@ Extract duplicated logic into shared helpers (~100+ lines saved), improve consis
 
 ### Required
 
-- [ ] **4.1** **`__tide_report_cache_state`**
+- [x] **4.1** **`__tide_report_cache_state`**
   - Inputs: cache file path, now, refresh_seconds, expire_seconds.
   - Outputs: trigger_fetch, cache_valid (and optionally stale flag).
   - Replace duplicate blocks in:
@@ -39,20 +39,20 @@ Extract duplicated logic into shared helpers (~100+ lines saved), improve consis
     - [`functions/_tide_item_tide.fish`](../functions/_tide_item_tide.fish)
   - Consider GitHub CI segment (phase 3 may inline first; refactor here if not done).
 
-- [ ] **4.2** **`__tide_report_write_json_cache`**
+- [x] **4.2** **`__tide_report_write_json_cache`**
   - Atomic `$path.$fish_pid.tmp` + `mv`; `mkdir -p` parent.
   - Adopt in tide fetch (if not done in phase 1), weather, moon providers.
 
-- [ ] **4.3** **`__tide_report_openmeteo_resolve_location`**
+- [x] **4.3** **`__tide_report_openmeteo_resolve_location`**
   - Unify geocoding/lat-lon/IP logic from:
     - [`functions/_tide_report_provider_weather_openmeteo.fish`](../functions/_tide_report_provider_weather_openmeteo.fish)
     - [`functions/__tide_report_validate_weather_location.fish`](../functions/__tide_report_validate_weather_location.fish)
     - Install wizard IP display in [`functions/_tide_report_do_install.fish`](../functions/_tide_report_do_install.fish) / wizard file.
 
-- [ ] **4.4** **`__tide_report_build_weather_normalized_json`**
+- [x] **4.4** **`__tide_report_build_weather_normalized_json`**
   - Single `jq -n` builder shared by wttr and openmeteo providers.
 
-- [ ] **4.5** **`_tide_report_handle_async_tide`**
+- [x] **4.5** **`_tide_report_handle_async_tide`**
   - Extract inline async logic from [`functions/_tide_item_tide.fish`](../functions/_tide_item_tide.fish) to match weather/moon pattern.
   - Item file: locals + handler call + parse only.
 
@@ -84,4 +84,9 @@ Extract duplicated logic into shared helpers (~100+ lines saved), improve consis
 
 ## Done notes
 
-_(Fill when completed.)_
+- Split helpers by concern: `_tide_report_cache_helpers.fish` (cache state, atomic JSON write, `__tide_report_file_mtime`), `_tide_report_weather_helpers.fish` (Open-Meteo location + normalized weather JSON), `_tide_report_tide_helpers.fish` (parse/render/fetch), `_tide_report_handle_async_tide.fish` (async handler).
+- Tide parse/render/fetch moved out of `_tide_item_tide.fish` to avoid circular autoload with the async handler.
+- Moon cache writes use generic `__tide_report_write_json_cache` (optional 4.8 deferred).
+- GitHub CI segment still uses its own refresh model; not refactored to `__tide_report_cache_state` (different expire semantics).
+- Fish pitfall documented: `read -l` from multi-line command substitution can hang; use list capture + explicit boolean `and set` instead of `(test …)`.
+- `fish scripts/run_tests_isolated.fish` — all passed.

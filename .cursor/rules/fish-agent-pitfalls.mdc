@@ -122,6 +122,28 @@ end
 
 **Good:** `set state (compute)` without `-l` on reassignment (outer was created with `set -l state`).
 
+### `read -l` from multi-line command substitution can hang
+
+**Symptom:** Prompt handler or test appears stuck after calling a helper that echoes several lines; direct calls to the helper return instantly.
+
+**Cause:** `read -l a b c (my_helper …)` when `my_helper` prints multiple lines may block waiting for stdin instead of consuming the substitution output (Fish 3.x).
+
+**Bad:**
+
+```fish
+read -l trigger_fetch cache_valid stale (__tide_report_cache_state "$file" $now $refresh $expire)
+```
+
+**Good:** Capture as a list, then index or convert to booleans:
+
+```fish
+set -l state (__tide_report_cache_state "$file" $now $refresh $expire)
+set -l trigger_fetch false
+set -l cache_valid false
+test "$state[1]" = true; and set trigger_fetch true
+test "$state[2]" = true; and set cache_valid true
+```
+
 ### Empty positional arguments are dropped
 
 **Cause:** Fish **omits** `""` from `$argv`. Optional positional APIs break silently.

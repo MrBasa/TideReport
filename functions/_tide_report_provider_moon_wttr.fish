@@ -15,9 +15,10 @@ function __tide_report_provider_moon_wttr --description "Fetch moon phase from w
     set -l phase (printf "%s" "$fetched_data" | jq -r '.weather[0].astronomy[0].moon_phase // ""')
     if test -n "$phase"
         set -l moon_json (jq -n --arg phase "$phase" '{phase:$phase}')
-        mkdir -p (dirname "$moon_cache")
-        set -l moon_temp "$moon_cache.$fish_pid.tmp"
-        printf "%s" "$moon_json" > "$moon_temp" && command mv -f "$moon_temp" "$moon_cache"
+        if not functions -q __tide_report_write_json_cache
+            source (status filename | path dirname)/_tide_report_cache_helpers.fish
+        end
+        __tide_report_write_json_cache "$moon_cache" "$moon_json"
     else
         functions -q __tide_report_log_expected && __tide_report_log_expected moon "wttr.in unavailable or no moon data"
     end

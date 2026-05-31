@@ -12,6 +12,12 @@ function __tide_report_weather_load_lock --description "Lazy-load weather lock h
     end
 end
 
+function __tide_report_weather_load_cache --description "Lazy-load shared cache helpers"
+    if not functions -q __tide_report_cache_state
+        source (status filename | path dirname)/_tide_report_cache_helpers.fish
+    end
+end
+
 function __tide_report_weather_load_providers --description "Lazy-load weather provider implementations"
     set -l _dir (status filename | path dirname)
     if not functions -q __tide_report_provider_wttr
@@ -25,40 +31,24 @@ end
 ## --- Main async handler for the weather cache (used by weather item only) ---
 function _tide_report_handle_async_weather --description "Manage weather.json cache validity and trigger provider fetches" --argument-names item_name cache_file refresh_seconds expire_seconds unavailable_text unavailable_color timeout_sec
     __tide_report_weather_load_lock
+    __tide_report_weather_load_cache
     set -l now (command date +%s)
+
+    set -l _state (__tide_report_cache_state "$cache_file" "$now" $refresh_seconds $expire_seconds)
     set -l trigger_fetch false
     set -l cache_valid false
-
-    # Check cache status
-    if test -f "$cache_file"
-        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
-        set -l cache_age (math $now - $mod_time)
-        if test $cache_age -le $expire_seconds
-            set cache_valid true
-            test $cache_age -gt $refresh_seconds && set trigger_fetch true
-        else
-            set trigger_fetch true
-        end
-    else
-        set trigger_fetch true
-    end
+    test "$_state[1]" = true; and set trigger_fetch true
+    test "$_state[2]" = true; and set cache_valid true
 
     if $trigger_fetch
         set -l lock_var "weather"
         if __tide_report_lock_acquire "$lock_var" "$now" 120
             set -l resolved ""
             if test "$tide_report_weather_provider" = "openmeteo"; and test -z "$tide_report_weather_location"
-                set -l ip_file "$HOME/.cache/tide-report/ip-location"
-                if test -f "$ip_file"
-                    set -l line (string split '|' (cat "$ip_file" 2>/dev/null; or echo ""))
-                    if test (count $line) -ge 3; and test "$line[1]" = "$fish_pid"
-                        set -l mtime (command date -r "$ip_file" +%s 2>/dev/null; or echo 0)
-                        set -l age (math $now - $mtime)
-                        if test $age -le 86400
-                            set resolved "$line[2],$line[3]"
-                        end
-                    end
+                if not functions -q __tide_report_read_ip_location_cache
+                    source (status filename | path dirname)/_tide_report_weather_helpers.fish
                 end
+                set resolved (__tide_report_read_ip_location_cache "$now" 86400)
             end
             set -l parent_pid "$fish_pid"
             begin

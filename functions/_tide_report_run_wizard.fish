@@ -73,19 +73,11 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
         echo (set_color brcyan)"    Fixed location"(set_color brwhite)" saves a city, postal code, or coordinates so weather stays pinned to one place."(set_color normal)
         set -l ip_line ""
         if command -q curl; and command -q jq
-            echo (set_color brcyan)"Retrieving location..."(set_color normal)
-            set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time 5 "http://ip-api.com/json/?fields=lat,lon,city,regionName,country")
-            if test $status -eq 0; and test -n "$ip_data"
-                set -l _lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
-                set -l _lon (printf "%s" "$ip_data" | jq -r '.lon // empty')
-                set -l _city (printf "%s" "$ip_data" | jq -r '.city // empty')
-                set -l _region (printf "%s" "$ip_data" | jq -r '.regionName // empty')
-                set -l _country (printf "%s" "$ip_data" | jq -r '.country // empty')
-                if test -n "$_lat"; and test -n "$_lon"
-                    set -l _parts $_city $_region $_country
-                    set ip_line (string join ", " $_parts)" ($_lat, $_lon)"
-                end
+            if not functions -q __tide_report_openmeteo_wizard_ip_line
+                source (status filename | path dirname)/_tide_report_weather_helpers.fish
             end
+            echo (set_color brcyan)"Retrieving location..."(set_color normal)
+            set ip_line (__tide_report_openmeteo_wizard_ip_line 5)
         end
         set -l use_ip_location true
         if test -n "$ip_line"

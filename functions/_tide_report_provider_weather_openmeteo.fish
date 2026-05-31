@@ -5,52 +5,22 @@
 if not functions -q __tide_report_iso8601_to_unix
     source (status filename | path dirname)/_tide_report_time_helpers.fish
 end
+if not functions -q __tide_report_openmeteo_resolve_location
+    source (status filename | path dirname)/_tide_report_weather_helpers.fish
+end
+if not functions -q __tide_report_write_json_cache
+    source (status filename | path dirname)/_tide_report_cache_helpers.fish
+end
 
 function __tide_report_provider_openmeteo --description "Fetch weather from Open-Meteo, normalize, and write weather.json" --argument-names weather_cache timeout_sec lock_var
-    set -l lat ""
-    set -l lon ""
-    set -l tz "auto"
-
-    if set -q TIDE_REPORT_RESOLVED_LOCATION; and test -n "$TIDE_REPORT_RESOLVED_LOCATION"
-        set -l parts (string split ',' -- $TIDE_REPORT_RESOLVED_LOCATION)
-        if test (count $parts) -ge 2
-            set lat (string trim -- $parts[1])
-            set lon (string trim -- $parts[2])
-        end
-    else if test -z "$tide_report_weather_location"
-        set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time 5 "http://ip-api.com/json/?fields=lat,lon")
-        if test $status -eq 0; and test -n "$ip_data"
-            set lat (printf "%s" "$ip_data" | jq -r '.lat // empty')
-            set lon (printf "%s" "$ip_data" | jq -r '.lon // empty')
-            if test -n "$lat"; and test -n "$lon"
-                set -l ip_file "$HOME/.cache/tide-report/ip-location"
-                if set -q TIDE_REPORT_PARENT_PID; and test -n "$TIDE_REPORT_PARENT_PID"
-                    mkdir -p (dirname "$ip_file")
-                    printf "%s|%s|%s\n" "$TIDE_REPORT_PARENT_PID" "$lat" "$lon" > "$ip_file"
-                end
-            end
-        end
-    else if string match -qr '^-?[0-9]+\.?[0-9]*,-?[0-9]+\.?[0-9]*$' -- (string trim -- "$tide_report_weather_location")
-        set -l parts (string split ',' -- (string trim -- "$tide_report_weather_location"))
-        set lat (string trim -- $parts[1])
-        set lon (string trim -- $parts[2])
-    else
-        set -l location_escaped (string escape --style url "$tide_report_weather_location")
-        set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
-        set -l geo_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$geo_url")
-        if test $status -ne 0; or test -z "$geo_data"
-            functions -q __tide_report_log_expected && __tide_report_log_expected weather "geocoding failed or invalid location"
-            return
-        end
-        set lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty')
-        set lon (printf "%s" "$geo_data" | jq -r '.results[0].longitude // empty')
-        set tz (printf "%s" "$geo_data" | jq -r '.results[0].timezone // "auto"')
-    end
-
-    if test -z "$lat"; or test -z "$lon"
+    if not set resolved (__tide_report_openmeteo_resolve_location "$tide_report_weather_location" "$timeout_sec" true)
         functions -q __tide_report_log_expected && __tide_report_log_expected weather "geocoding failed or invalid location"
         return
     end
+    set -l lat $resolved[1]
+    set -l lon $resolved[2]
+    set -l tz $resolved[3]
+
     set -l tz_escaped (string escape --style url "$tz")
     set -l forecast_url "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,uv_index,apparent_temperature&daily=sunrise,sunset&timezone=$tz_escaped"
     set -l forecast_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$forecast_url")
@@ -85,20 +55,9 @@ function __tide_report_provider_openmeteo --description "Fetch weather from Open
     if test -n "$sunset_iso"
         set sv (__tide_report_iso8601_to_unix "$sunset_iso")
     end
-    set -l su (string trim -- $su)
-    set -l sv (string trim -- $sv)
-    set ct (string replace '\\' '\\\\' -- $ct)
-    set ct (string replace '"' '\\"' -- $ct)
-    set -l normalized (jq -n \
-        --argjson tc $tc --argjson tf $tf --argjson fc $fc --argjson ff $ff \
-        --argjson cc $cc --arg ct "$ct" --argjson wk $wk --argjson wm $wm \
-        --arg wd "$wd" --argjson hu $hu --argjson uv $uv \
-        --arg su "$su" --arg sv "$sv" \
-        '{temp_c:$tc,temp_f:$tf,feels_like_c:$fc,feels_like_f:$ff,condition_code:$cc,condition_text:$ct,wind_speed_kmh:$wk,wind_speed_mph:$wm,wind_dir_16:$wd,humidity:$hu,uv_index:$uv,sunrise_utc:(if $su=="" then null else ($su|tonumber) end),sunset_utc:(if $sv=="" then null else ($sv|tonumber) end)}')
+    set -l normalized (__tide_report_build_weather_normalized_json $tc $tf $fc $ff $cc "$ct" $wk $wm "$wd" $hu $uv "$su" "$sv")
     if test -n "$normalized"; and printf "%s" "$normalized" | jq -e '.temp_c != null' 2>/dev/null >/dev/null
-        mkdir -p (dirname "$weather_cache")
-        set -l temp_file "$weather_cache.$fish_pid.tmp"
-        printf "%s" "$normalized" > "$temp_file" && command mv -f "$temp_file" "$weather_cache"
+        __tide_report_write_json_cache "$weather_cache" "$normalized"
     end
 end
 

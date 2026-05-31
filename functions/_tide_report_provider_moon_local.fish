@@ -53,7 +53,8 @@ function __tide_report_provider_moon_local --description "Write normalized moon.
     end
 
     set -l moon_json (jq -n --arg phase "$phase" '{phase:$phase}')
-    mkdir -p (dirname "$moon_cache")
-    set -l moon_temp "$moon_cache.$fish_pid.tmp"
-    printf "%s" "$moon_json" > "$moon_temp" && command mv -f "$moon_temp" "$moon_cache"
+    if not functions -q __tide_report_write_json_cache
+        source (status filename | path dirname)/_tide_report_cache_helpers.fish
+    end
+    __tide_report_write_json_cache "$moon_cache" "$moon_json"
 end

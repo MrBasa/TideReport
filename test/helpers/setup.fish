@@ -21,6 +21,7 @@ function __tide_report_test_source_items --description "Source common item and a
     source "$root/_tide_item_weather.fish"
     source "$root/_tide_item_moon.fish"
     source "$root/_tide_item_github.fish"
+    source "$root/_tide_report_tide_helpers.fish"
     source "$root/_tide_item_tide.fish"
 end
 

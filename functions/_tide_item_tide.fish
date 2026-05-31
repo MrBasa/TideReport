@@ -1,21 +1,5 @@
 ## TideReport :: Tide Prompt Item
 ## This function handles all logic for displaying the tide prediction module.
-##
-## --- Sample Data: ---
-## https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=8443970&product=predictions&interval=hilo&datum=MLLW&time_zone=lst_ldt&units=english&format=json
-## { "predictions" : [
-##    {"t":"2025-10-22 00:18", "v":"9.398", "type":"H"},
-##    {"t":"2025-10-22 06:15", "v":"1.085", "type":"L"},
-##    {"t":"2025-10-22 12:24", "v":"10.093", "type":"H"},
-##    {"t":"2025-10-22 18:43", "v":"0.343", "type":"L"}
-## ]}
-
-if not functions -q __tide_report_gnu_date_cmd
-    source (status filename | path dirname)/_tide_report_time_helpers.fish
-end
-if not functions -q __tide_report_lock_acquire
-    source (status filename | path dirname)/_tide_report_lock_helpers.fish
-end
 
 function _tide_item_tide --description "Fetches and displays next high or low tide"
     if not set -q tide_report_tide_station_id
@@ -24,145 +8,27 @@ function _tide_item_tide --description "Fetches and displays next high or low ti
         return
     end
 
-    # Get current epoch (cross-platform)
-    set -l now (command date +%s)
-    # Get current date for URL (cross-platform)
-    set -l current_date (command date +%Y%m%d)
+    if not functions -q _tide_report_handle_async_tide
+        source (status filename | path dirname)/_tide_report_handle_async_tide.fish
+    end
+    if not functions -q __tide_report_gnu_date_cmd
+        source (status filename | path dirname)/_tide_report_time_helpers.fish
+    end
 
+    set -l now (command date +%s)
+    set -l current_date (command date +%Y%m%d)
     set -l gnu_date_cmd (__tide_report_gnu_date_cmd)
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
-
     set -l cache_file ~/.cache/tide-report/tide.json
-    set -l output
-    set -l trigger_fetch false
     set -l url "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&interval=hilo&datum=MLLW&time_zone=gmt&units=metric&format=json"
     set url "$url&station=$tide_report_tide_station_id"
     set url "$url&begin_date=$current_date"
     set url "$url&range=48"
 
-    if test -f "$cache_file"
-        set -l mod_time (command date -r "$cache_file" +%s 2>/dev/null; or echo 0)
-        set -l cache_age (math $now - $mod_time)
-
-        if test $cache_age -le $tide_report_tide_expire_seconds
-            if set output (__tide_report_parse_tide $now "$cache_file" "$gnu_date_cmd")
-                test $cache_age -gt $tide_report_tide_refresh_seconds && set trigger_fetch true
-            else
-                set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text!data"
-                set trigger_fetch true
-            end
-        else
-            set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text"
-            set trigger_fetch true
-        end
-    else
-        set output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text"
-        set trigger_fetch true
-    end
-
-    if $trigger_fetch
-        set -l lock_name "tide"
-        if __tide_report_lock_acquire "$lock_name" "$now" 120
-            __tide_report_fetch_tide "$url" "$cache_file" "$lock_name" "$timeout_sec" &
-            disown 2>/dev/null  # Avoid prompt delay; ignore "no suitable jobs" if job already finished
-        end
-    end
+    set -l output (_tide_report_handle_async_tide \
+        "$cache_file" "$now" $tide_report_tide_refresh_seconds $tide_report_tide_expire_seconds \
+        "$gnu_date_cmd" "$tide_report_tide_unavailable_text" "$tide_report_tide_unavailable_color" "!data" \
+        "$timeout_sec" "$url")
 
     _tide_print_item tide $output
-end
-
-## --- Render: display inputs → formatted string (no I/O) ---
-function __tide_report_render_tide --description "Render tide segment from type (H/L), time_str, value_metric, show_level" --argument-names type time_str value_metric show_level
-    set -q type || set type "H"
-    set -q time_str || set time_str ""
-    set -q value_metric || set value_metric ""
-    set -q show_level || set show_level "true"
-
-    set -q tide_report_tide_symbol_high || set -l tide_report_tide_symbol_high "⇞"
-    set -q tide_report_tide_symbol_low || set -l tide_report_tide_symbol_low "⇟"
-    set -q tide_report_tide_symbol_color || set -l tide_report_tide_symbol_color white
-    set -q tide_tide_color || set -l tide_tide_color 0087AF
-
-    set -l arrow_symbol
-    test "$type" = "H" && set arrow_symbol $tide_report_tide_symbol_high || set arrow_symbol $tide_report_tide_symbol_low
-    set -l arrow (set_color $tide_report_tide_symbol_color)$arrow_symbol(set_color $tide_tide_color)
-    set -l output_string "$arrow$time_str"
-
-    # Append level with unit (m or ft) when show_level is true
-    if test "$show_level" = "true"; and test -n "$value_metric"
-        set -l unit_suffix "m"
-        set -l level_value $value_metric
-        if set -q tide_report_units; and test "$tide_report_units" = "u"
-            set level_value (math --scale=1 "$value_metric * 3.28084")
-            set unit_suffix "ft"
-        else
-            set level_value (math --scale=1 $value_metric)
-        end
-        if test -n "$level_value"
-            set output_string "$output_string $level_value$unit_suffix"
-        end
-    end
-    echo "$output_string"
-end
-
-## --- Parse Tide Data ---
-function __tide_report_parse_tide --description "Parse tide.json and compute the next tide time and level" --argument-names now cache_file gnu_date_cmd
-    if not test -f "$cache_file"
-        return 1
-    end
-
-    set -l time_format %H:%M
-    if set -q tide_time_format; and test -n "$tide_time_format"
-        set time_format $tide_time_format
-    end
-
-    # NOAA returns "YYYY-MM-DD HH:MM" in GMT.
-    set -l current_time_str (command date -u +"%Y-%m-%d %H:%M")
-
-    # Select the first entry where the time '.t' is greater than our current time string. Date format is YYYY-MM-DD HH:MM.
-    set -l next_tide (jq -r --arg now_str "$current_time_str" '
-        ([.predictions[]
-        | select(.t > $now_str)
-        | select(.v != null and .v != "")
-        | "\(.t);\(.type);\(.v)"] | first // empty)
-        ' "$cache_file" 2>/dev/null)
-
-    if test -z "$next_tide"
-        return 1
-    end
-
-    # Parse the single result: "2025-10-22 00:18;H;9.398"
-    echo "$next_tide" | read --delimiter ";" -l date_str tide_type tide_value_metric
-
-    set -l epoch (__tide_report_noaa_gmt_to_unix "$date_str")
-    set -l tide_time (__tide_report_format_unix_time $epoch $time_format)
-
-    if test -n "$epoch"; and test -n "$tide_time"
-        set -l show_level "true"
-        set -q tide_report_tide_show_level; and test "$tide_report_tide_show_level" != "true"; and set show_level "false"
-        __tide_report_render_tide "$tide_type" "$tide_time" "$tide_value_metric" "$show_level"
-        return 0
-    end
-    return 1
-end
-
-## --- Fetch Tide Data ---
-function __tide_report_fetch_tide --description "Fetch tide predictions from NOAA and update tide.json cache" --argument-names url cache_file lock_var timeout_sec
-    function _remove_lock --description "Clear tide fetch lock when process exits" --on-process-exit $fish_pid --on-signal INT --on-signal TERM --inherit-variable lock_var
-        __tide_report_lock_release "$lock_var"
-    end
-    set -q timeout_sec || set timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
-    set -l tide_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$url")
-    set -l curl_status $status
-    if test $curl_status -ne 0; or test -z "$tide_data"
-        functions -q __tide_report_log_expected && __tide_report_log_expected tide "NOAA API unavailable or invalid response"
-        return
-    end
-    if printf "%s" "$tide_data" | jq -e '.predictions | length > 0' 2>/dev/null >/dev/null
-        mkdir -p (dirname "$cache_file")
-        set -l temp_file "$cache_file.$fish_pid.tmp"
-        printf "%s" "$tide_data" > "$temp_file" && command mv -f "$temp_file" "$cache_file"
-    else
-        functions -q __tide_report_log_expected && __tide_report_log_expected tide "NOAA API unavailable or invalid response"
-    end
 end
