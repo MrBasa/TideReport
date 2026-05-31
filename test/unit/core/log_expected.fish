@@ -6,20 +6,39 @@ set -g HOME "$tmp/home"
 set -g XDG_STATE_HOME "$tmp/state"
 mkdir -p "$HOME" "$XDG_STATE_HOME"
 set -g _tide_report_version "1.7.0"
+set -l log_file "$XDG_STATE_HOME/tide-report/tide-report.log"
+
+function __tide_report_test_log_has_message --argument-names needle
+    test -f "$log_file"; and string match -q "*$needle*" (command cat "$log_file")
+end
 
 @test "log_expected writes one line when enabled" (
     set -g tide_report_log_expected 1
+    command rm -f "$log_file"
     __tide_report_log_expected weather "api timeout"
-    test -f "$XDG_STATE_HOME/tide-report/tide-report.log"
+    test -f "$log_file"
     echo $status
 ) -eq 0
 
-@test "log_expected does not write when disabled" (
+@test "log_expected does not write when disabled with no" (
     set -g tide_report_log_expected no
-    __tide_report_log_expected weather "should-not-log"
-    string match -q '*should-not-log*' (cat "$XDG_STATE_HOME/tide-report/tide-report.log" 2>/dev/null)
-    set -l found $status
-    test $found -eq 0; and echo 1; or echo 0
+    command rm -f "$log_file"
+    __tide_report_log_expected weather "should-not-log-no"
+    __tide_report_test_log_has_message "should-not-log-no"; and echo 1; or echo 0
+) -eq 0
+
+@test "log_expected does not write when disabled with 0" (
+    set -g tide_report_log_expected 0
+    command rm -f "$log_file"
+    __tide_report_log_expected weather "should-not-log-zero"
+    __tide_report_test_log_has_message "should-not-log-zero"; and echo 1; or echo 0
+) -eq 0
+
+@test "log_expected does not write when disabled with false" (
+    set -g tide_report_log_expected false
+    command rm -f "$log_file"
+    __tide_report_log_expected weather "should-not-log-false"
+    __tide_report_test_log_has_message "should-not-log-false"; and echo 1; or echo 0
 ) -eq 0
 
 command rm -rf "$tmp"

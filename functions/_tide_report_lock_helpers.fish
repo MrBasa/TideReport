@@ -24,7 +24,7 @@ function __tide_report_lock_acquire --description "Acquire a cache lock when abs
 
     set -l lock_time 0
     if test -f "$ts_file"
-        read -l lock_time < "$ts_file"
+        set lock_time (string trim -- (cat "$ts_file" 2>/dev/null))
     end
     string match -qr '^[0-9]+$' -- "$lock_time"; or set lock_time 0
 

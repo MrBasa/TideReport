@@ -1,0 +1,15 @@
+{
+  "current": {
+    "temperature_2m": 12,
+    "relative_humidity_2m": 72,
+    "weather_code": 0,
+    "wind_speed_10m": 15,
+    "wind_direction_10m": 225,
+    "uv_index": 2,
+    "apparent_temperature": 10
+  },
+  "daily": {
+    "sunrise": ["2024-09-30T07:30"],
+    "sunset": ["2024-09-30T17:45"]
+  }
+}

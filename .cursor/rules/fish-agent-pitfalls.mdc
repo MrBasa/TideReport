@@ -144,7 +144,17 @@ end
 
 **Good:** `set state (compute)` without `-l` on reassignment (outer was created with `set -l state`).
 
-### `read -l` from multi-line command substitution can hang
+### `(set_color)` glued to literal text drops the text
+
+**Symptom:** Unavailable segment is blank in tests or non-interactive Fish; `(string length (set_color red)hello)` is 0.
+
+**Cause:** `(set_color …)text` is not reliable concatenation in Fish. Assign `set_color` to a variable first, then `"$color_var$text"`.
+
+**Bad:** `set -l out (set_color red)"$unavailable_text"`
+
+**Good:** `set -l c (set_color red); set -l out "$c$unavailable_text"`
+
+### `read -l` from lock timestamp file can fail silently
 
 **Symptom:** Prompt handler or test appears stuck after calling a helper that echoes several lines; direct calls to the helper return instantly.
 

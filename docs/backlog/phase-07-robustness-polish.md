@@ -5,7 +5,7 @@
 | **Status** | `pending` |
 | **Started** | — |
 | **Completed** | — |
-| **Depends on** | [phase-03-user-features.md](phase-03-user-features.md) (recommended) |
+| **Depends on** | [phase-03-user-features.md](phase-03-user-features.md), [phase-06-structure-tests.md](../archive/phase-06-structure-tests.md) (recommended) |
 
 ---
 
@@ -71,6 +71,13 @@ Remaining reliability gaps, install/uninstall polish, security/network hardening
 - [ ] **7.9** **Provider naming consistency**
   - `__tide_report_provider_wttr` vs `__tide_report_provider_moon_wttr` vs `__tide_report_provider_openmeteo`.
 
+### Testing (carried from Phase 6)
+
+- [ ] **7.11** **Non-blocking prompt timing test** _(deferred from [phase-06-structure-tests.md](../archive/phase-06-structure-tests.md) §6.8)_
+  - Extend [`test/helpers/fake_bin/curl`](../test/helpers/fake_bin/curl) with a controllable sleep (e.g. env var).
+  - Integration test: expired/missing cache triggers background fetch; assert prompt item returns before fetch completes.
+  - Keep timing generous enough for Ubuntu/macOS CI; prefer “prompt returned + lock held” over tight wall-clock thresholds where possible.
+
 ### Conf init tests
 
 - [ ] **7.10** **README defaults vs code test**
@@ -81,6 +88,7 @@ Remaining reliability gaps, install/uninstall polish, security/network hardening
 - No unexplained 3s install delay on dev branch.
 - Uninstall behavior documented or fixed for `_tide_item_*` session functions.
 - CI fetch failures visible in log when `tide_report_log_expected` enabled.
+- Non-blocking prompt timing test (7.11) implemented or explicitly deferred again in Done notes.
 - Test suite passes.
 
 ## Key files

@@ -22,7 +22,8 @@ function _tide_report_handle_async_tide --description "Manage tide.json cache, t
     __tide_report_tide_load_deps
 
     set -l trigger_fetch false
-    set -l output (set_color $unavailable_color)"$unavailable_text"
+    set -l _unavail_color (set_color $unavailable_color)
+    set -l output "$_unavail_color$unavailable_text"
 
     set -l _state (__tide_report_cache_state "$cache_file" "$now" $refresh_seconds $expire_seconds)
     set -l trigger_fetch false
@@ -34,7 +35,7 @@ function _tide_report_handle_async_tide --description "Manage tide.json cache, t
         if set parsed (__tide_report_parse_tide "$now" "$cache_file" "$gnu_date_cmd")
             set output $parsed
         else
-            set output (set_color $unavailable_color)"$unavailable_text$parse_failed_suffix"
+            set output "$_unavail_color$unavailable_text$parse_failed_suffix"
             set trigger_fetch true
         end
     end

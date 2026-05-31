@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-05-31 |
+| **Completed** | 2026-05-31 |
 | **Depends on** | [phase-03-user-features.md](phase-03-user-features.md), [phase-04-shared-helpers.md](phase-04-shared-helpers.md) (recommended) |
 
 ---
@@ -30,7 +30,7 @@ Larger refactors (optional) and close test coverage gaps identified in the code 
 
 ### Structure (optional — larger diffs)
 
-- [ ] **6.1** **Split [`functions/_tide_item_github.fish`](../functions/_tide_item_github.fish) (~477 lines)**
+- [x] **6.1** **Split [`functions/_tide_item_github.fish`](../functions/_tide_item_github.fish) (~477 lines)**
   - Move to modules mirroring weather, e.g.:
     - `_tide_report_github_context.fish`
     - `_tide_report_github_fetch.fish`
@@ -38,30 +38,30 @@ Larger refactors (optional) and close test coverage gaps identified in the code 
   - Item file: thin entry + lazy sources.
   - Use `git mv` per [.cursor/rules/git-rename.mdc](../../.cursor/rules/git-rename.mdc).
 
-- [ ] **6.2** **Align naming conventions**
+- [x] **6.2** **Align naming conventions**
   - `--argument-names` on `__tide_report_fetch_tide` (matches peers).
   - Consider renaming `__tide_report_provider_wttr` → `__tide_report_provider_weather_wttr` (optional breaking internal rename only if no external refs).
 
 ### Async & cache tests (recommended)
 
-- [ ] **6.3** **Stale cache window tests (weather, moon, tide)**
+- [x] **6.3** **Stale cache window tests (weather, moon, tide)**
   - Assert: `refresh < age ≤ expire` still renders cached data **and** sets trigger_fetch.
   - Files: extend [`test/unit/weather/async_cache_logic.fish`](../test/unit/weather/async_cache_logic.fish), [`test/unit/moon/async_cache_logic.fish`](../test/unit/moon/async_cache_logic.fish); add tide equivalent.
 
-- [ ] **6.4** **Expired cache with file present**
+- [x] **6.4** **Expired cache with file present**
   - Weather/moon: missing vs expired distinction.
   - Moon integration pattern: [`test/integration/moon_providers.fish`](../test/integration/moon_providers.fish).
 
-- [ ] **6.5** **Lock helper unit tests**
+- [x] **6.5** **Lock helper unit tests**
   - [`functions/_tide_report_lock_helpers.fish`](../functions/_tide_report_lock_helpers.fish):
     - acquire success/failure
     - stale lock recovery (120s TTL)
     - release cleanup
 
-- [ ] **6.6** **Lock-held skip behavior**
+- [x] **6.6** **Lock-held skip behavior**
   - When lock already held, second prompt does not spawn duplicate fetch; shows unavailable/expired until first completes.
 
-- [ ] **6.7** **Open-Meteo provider E2E (fake curl)**
+- [x] **6.7** **Open-Meteo provider E2E (fake curl)**
   - Mirror [`test/unit/weather/provider_wttr.fish`](../test/unit/weather/provider_wttr.fish) for `__tide_report_provider_openmeteo` writing `weather.json`.
   - IP-location sidecar + `TIDE_REPORT_RESOLVED_LOCATION` if applicable.
 
@@ -70,23 +70,23 @@ Larger refactors (optional) and close test coverage gaps identified in the code 
 
 ### GitHub & tide failure paths
 
-- [ ] **6.9** **Tide unavailable suffix tests**
+- [x] **6.9** **Tide unavailable suffix tests**
   - `!stationID` when station unset; `!data` when parse fails ([`_tide_item_tide.fish`](../functions/_tide_item_tide.fish)).
 
-- [ ] **6.10** **Malformed cache JSON tests**
+- [x] **6.10** **Malformed cache JSON tests**
   - Corrupt weather/tide/github cache files → graceful unavailable.
 
-- [ ] **6.11** **`tide_report_service_timeout_millis` propagation test**
+- [x] **6.11** **`tide_report_service_timeout_millis` propagation test**
   - Assert curl receives expected `--max-time` via fake_bin.
 
-- [ ] **6.12** **Moon provider combination tests**
+- [x] **6.12** **Moon provider combination tests**
   - `moon=wttr` + `weather=wttr` shared `"weather"` lock.
   - Malformed empty `moon.json` at parse time.
 
-- [ ] **6.13** **GitHub integration: full unavailable path**
+- [x] **6.13** **GitHub integration: full unavailable path**
   - Missing cache → unavailable text; with auth mock for `!auth` (may overlap phase 3).
 
-- [ ] **6.14** **`log_expected` disable values**
+- [x] **6.14** **`log_expected` disable values**
   - README lists `0`, `false`, `no`; tests only cover `no`—add cases if desired.
 
 ## Acceptance criteria
@@ -102,4 +102,9 @@ Larger refactors (optional) and close test coverage gaps identified in the code 
 
 ## Done notes
 
-_(Fill when completed.)_
+- Split GitHub into `_tide_report_github_context.fish`, `_tide_report_github_parse.fish`, `_tide_report_github_fetch.fish`; `_tide_item_github.fish` is a thin entry with conditional module sources.
+- Fixed lock timestamp read (`cat` + trim instead of `read -l < file`) so fresh locks are not immediately treated as stale.
+- Fixed tide unavailable output: Fish drops text when `(set_color …)"literal"` is glued without a variable (`_tide_item_tide.fish`, `_tide_report_handle_async_tide.fish`).
+- Added async/cache, lock, Open-Meteo E2E, malformed-cache, tide suffix, moon combination, GitHub unavailable, and `log_expected` disable tests; shared helper `__tide_report_test_set_cache_age`.
+- **6.2:** `__tide_report_fetch_tide` already had `--argument-names`; skipped optional `__tide_report_provider_wttr` rename (internal name kept; file is `_tide_report_provider_weather_wttr.fish`).
+- **6.8 moved to Phase 7:** non-blocking prompt timing test → [phase-07-robustness-polish.md](../backlog/phase-07-robustness-polish.md) §7.11.

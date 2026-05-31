@@ -27,6 +27,23 @@ popd >/dev/null
     echo $status
 ) -eq 0
 
+@test "github item shows unavailable when cache missing in git repo" (
+    set -l repo_tmp "$tmp/repo-no-cache"
+    mkdir -p "$repo_tmp"
+    pushd "$repo_tmp" >/dev/null
+    command git init >/dev/null 2>&1
+    command git remote add origin "https://github.com/MrBasa/TideReport.git"
+    set -g tide_report_github_unavailable_text "…"
+    set -g tide_report_github_refresh_seconds 0
+    set -g tide_report_github_show_ci false
+    __tide_report_test_reset_print_capture
+    _tide_item_github
+    set -l item "$_tide_print_item_last_argv[1]"
+    popd >/dev/null
+    test "$item" = github
+    echo $status
+) -eq 0
+
 @test "github item emits nothing in non-git directory" (
     set -l d "$tmp/no-git"
     mkdir -p "$d"

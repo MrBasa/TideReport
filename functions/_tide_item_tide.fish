@@ -3,7 +3,8 @@
 
 function _tide_item_tide --description "Fetches and displays next high or low tide"
     if not set -q tide_report_tide_station_id
-        set -l output (set_color $tide_report_tide_unavailable_color)"$tide_report_tide_unavailable_text!stationID"
+        set -l _unavail_color (set_color $tide_report_tide_unavailable_color)
+        set -l output "$_unavail_color$tide_report_tide_unavailable_text!stationID"
         _tide_print_item tide $output
         return
     end

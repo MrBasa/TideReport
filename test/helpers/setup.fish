@@ -14,6 +14,16 @@ function __tide_report_test_reset_print_capture --description "Clear captured pr
     set -e _tide_print_item_last_argv
 end
 
+function __tide_report_test_set_cache_age --description "Set file mtime so cache age equals age_seconds (GNU and BSD touch)" --argument-names file age_seconds
+    set -l now (command date +%s)
+    set -l mtime (math $now - $age_seconds)
+    if touch --version >/dev/null 2>&1
+        touch -d "@$mtime" -- "$file"
+    else
+        touch -t (command date -r $mtime +%Y%m%d%H%M.%S) -- "$file"
+    end
+end
+
 function __tide_report_test_source_items --description "Source common item and async functions"
     set -l root $REPO_ROOT/functions
     source "$root/_tide_report_handle_async_weather.fish"
