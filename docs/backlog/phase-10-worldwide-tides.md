@@ -5,7 +5,7 @@
 | **Status**     | `pending`                                                                             |
 | **Started**    | —                                                                                     |
 | **Completed**  | —                                                                                     |
-| **Depends on** | none (may run in parallel with [phase-09-prompt-preview-images.md](phase-09-prompt-preview-images.md)) |
+| **Depends on** | none (may run in parallel with [phase-09-prompt-preview-images.md](../archive/phase-09-prompt-preview-images.md)) |
 
 ---
 
@@ -24,7 +24,7 @@
 
 ## Goal
 
-Capture research on worldwide tide support so a future implementation can pick a direction without re-litigating basics. Intentionally loose — a design spike backlog, not a committed feature. Independent of [phase-09-prompt-preview-images.md](phase-09-prompt-preview-images.md).
+Capture research on worldwide tide support so a future implementation can pick a direction without re-litigating basics. Intentionally loose — a design spike backlog, not a committed feature. Independent of [phase-09-prompt-preview-images.md](../archive/phase-09-prompt-preview-images.md).
 
 ---
 

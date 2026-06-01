@@ -215,6 +215,26 @@ end
 command -q gh; and gh version
 ```
 
+### `set -n` lists variable names (not a non-empty test)
+
+**Symptom:** Preview or helper output explodes to megabytes when a function result is captured in `"$()"` .
+
+**Cause:** `set -n name` prints variable **names** to stdout. It is not `test -n`.
+
+**Bad:** `set -q var; and set -n var; and set fg $var`
+
+**Good:** `set -q var; and test -n "$var"; and set fg $var`
+
+### `rm` aliases block non-interactive cleanup
+
+**Symptom:** Agent or script hangs on “Use trash-put instead?” when deleting temp dirs under `/tmp` or in tests.
+
+**Cause:** User config wraps `rm` (e.g. trash-put training wheels). Fish resolves bare `rm` to the alias/function, not the binary.
+
+**Bad:** `rm -rf "$tmp"`, `rm -rf /tmp/my-test-dir` in scripts or agent shell one-liners
+
+**Good:** `command rm -rf "$tmp"` — same pattern as [`scripts/run_tests_isolated.fish`](scripts/run_tests_isolated.fish) and [`scripts/generate_prompt_previews.fish`](scripts/generate_prompt_previews.fish)
+
 ### Interactive-only features
 
 **Cause:** Abbreviations and some `read` UX do nothing in non-interactive Fisher install / CI.
@@ -323,6 +343,7 @@ __tide_report_spawn_github_fetch "$slug" "$cache" $timeout "$lock"
 - [ ] Optional positionals: `-` sentinel, not `""`
 - [ ] `functions/name.fish` defines `function name` only at top level
 - [ ] `fish -n` on all modified `.fish` files
+- [ ] Temp cleanup: `command rm -rf`, not bare `rm` (aliases may prompt)
 
 **TideReport**
 

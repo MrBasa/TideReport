@@ -16,6 +16,12 @@
     echo $status
 ) -eq 0
 
+@test "pre-push hook runs isolated test runner with --no-config" (
+    set -l hook (string collect < scripts/pre-push)
+    string match -q '*run_tests_isolated.fish*' "$hook"; and not string match -q '*fishtape test/*' "$hook"; and string match -q '*fish --no-config scripts/run_tests_isolated.fish*' "$hook"
+    echo $status
+) -eq 0
+
 @test "set -U in isolated child does not leak to parent environment" (
     set -l var_name "__tide_report_isolation_guard_"(random)
     set -e $var_name

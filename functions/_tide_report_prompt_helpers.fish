@@ -16,6 +16,21 @@ function _tide_report_warn_global_prompt_items --description "Warn when a global
     test -n "$right_list"; and echo "$c_cyan""  set -g tide_right_prompt_items $right_list"$c_norm
 end
 
+function __tide_report_preview_show_leading_ellipsis --description "True when preview/wizard should show the leading … placeholder segment"
+    set -q _tide_report_preview_omit_leading_ellipsis; and test "$_tide_report_preview_omit_leading_ellipsis" = 1; and return 1
+    return 0
+end
+
+function __tide_report_powerline_sep --description "set_color for a Powerline separator (next bg as fg; visible when bgs match)" --argument-names sep_glyph next_bg current_bg
+    set -l fg $next_bg
+    if test "$fg" = "$current_bg"
+        if set -q tide_color_separator_same_color; and test -n "$tide_color_separator_same_color"
+            set fg $tide_color_separator_same_color
+        end
+    end
+    echo (set_color $fg -b $current_bg)"$sep_glyph"
+end
+
 function _tide_report_install_show_preview --description "Echo sample output for one item or all items with separators" --argument-names which_item weather_format default_bg_color
     set -q which_item || set which_item all
     set -q weather_format || set weather_format medium
@@ -64,9 +79,9 @@ function _tide_report_install_show_preview --description "Echo sample output for
 
     if test "$which_item" = "all"
         set -l gh_out (__tide_report_render_github 86 75 30 9 42 pass | string collect)
-        set -l w_fmt "%c %t %d%w"
-        test "$weather_format" = "concise" && set w_fmt "%c %t"
-        test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
+        set -l w_fmt "%c%t %d%w"
+        test "$weather_format" = "concise" && set w_fmt "%c%t"
+        test "$weather_format" = "detailed" && set w_fmt "%c %t (%f) %h %d%w"
         set -l save_fmt $tide_report_weather_format
         set -g tide_report_weather_format $w_fmt
         set -l weather_out (__tide_report_render_weather "$temp_sample" "$feels_sample" "☀️" "Clear" "$wind_sample" "⬇" "65%" "" "" "" | string collect)
@@ -74,41 +89,37 @@ function _tide_report_install_show_preview --description "Echo sample output for
         set -l moon_out (__tide_report_get_moon_emoji "Full Moon")
         set -l tide_out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
 
-        set -l left_part (set_color $tide_time_color -b $tide_github_bg_color)" … "
-        if test -n "$sep_color"
-            set left_part "$left_part"(set_color $sep_color -b $tide_github_bg_color)"$lsep "
-        else
-            set left_part "$left_part"(set_color normal -b $tide_github_bg_color)"$lsep "
+        set -l left_part ""
+        if __tide_report_preview_show_leading_ellipsis
+            set left_part (set_color $tide_time_color -b $tide_github_bg_color)" … "
+            if test -n "$lsep"
+                set left_part "$left_part"(__tide_report_powerline_sep "$lsep " $tide_github_bg_color $tide_github_bg_color)
+            end
         end
-        set left_part "$left_part"(set_color $tide_github_color -b $tide_github_bg_color)" $gh_out "(set_color normal)
+        set left_part "$left_part"(set_color $tide_github_color -b $tide_github_bg_color)" $gh_out "
         if test -n "$left_suffix"
-            set left_part "$left_part"(set_color $tide_github_bg_color -b 000000)"$left_suffix"
-            set left_part "$left_part"(set_color normal)
+            set left_part "$left_part"(__tide_report_powerline_sep "$left_suffix" $tide_github_bg_color 000000)
         end
 
-        set -l mid (set_color $conn_color)(string repeat -n 6 -- "$conn_icon")(set_color normal)
+        set -l mid (set_color $conn_color -b 000000)"$conn_icon"(set_color normal)
 
         set -l right_parts ""
         if test -n "$right_prefix"
-            set right_parts "$right_parts"(set_color $tide_weather_bg_color -b 000000)"$right_prefix"
+            set right_parts "$right_parts"(__tide_report_powerline_sep "$right_prefix" $tide_weather_bg_color 000000)
         end
-        set right_parts "$right_parts"(set_color $tide_time_color -b $tide_weather_bg_color)" … "
-        if test -n "$sep_color"
-            set right_parts "$right_parts"(set_color $sep_color -b $tide_weather_bg_color)"$rsep "
-        else
-            set right_parts "$right_parts"(set_color normal -b $tide_weather_bg_color)"$rsep "
+        if __tide_report_preview_show_leading_ellipsis
+            set right_parts "$right_parts"(set_color $tide_time_color -b $tide_weather_bg_color)" … "
+            if test -n "$rsep"
+                set right_parts "$right_parts"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
+            end
         end
         set right_parts "$right_parts"(set_color $tide_weather_color -b $tide_weather_bg_color)"$weather_out"
-        if test -n "$sep_color"
-            set right_parts "$right_parts"(set_color $sep_color -b $tide_weather_bg_color)" $rsep "
-        else
-            set right_parts "$right_parts"(set_color normal -b $tide_weather_bg_color)" $rsep "
+        if test -n "$rsep"
+            set right_parts "$right_parts"(__tide_report_powerline_sep " $rsep " $tide_moon_bg_color $tide_weather_bg_color)
         end
         set right_parts "$right_parts"(set_color $tide_moon_color -b $tide_moon_bg_color)"$moon_out"
-        if test -n "$sep_color"
-            set right_parts "$right_parts"(set_color $sep_color -b $tide_moon_bg_color)" $rsep "
-        else
-            set right_parts "$right_parts"(set_color normal -b $tide_moon_bg_color)" $rsep "
+        if test -n "$rsep"
+            set right_parts "$right_parts"(__tide_report_powerline_sep " $rsep " $tide_tide_bg_color $tide_moon_bg_color)
         end
         set right_parts "$right_parts"(set_color $tide_tide_color -b $tide_tide_bg_color)"$tide_out"(set_color normal)
 
@@ -119,34 +130,35 @@ function _tide_report_install_show_preview --description "Echo sample output for
     switch "$which_item"
         case github
             set -l out (__tide_report_render_github 86 75 30 9 42 pass | string collect)
-            set -l line (set_color $tide_time_color -b $tide_github_bg_color)" … "
-            if test -n "$sep_color"
-                set line "$line"(set_color $sep_color -b $tide_github_bg_color)"$lsep "
-            else
-                set line "$line"(set_color normal -b $tide_github_bg_color)"$lsep "
+            set -l line ""
+            if __tide_report_preview_show_leading_ellipsis
+                set line (set_color $tide_time_color -b $tide_github_bg_color)" … "
+                if test -n "$lsep"
+                    set line "$line"(__tide_report_powerline_sep "$lsep " $tide_github_bg_color $tide_github_bg_color)
+                end
             end
             set line "$line"(set_color $tide_github_color -b $tide_github_bg_color)" $out "
             if test -n "$left_suffix"
-                set line "$line"(set_color $tide_github_bg_color -b 000000)"$left_suffix"
+                set line "$line"(__tide_report_powerline_sep "$left_suffix" $tide_github_bg_color 000000)
             end
             echo (set_color brwhite)"$line"(set_color normal)
         case weather
-            set -l w_fmt "%c %t %d%w"
-            test "$weather_format" = "concise" && set w_fmt "%c %t"
-            test "$weather_format" = "detailed" && set w_fmt "%c 🌡️%t (%f) %h %d%w"
+            set -l w_fmt "%c%t %d%w"
+            test "$weather_format" = "concise" && set w_fmt "%c%t"
+            test "$weather_format" = "detailed" && set w_fmt "%c %t (%f) %h %d%w"
             set -l save_fmt $tide_report_weather_format
             set -g tide_report_weather_format $w_fmt
             set -l out (__tide_report_render_weather "$temp_sample" "$feels_sample" "☀️" "Clear" "$wind_sample" "⬇" "65%" "" "" "" | string collect)
             set -g tide_report_weather_format $save_fmt
             set -l line ""
             if test -n "$right_prefix"
-                set line (set_color $tide_weather_bg_color -b 000000)"$right_prefix"
+                set line (__tide_report_powerline_sep "$right_prefix" $tide_weather_bg_color 000000)
             end
-            set line "$line"(set_color $tide_time_color -b $tide_weather_bg_color)" … "
-            if test -n "$sep_color"
-                set line "$line"(set_color $sep_color -b $tide_weather_bg_color)" $rsep "
-            else
-                set line "$line"(set_color normal -b $tide_weather_bg_color)" $rsep "
+            if __tide_report_preview_show_leading_ellipsis
+                set line "$line"(set_color $tide_time_color -b $tide_weather_bg_color)" … "
+                if test -n "$rsep"
+                    set line "$line"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
+                end
             end
             set line "$line"(set_color $tide_weather_color -b $tide_weather_bg_color)"$out"(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)
@@ -154,13 +166,13 @@ function _tide_report_install_show_preview --description "Echo sample output for
             set -l out (__tide_report_get_moon_emoji "Full Moon")
             set -l line ""
             if test -n "$right_prefix"
-                set line (set_color $tide_moon_bg_color -b 000000)"$right_prefix"
+                set line (__tide_report_powerline_sep "$right_prefix" $tide_moon_bg_color 000000)
             end
-            set line "$line"(set_color $tide_time_color -b $tide_moon_bg_color)" … "
-            if test -n "$sep_color"
-                set line "$line"(set_color $sep_color -b $tide_moon_bg_color)" $rsep "
-            else
-                set line "$line"(set_color normal -b $tide_moon_bg_color)" $rsep "
+            if __tide_report_preview_show_leading_ellipsis
+                set line "$line"(set_color $tide_time_color -b $tide_moon_bg_color)" … "
+                if test -n "$rsep"
+                    set line "$line"(__tide_report_powerline_sep "$rsep " $tide_moon_bg_color $tide_moon_bg_color)
+                end
             end
             set line "$line"(set_color $tide_moon_color -b $tide_moon_bg_color)" $out "(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)
@@ -168,13 +180,13 @@ function _tide_report_install_show_preview --description "Echo sample output for
             set -l out (__tide_report_render_tide H "14:30" 3.2 true | string collect)
             set -l line ""
             if test -n "$right_prefix"
-                set line (set_color $tide_tide_bg_color -b 000000)"$right_prefix"
+                set line (__tide_report_powerline_sep "$right_prefix" $tide_tide_bg_color 000000)
             end
-            set line "$line"(set_color $tide_time_color -b $tide_tide_bg_color)" … "
-            if test -n "$sep_color"
-                set line "$line"(set_color $sep_color -b $tide_tide_bg_color)" $rsep "
-            else
-                set line "$line"(set_color normal -b $tide_tide_bg_color)" $rsep "
+            if __tide_report_preview_show_leading_ellipsis
+                set line "$line"(set_color $tide_time_color -b $tide_tide_bg_color)" … "
+                if test -n "$rsep"
+                    set line "$line"(__tide_report_powerline_sep "$rsep " $tide_tide_bg_color $tide_tide_bg_color)
+                end
             end
             set line "$line"(set_color $tide_tide_color -b $tide_tide_bg_color)" $out "(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)

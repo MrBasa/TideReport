@@ -65,7 +65,7 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
         end
         switch "$fmt"
             case 1; set -U tide_report_weather_format "%c %t"
-            case 3; set -U tide_report_weather_format "%c 🌡️%t (%f) %h %d%w"
+            case 3; set -U tide_report_weather_format "%c %t (%f) %h %d%w"
             case "*"; set -U tide_report_weather_format "%c %t %d%w"
         end
         echo (set_color brwhite)"  Weather location modes:"(set_color normal)

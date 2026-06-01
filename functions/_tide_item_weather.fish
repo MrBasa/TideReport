@@ -66,7 +66,7 @@ function __tide_report_weather_render_init --description "Cache weather render h
              󰖚 󰖛 󰖜  \
             ⬆ ⬈ ➡ ⬊ ⬇ ⬋ ⬅ ⬉ \
             ↑ ↓ → ← ▴ ▾     \
-                 🌡 󰔅 󰔄 \
+                 󰔅 󰔄 \
              󰖌  󱂙 󱪀 󱔂 󱔃 󱔄 󱔅 󱠆 󱪆 󱔉 \
             🕶 󰓠    󰖙  󰖨 \
                󱪈 󱪉 󰖝 󱗺 \

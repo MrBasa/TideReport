@@ -11,9 +11,11 @@ TideReport provides rich prompt items that display **Weather**, **Moon Phase**, 
 - 💁 **Helpful**: Provides succinct weather data, moon phase data, GitHub stats, or if you really want to lean into the maritime theme, tide data.
 
 ## 👀 Previews
-![Screenshot](https://github.com/user-attachments/assets/185f983b-7db9-4934-bf0b-202d19315613)
-![Screenshot](https://github.com/user-attachments/assets/afa0b8a8-9ff4-47c8-ae64-e20f6093c16c)
-![Screenshot](https://github.com/user-attachments/assets/2441a581-2925-44e9-8d13-e98e11b4c17a)
+![Full prompt — metric units](docs/assets/prompt-previews/all-medium-metric.png)
+![GitHub module](docs/assets/prompt-previews/github.png)
+![Weather module — detailed format](docs/assets/prompt-previews/weather-detailed-metric.png)
+
+_Maintainers: regenerate committed preview PNGs with `fish scripts/generate_prompt_previews.fish`. Tune segment colors, Powerline glyphs, and fonts in `scripts/prompt_preview_appearance.fish`. Requires a [Nerd Font](https://www.nerdfonts.com/) and ImageMagick or rsvg-convert; the script creates `scripts/.preview-venv` with [termtosvg](https://github.com/nbedos/termtosvg) on first run. Repo-only — not installed by Fisher._
 
 ## ⚡ Quick Start
 ### 1. Requirements
@@ -241,7 +243,11 @@ set -x RUN_NETWORK_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
 set -x RUN_SLOW_TESTS 1; and fish --no-config scripts/run_tests_isolated.fish
 # To regenerate the canonical SunCalc moon fixture:
 fish scripts/fetch_moon_phase_fixture.fish
+# To regenerate README prompt preview PNGs (maintainer-only; not shipped by Fisher):
+fish scripts/generate_prompt_previews.fish
 ```
+
+**Prompt preview images:** `scripts/generate_prompt_previews.fish` sources `_tide_report_install_show_preview` in an isolated temp `HOME`, applies Tide styling from `scripts/prompt_preview_appearance.fish`, and writes PNGs via the ANSI→SVG converter (accurate framing). Pass `--termtosvg` to use termtosvg instead (requires `scripts/.preview-venv`). Use `--open` to reveal the output folder. Set `TERM=xterm-256color` and install a Nerd Font locally so Powerline separators and icons match a real Tide segment.
 
 The VS Code **Test** task and the optional pre-push hook also run tests through `scripts/run_tests_isolated.fish`, which uses a temporary `HOME` / `XDG_CONFIG_HOME` so any `set -U` inside tests does **not** modify your real Fish universals or prompt configuration.
 

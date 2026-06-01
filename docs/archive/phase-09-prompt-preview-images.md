@@ -2,9 +2,9 @@
 
 | Field          | Value                                                                                 |
 | -------------- | ------------------------------------------------------------------------------------- |
-| **Status**     | `pending`                                                                             |
-| **Started**    | —                                                                                     |
-| **Completed**  | —                                                                                     |
+| **Status**     | `completed`                                                                           |
+| **Started**    | 2026-05-31                                                                            |
+| **Completed**  | 2026-05-31                                                                            |
 | **Depends on** | [phase-08-future-deferred.md](../archive/phase-08-future-deferred.md) (completed)     |
 
 ---
@@ -30,7 +30,7 @@ Automate README / marketing prompt screenshots from the existing text preview he
 
 ## Checklist
 
-- [ ] **9.1** **Prompt preview image generation script (repo-only)**
+- [x] **9.1** **Prompt preview image generation script (repo-only)**
   - **Problem:** [README.md](../../README.md) **Previews** uses manually captured PNGs (GitHub user-attachments). The install wizard already prints deterministic ANSI previews via [`_tide_report_install_show_preview`](../functions/_tide_report_prompt_helpers.fish), but there is no repeatable way to turn those into image assets for docs.
   - **Scope:** Add a **developer script** under `scripts/` (e.g. `scripts/generate_prompt_previews.fish`) that automates sample image generation for maintainers.
   - **Not installable:** Fisher installs `conf.d/` and `functions/` only — **`scripts/` must not be referenced from install paths** (`conf.d`, `functions`, Fisher events). Do not add wizard/CLI subcommands that depend on this script. Document in script header + README **Contributing** (or a short comment in README Previews) that it is maintainer-only.
@@ -61,4 +61,6 @@ Automate README / marketing prompt screenshots from the existing text preview he
 
 ## Done notes
 
-_(Fill when completed.)_
+- Added `scripts/generate_prompt_previews.fish` and `scripts/ansi_preview_to_png.py` (ANSI → SVG → PNG via `rsvg-convert` or ImageMagick; no pip deps).
+- Committed 11 preview variants under `docs/assets/prompt-previews/`; README **Previews** uses three representative PNGs.
+- Capture uses `TERM=xterm-256color`, isolated temp `HOME`/`XDG_*`, and FiraCode Nerd Font Mono when available.
