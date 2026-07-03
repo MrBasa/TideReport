@@ -172,6 +172,16 @@ end
 
 **Good:** `gh auth status -h github.com >/dev/null 2>&1`; run health checks once from the install orchestrator (or `tide-report configure`), not from wizard and install.
 
+### Do not name a parameter `argv` when using `--argument-names`
+
+**Symptom:** GitHub prompt stuck on `…`; background `gh repo view` / spawn workers never write cache; real `gh` prints subcommand help.
+
+**Cause:** `--argument-names timeout_sec argv` binds only **one** positional to `argv` (`repo`). In Fish 4.x, `$argv` inside functions still holds **all** positionals, so you must forward `$argv[2..-1]` (or similar), not a named `argv` parameter.
+
+**Bad:** `function __tide_report_run_gh --argument-names timeout_sec argv` then `gh $argv`
+
+**Good:** `function __tide_report_run_gh --argument-names timeout_sec` then `set -l gh_argv $argv[2..-1]; gh $gh_argv`
+
 ### Validate HTTP bodies before piping to `jq`
 
 **Symptom:** Wizard or doctor prints `jq: parse error: Invalid numeric literal…` during “Retrieving location…”.
@@ -352,6 +362,31 @@ __tide_report_spawn_github_fetch "$slug" "$cache" $timeout "$lock"
 **Exception:** `__tide_report_provider_moon_local` (offline, no network) may run inline on the prompt path.
 
 **Reference:** [Fish job control](https://fishshell.com/docs/current/language.html#job-control); [`functions/_tide_report_spawn_helpers.fish`](functions/_tide_report_spawn_helpers.fish).
+
+### `string match -r` on a pipe emits regex capture groups as extra lines
+
+**Symptom:** After `fisher remove`, `tide` is “Unknown command”; prompt errors for erased `_tide_item_*` until a new session.
+
+**Cause:** `functions --all | string match -r '…(github|weather|moon|tide)'` prints each **capture group** as a separate stdout line (`tide`, `github`, …). Those spurious names get passed to `functions --erase`, deleting Tide’s `tide` command. `tide reload` also ran after the erase, so `$_tide_left_items` stayed stale.
+
+**Bad:**
+
+```fish
+set -l funcs (builtin functions --all | string match --entire -r '^(_*tide_report|_tide_item_(github|weather|moon|tide))')
+builtin functions --erase $funcs
+type -q tide && tide reload
+```
+
+**Good:** Iterate function names; reload Tide **before** erasing plugin functions:
+
+```fish
+for f in (builtin functions --all)
+    string match -q --entire -r '^(_*tide_report|_tide_item_(github|weather|moon|tide))' -- $f
+    and set -a funcs $f
+end
+type -q tide; and tide reload 2>/dev/null
+builtin functions --erase $funcs
+```
 
 ---
 

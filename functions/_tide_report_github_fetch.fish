@@ -1,10 +1,11 @@
 ## TideReport :: GitHub background fetch workers
 
-function __tide_report_run_gh --description "Run gh with optional timeout wrapper" --argument-names timeout_sec argv
+function __tide_report_run_gh --description "Run gh with optional timeout wrapper" --argument-names timeout_sec
+    set -l gh_argv $argv[2..-1]
     if test -n "$timeout_sec"; and test "$timeout_sec" -gt 0; and command -q timeout
-        command timeout "$timeout_sec"s gh $argv
+        command timeout "$timeout_sec"s gh $gh_argv
     else
-        gh $argv
+        gh $gh_argv
     end
 end
 

@@ -28,6 +28,15 @@ source $root/conf.d/tide_report.fish
 for _item in github weather moon tide
     functions -q _tide_item_$_item; or source $root/functions/_tide_item_$_item.fish
 end
+# Tide core must survive uninstall (regression: piped string match -r erased `tide`).
+set -l tide_stub_path $HOME/.config/fish/functions/tide.fish
+if test -f $tide_stub_path
+    source $tide_stub_path
+else
+    function tide --description "Stub tide command for uninstall regression test"
+        echo tide-stub
+    end
+end
 _tide_report_uninstall
 
 switch $test_name
@@ -55,6 +64,7 @@ switch $test_name
         if functions -q _tide_item_weather; exit 1; end
         if functions -q _tide_item_moon; exit 1; end
         if functions -q _tide_item_tide; exit 1; end
+        if not functions -q tide; exit 1; end
     case "*"
         echo "Unknown test: $test_name" >&2
         exit 2

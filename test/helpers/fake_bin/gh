@@ -12,6 +12,14 @@ if set -q TIDE_REPORT_TEST_GH_SLEEP_SECONDS
     sleep $TIDE_REPORT_TEST_GH_SLEEP_SECONDS
 end
 
+if contains -- repo $argv; and not contains -- view $argv
+    exit 1
+end
+
+if contains -- run $argv; and contains -- list $argv; and not contains -- -R $argv
+    exit 1
+end
+
 set -l response "$TIDE_REPORT_TEST_GH_RESPONSE"
 set -l st 0
 if set -q TIDE_REPORT_TEST_GH_STATUS

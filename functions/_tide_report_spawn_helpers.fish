@@ -27,7 +27,7 @@ function __tide_report_spawn_fish_script --description "Run a fish script in a d
     disown 2>/dev/null
 end
 
-function __tide_report_spawn_write_script --description "Write spawn script lines and launch detached fish" --argument-names spawn_path source_file func_name argv
+function __tide_report_spawn_write_script --description "Write spawn script lines and launch detached fish" --argument-names spawn_path source_file func_name
     set -l dir (status filename | path dirname)
     mkdir -p (dirname "$spawn_path")
 
@@ -37,7 +37,7 @@ function __tide_report_spawn_write_script --description "Write spawn script line
     set -a lines (__tide_report_spawn_common_config)
     set -a lines "source "(string escape --style script -- "$dir/$source_file")
     set -l call "$func_name"
-    for arg in $argv
+    for arg in $argv[4..-1]
         set call "$call "(string escape --style script -- "$arg")
     end
     set -a lines $call
@@ -47,9 +47,9 @@ function __tide_report_spawn_write_script --description "Write spawn script line
     __tide_report_spawn_fish_script "$spawn_path"
 end
 
-function __tide_report_spawn_call --description "Run a TideReport function in a detached fish subprocess" --argument-names source_file func_name argv
+function __tide_report_spawn_call --description "Run a TideReport function in a detached fish subprocess" --argument-names source_file func_name
     set -l spawn "$HOME/.cache/tide-report/spawn-$func_name-$fish_pid.fish"
-    __tide_report_spawn_write_script "$spawn" "$source_file" "$func_name" $argv
+    __tide_report_spawn_write_script "$spawn" "$source_file" "$func_name" $argv[3..-1]
 end
 
 function __tide_report_spawn_weather_fetch --description "Refresh weather.json in a detached fish subprocess" --argument-names cache_file timeout_sec lock_var parent_pid resolved
