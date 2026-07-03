@@ -1,0 +1,19 @@
+Output {{THROWAWAY_GIF}}
+Require fish
+Set Shell fish
+Set FontFamily "{{FONT_FAMILY}}"
+Set FontSize {{FONT_SIZE}}
+Set Width {{WIDTH}}
+Set Height {{HEIGHT}}
+Set Padding 0
+Set CursorBlink false
+Set Theme {{THEME_JSON}}
+Hide
+Type "clear"
+Enter
+Type "env TERM=xterm-256color HOME='{{HOME}}' XDG_CONFIG_HOME='{{XDG_CONFIG_HOME}}' XDG_DATA_HOME='{{XDG_DATA_HOME}}' XDG_STATE_HOME='{{XDG_STATE_HOME}}' fish --no-config {{RUNNER}} {{WHICH}} {{WFMT}} {{UNITS}}"
+Enter
+Show
+Sleep 2s
+Screenshot {{PNG_CAPTURE}}
+Sleep 300ms

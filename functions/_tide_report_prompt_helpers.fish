@@ -79,8 +79,8 @@ function _tide_report_install_show_preview --description "Echo sample output for
 
     if test "$which_item" = "all"
         set -l gh_out (__tide_report_render_github 86 75 30 9 42 pass | string collect)
-        set -l w_fmt "%c%t %d%w"
-        test "$weather_format" = "concise" && set w_fmt "%c%t"
+        set -l w_fmt "%c %t %d%w"
+        test "$weather_format" = "concise" && set w_fmt "%c %t"
         test "$weather_format" = "detailed" && set w_fmt "%c %t (%f) %h %d%w"
         set -l save_fmt $tide_report_weather_format
         set -g tide_report_weather_format $w_fmt
@@ -112,8 +112,10 @@ function _tide_report_install_show_preview --description "Echo sample output for
             if test -n "$rsep"
                 set right_parts "$right_parts"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
             end
+        else if test -n "$rsep"
+            set right_parts "$right_parts"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
         end
-        set right_parts "$right_parts"(set_color $tide_weather_color -b $tide_weather_bg_color)"$weather_out"
+        set right_parts "$right_parts"(set_color $tide_weather_color -b $tide_weather_bg_color)" $weather_out"
         if test -n "$rsep"
             set right_parts "$right_parts"(__tide_report_powerline_sep " $rsep " $tide_moon_bg_color $tide_weather_bg_color)
         end
@@ -143,8 +145,8 @@ function _tide_report_install_show_preview --description "Echo sample output for
             end
             echo (set_color brwhite)"$line"(set_color normal)
         case weather
-            set -l w_fmt "%c%t %d%w"
-            test "$weather_format" = "concise" && set w_fmt "%c%t"
+            set -l w_fmt "%c %t %d%w"
+            test "$weather_format" = "concise" && set w_fmt "%c %t"
             test "$weather_format" = "detailed" && set w_fmt "%c %t (%f) %h %d%w"
             set -l save_fmt $tide_report_weather_format
             set -g tide_report_weather_format $w_fmt
@@ -159,8 +161,10 @@ function _tide_report_install_show_preview --description "Echo sample output for
                 if test -n "$rsep"
                     set line "$line"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
                 end
+            else if test -n "$rsep"
+                set line "$line"(__tide_report_powerline_sep "$rsep " $tide_weather_bg_color $tide_weather_bg_color)
             end
-            set line "$line"(set_color $tide_weather_color -b $tide_weather_bg_color)"$out"(set_color normal)
+            set line "$line"(set_color $tide_weather_color -b $tide_weather_bg_color)" $out"(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)
         case moon
             set -l out (__tide_report_get_moon_emoji "Full Moon")
@@ -173,6 +177,8 @@ function _tide_report_install_show_preview --description "Echo sample output for
                 if test -n "$rsep"
                     set line "$line"(__tide_report_powerline_sep "$rsep " $tide_moon_bg_color $tide_moon_bg_color)
                 end
+            else if test -n "$rsep"
+                set line "$line"(__tide_report_powerline_sep "$rsep " $tide_moon_bg_color $tide_moon_bg_color)
             end
             set line "$line"(set_color $tide_moon_color -b $tide_moon_bg_color)" $out "(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)
@@ -187,6 +193,8 @@ function _tide_report_install_show_preview --description "Echo sample output for
                 if test -n "$rsep"
                     set line "$line"(__tide_report_powerline_sep "$rsep " $tide_tide_bg_color $tide_tide_bg_color)
                 end
+            else if test -n "$rsep"
+                set line "$line"(__tide_report_powerline_sep "$rsep " $tide_tide_bg_color $tide_tide_bg_color)
             end
             set line "$line"(set_color $tide_tide_color -b $tide_tide_bg_color)" $out "(set_color normal)
             echo (set_color brwhite)"$line"(set_color normal)

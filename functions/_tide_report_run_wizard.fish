@@ -71,6 +71,10 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
         echo (set_color brwhite)"  Weather location modes:"(set_color normal)
         echo (set_color brcyan)"    IP-based auto-detect"(set_color brwhite)" follows your current network/location and may change over time."(set_color normal)
         echo (set_color brcyan)"    Fixed location"(set_color brwhite)" saves a city, postal code, or coordinates so weather stays pinned to one place."(set_color normal)
+        set -l c_cyan (set_color brcyan)
+        set -l c_white (set_color brwhite)
+        set -l c_norm (set_color normal)
+        set -l loc_hint '(city, postal code, or lat,lon e.g. 52.52,13.41)'
         set -l ip_line ""
         if command -q curl; and command -q jq
             if not functions -q __tide_report_openmeteo_wizard_ip_line
@@ -82,7 +86,8 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
         set -l use_ip_location true
         if test -n "$ip_line"
             echo (set_color brwhite)"  Choosing IP-based auto-detect keeps tide_report_weather_location empty, so weather follows your current IP-based location."(set_color normal)
-            read -l -P (set_color brcyan)"Detected IP-based location: "(set_color brwhite)"$ip_line"(set_color brcyan)". Use IP-based auto-detect for weather? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
+            echo (string join '' $c_cyan 'Detected IP-based location: ' $c_white $ip_line $c_norm)
+            read -l -P (set_color brcyan)"Use IP-based auto-detect for weather? "(set_color brgreen)"["(set_color bryellow)"Y"(set_color brgreen)"/"(set_color bryellow)"n"(set_color brgreen)"]"(set_color brcyan)": "(set_color normal) reply
             set -l r (string trim (string lower -- "$reply"))
             if test "$r" = "n"; or test "$r" = "no"
                 set use_ip_location false
@@ -96,9 +101,9 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
         set -l location_tries 0
         set -l max_location_tries 3
         while test "$use_ip_location" = false
-            set -l prompt_str (set_color brcyan)"Enter a fixed location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to keep IP-based auto-detect: "(set_color normal)
+            set -l prompt_str (string join '' $c_cyan 'Enter a fixed location ' $c_white $loc_hint $c_cyan ' or press Enter to keep IP-based auto-detect: ' $c_norm)
             if test -z "$ip_line"; and test "$first_manual_prompt" = true
-                set prompt_str (set_color brcyan)"Could not detect an IP-based location right now. Enter a fixed location "(set_color brwhite)"(city, postal code, or lat,lon e.g. 52.52,13.41)"(set_color brcyan)" or press Enter to keep IP-based auto-detect: "(set_color normal)
+                set prompt_str (string join '' $c_cyan 'Could not detect an IP-based location right now. Enter a fixed location ' $c_white $loc_hint $c_cyan ' or press Enter to keep IP-based auto-detect: ' $c_norm)
                 set first_manual_prompt false
             end
             read -l -P "$prompt_str" reply
@@ -187,9 +192,4 @@ function _tide_report_run_wizard --description "Interactive TideReport configura
     type -q tide && tide reload 2>/dev/null; or true
     echo (set_color brwhite)"You may need to run "(set_color cyan)"'tide reload'"(set_color brwhite)" or start a new session to see your prompt."(set_color normal)
     echo (set_color brwhite)"To reconfigure TideReport later, run "(set_color cyan)"tide-report configure"(set_color brwhite)" or "(set_color cyan)"fisher update MrBasa/TideReport@v1"(set_color brwhite)" and answer yes at the wizard prompt."(set_color normal)
-
-    if not functions -q _tide_report_run_health_checks
-        source (status filename | path dirname)/_tide_report_health_checks.fish
-    end
-    _tide_report_run_health_checks
 end

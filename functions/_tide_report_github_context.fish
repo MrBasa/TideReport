@@ -43,7 +43,7 @@ function __tide_report_github_auth_ok --description "Return whether gh is authen
         test "$__tide_report_github_auth_ok" = 1
         return $status
     end
-    if gh auth status -h github.com 2>/dev/null
+    if gh auth status -h github.com >/dev/null 2>&1
         set -g __tide_report_github_auth_ok 1
         return 0
     end

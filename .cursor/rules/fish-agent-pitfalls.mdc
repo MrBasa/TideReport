@@ -154,6 +154,32 @@ end
 
 **Good:** `set -l c (set_color red); set -l out "$c$unavailable_text"`
 
+### `(set_color)` before `"(..."` runs command substitution on the parenthetical
+
+**Symptom:** Install wizard shows ghost text (`(set_color normal)`, `(city, postal code…)`, empty location prompts); `read -P` prints raw fragments.
+
+**Cause:** `(set_color brwhite)"(city, …)"` parses as `(set_color brwhite)` plus an empty `""` string plus `(city, …)` as **command substitution**, not literal parentheses.
+
+**Bad:** `set -l prompt (set_color brcyan)"Enter "(set_color brwhite)"(city, postal code)"(set_color normal)`
+
+**Good:** `set -l loc_hint '(city, postal code)'`; `set -l c (set_color brwhite)`; `set -l prompt (string join '' $c_cyan 'Enter ' $c_white $loc_hint $c_norm)`
+
+### `gh auth status` writes to stdout — redirect both streams when checking only exit status
+
+**Symptom:** After install or on the prompt, `github.com` / `Logged in to…` lines overlap the Tide prompt; health checks appear twice if wizard and install both run them.
+
+**Cause:** `gh auth status -h github.com 2>/dev/null` hides stderr only; auth details still print to stdout. Wizard and `_tide_report_do_install` both called `_tide_report_run_health_checks`.
+
+**Good:** `gh auth status -h github.com >/dev/null 2>&1`; run health checks once from the install orchestrator (or `tide-report configure`), not from wizard and install.
+
+### Validate HTTP bodies before piping to `jq`
+
+**Symptom:** Wizard or doctor prints `jq: parse error: Invalid numeric literal…` during “Retrieving location…”.
+
+**Cause:** `ipapi.co` (and similar) may return HTTP 429/403 **plain text** on rate limits; `curl -s` still captures the body and bare `jq` on non-JSON spews errors to the terminal.
+
+**Good:** `curl -s -f …` (fail on HTTP errors), `jq -e 'type == "object"'` gate, HTTPS fallback provider, and `jq … 2>/dev/null` on parse lines.
+
 ### `read -l` from lock timestamp file can fail silently
 
 **Symptom:** Prompt handler or test appears stuck after calling a helper that echoes several lines; direct calls to the helper return instantly.

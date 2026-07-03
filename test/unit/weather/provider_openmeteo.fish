@@ -57,9 +57,31 @@ set -l max_time_file "$tmp/curl_max_time"
     echo $status
 ) -eq 0
 
+@test "openmeteo_fetch_ip_geo falls back when ipapi returns non-json" (
+    source "$REPO_ROOT/functions/_tide_report_weather_helpers.fish"
+    set -gx TIDE_REPORT_TEST_CURL_IP_RESPONSE 'Please contact us for a trial account'
+    set -gx TIDE_REPORT_TEST_CURL_IP_GEOJS_RESPONSE "$REPO_ROOT/test/fixtures/weather/geojs_ip.json"
+    set -l ip_json (__tide_report_openmeteo_fetch_ip_geo 5 | string collect)
+    set -l lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
+    test "$lat" = 41.9209
+    echo $status
+) -eq 0
+
+@test "openmeteo_wizard_ip_line suppresses jq errors on provider failure" (
+    source "$REPO_ROOT/functions/_tide_report_weather_helpers.fish"
+    set -gx TIDE_REPORT_TEST_CURL_IP_RESPONSE 'Please contact us for a trial account'
+    set -e TIDE_REPORT_TEST_CURL_IP_GEOJS_RESPONSE
+    set -l out (__tide_report_openmeteo_wizard_ip_line 5 2>&1 | string collect)
+    __tide_report_openmeteo_wizard_ip_line 5 >/dev/null 2>/dev/null
+    test $status -ne 0
+    and not string match -qi '*jq:*' -- "$out"
+    echo $status
+) -eq 0
+
 set -e TIDE_REPORT_RESOLVED_LOCATION
 set -e TIDE_REPORT_TEST_CURL_FORECAST_RESPONSE
 set -e TIDE_REPORT_TEST_CURL_FORECAST_STATUS
 set -e TIDE_REPORT_TEST_CURL_MAX_TIME_FILE
 set -e TIDE_REPORT_TEST_CURL_IP_RESPONSE
+set -e TIDE_REPORT_TEST_CURL_IP_GEOJS_RESPONSE
 command rm -rf "$tmp"

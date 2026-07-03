@@ -25,7 +25,7 @@ Actionable work items from the **TideReport code review** (May 2026), split into
 | 9 | [archive/phase-09-prompt-preview-images.md](archive/phase-09-prompt-preview-images.md) | Prompt preview image generation (repo-only script) | `completed` |
 | 10 | [backlog/phase-10-worldwide-tides.md](backlog/phase-10-worldwide-tides.md) | Worldwide tide predictions — research & direction | `pending` |
 | 11 | [backlog/phase-11-optional-future.md](backlog/phase-11-optional-future.md) | Optional backlog (reload, cache, stats expire, defaults matrix) | `pending` |
-| 12 | [backlog/phase-12-prompt-preview-vhs.md](backlog/phase-12-prompt-preview-vhs.md) | VHS backend for prompt preview PNGs (color emoji) | `pending` |
+| 12 | [archive/phase-12-prompt-preview-vhs.md](archive/phase-12-prompt-preview-vhs.md) | VHS backend for prompt preview PNGs (color emoji) | `completed` |
 
 **Recommended order:** 0 (can run anytime) → 1 → … → 8 → 9 and/or 10 (independent). Phase 11 is pick-up work only. Phase 12 follows completed phase 9 when improving preview PNG fidelity (emoji / Powerline).
 

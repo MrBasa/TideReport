@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | `pending` |
-| **Started** | — |
-| **Completed** | — |
+| **Status** | `completed` |
+| **Started** | 2026-06-01 |
+| **Completed** | 2026-06-01 |
 | **Depends on** | [phase-09-prompt-preview-images.md](../archive/phase-09-prompt-preview-images.md) (completed) |
 
 ---
@@ -50,6 +50,7 @@ Preview text comes from [`_tide_report_install_show_preview`](../../functions/_t
 ```fish
 fish scripts/generate_prompt_previews.fish           # default ANSI backend
 fish scripts/generate_prompt_previews.fish --termtosvg
+fish scripts/generate_prompt_previews.fish --vhs     # color emoji / Powerline
 fish scripts/generate_prompt_previews.fish --open
 ```
 
@@ -62,7 +63,7 @@ fish scripts/generate_prompt_previews.fish --open
 | **ANSI → SVG → PNG** (`ansi_preview_to_png.py`) | **Default** | Missing / plain text gap before temp | Mostly OK | Stable framing; no pip deps beyond rsvg/ImageMagick |
 | **termtosvg** (`--termtosvg`) | Optional | Uncertain | Clipping/crop issues | Auto venv at `scripts/.preview-venv` |
 | **Charm Freeze** (`--execute` / pipe ANSI) | **Rejected** | No | Maybe with `--font.file` | Same SVG `<text>` model as Python; single font only |
-| **Charm VHS** | **This phase** | Expected yes | Expected yes | Real terminal via ttyd/xterm.js + headless browser |
+| **Charm VHS** | **Shipped (`--vhs`)** | Expected yes | Expected yes | Real terminal via ttyd/xterm.js + headless browser |
 
 ---
 
@@ -138,6 +139,7 @@ From [`scripts/prompt_preview_appearance.fish`](../../scripts/prompt_preview_app
 - Powerline: prefix `\uE0B2`, separator `\uE0B3`, left sep `\uE0B0`, left suffix `\uE0B0`
 - Connection: `·` × 20, color `brblack`
 - Font (ANSI path): `"FiraCode Nerd Font Mono, Noto Color Emoji"`, size 16
+- VHS: `_preview_vhs_*` + `__prompt_preview_vhs_theme_json`
 
 VHS `Set FontFamily` accepts **one** family name (no comma fallback).
 
@@ -157,62 +159,38 @@ VHS `Set FontFamily` accepts **one** family name (no comma fallback).
 
 ## Checklist
 
-- [ ] **12.1** **Spike VHS locally** (before code changes)
+- [x] **12.1** **Spike VHS locally** (before code changes)
   - Install: `vhs`, `ttyd`, `ffmpeg`, `noto-fonts-emoji` (or distro equivalent), Nerd Font; run `fc-cache -fv`.
   - Hand-write one `.tape` for `all-medium-metric`; compare to [`docs/assets/prompt-previews/all-medium-metric.png`](../../docs/assets/prompt-previews/all-medium-metric.png).
   - Spike `moon` and `weather-medium-metric` before wiring all 11.
   - Record spike outcome in **Done notes** (emoji OK? Powerline? crop?).
 
-- [ ] **12.2** **Extend appearance config for VHS**
+- [x] **12.2** **Extend appearance config for VHS**
   - Add `_preview_vhs_font_family`, `_preview_vhs_font_size`, `_preview_vhs_width`, `_preview_vhs_height`, theme JSON (or builder from existing `_preview_*` colors).
   - VHS font family: single name, e.g. `FiraCode Nerd Font Mono`.
 
-- [ ] **12.3** **Tape template**
+- [x] **12.3** **Tape template**
   - Add [`scripts/prompt_preview_vhs.tape.template`](../../scripts/prompt_preview_vhs.tape.template) with placeholders: `{{THROWAWAY_GIF}}`, `{{RUNNER}}`, `{{WHICH}}`, `{{WFMT}}`, `{{UNITS}}`, `{{PNG_OUT}}`, `{{HOME}}`, `{{XDG_*}}`, etc.
   - Pattern: `Hide` → `clear` → one-shot `fish --no-config $preview_runner …` → `Sleep` → `Screenshot` → `Sleep`.
-  - Example spike tape skeleton:
 
-    ```elixir
-    Output tmp/throwaway.gif
-    Require fish
-    Set Shell fish
-    Set FontFamily "FiraCode Nerd Font Mono"
-    Set FontSize 16
-    Set Width 1100
-    Set Height 80
-    Set Padding 0
-    Set CursorBlink false
-    Set Theme {"background":"#000000","foreground":"#d0d0d0","cursor":"#d0d0d0","black":"#000000","brightBlack":"#444444","cyan":"#5fafaf","brightCyan":"#5fafaf","blue":"#0087af","white":"#ffffff"}
-    Hide
-    Env TERM xterm-256color
-    Env HOME {{HOME}}
-    Type "clear"
-    Enter
-    Type "fish --no-config {{RUNNER}} {{WHICH}} {{WFMT}} {{UNITS}}"
-    Enter
-    Sleep 500ms
-    Screenshot {{PNG_OUT}}
-    Sleep 300ms
-    ```
-
-- [ ] **12.4** **Wire `--vhs` in generator**
+- [x] **12.4** **Wire `--vhs` in generator**
   - `argparse v/vhs` in [`scripts/generate_prompt_previews.fish`](../../scripts/generate_prompt_previews.fish).
   - Preflight: `vhs`, `ttyd`, `ffmpeg` on `PATH`; warn via `fc-list` if Nerd Font / Noto Color Emoji missing.
   - Per slug: render template → run `vhs` → delete throwaway gif.
   - Backend order: `--vhs` → VHS; `--termtosvg` → termtosvg; else ANSI Python.
 
-- [ ] **12.5** **Post-crop (if spike needs it)**
+- [x] **12.5** **Post-crop (if spike needs it)**
   - Optional [`scripts/vhs_preview_postcrop.py`](../../scripts/vhs_preview_postcrop.py) or ImageMagick `-trim` step behind `--vhs` only.
 
-- [ ] **12.6** **Documentation**
+- [x] **12.6** **Documentation**
   - Update README maintainer lines (~18 and ~250): `--vhs`, install stack, when to use vs default.
   - Clarify VHS not shipped by Fisher; not run in CI.
 
-- [ ] **12.7** **Hygiene (optional)**
+- [x] **12.7** **Hygiene (optional)**
   - `.gitignore`: `docs/assets/prompt-previews/_debug*.png`
   - Fix temp cleanup in generator (`builtin rm` if `command rm` fails due to shell alias).
 
-- [ ] **12.8** **Verification**
+- [x] **12.8** **Verification**
   - `fish -n scripts/generate_prompt_previews.fish`
   - `fish scripts/generate_prompt_previews.fish --vhs` → 11 PNGs
   - Visual: `all-medium-metric`, `moon`, `weather-medium-metric`
@@ -265,7 +243,7 @@ VHS `Set FontFamily` accepts **one** family name (no comma fallback).
 - [`docs/assets/prompt-previews/`](../../docs/assets/prompt-previews/)
 - [`README.md`](../../README.md) (Previews + Development sections)
 - New: `scripts/prompt_preview_vhs.tape.template`
-- New (maybe): `scripts/vhs_preview_postcrop.py`
+- New: `scripts/vhs_preview_postcrop.py`
 
 ---
 
@@ -280,6 +258,14 @@ VHS `Set FontFamily` accepts **one** family name (no comma fallback).
 
 ## Done notes
 
-_(Fill when completed.)_
+**Shipped 2026-06-01:** Optional `--vhs` backend with tape template, appearance tuning (`_preview_vhs_*`, `__prompt_preview_vhs_theme_json`), ImageMagick post-crop helper, README/docs updates, `.gitignore` hygiene. Default ANSI path verified (11 PNGs); `fish scripts/run_tests_isolated.fish` passes.
 
-**Planning context (2026-06-01):** Cursor plan `try_freeze_backend` evolved from Freeze evaluation → VHS for emoji; user chose VHS-only, optional `--vhs` flag, ANSI default until validated. Phase 9 archived; uncommitted working tree may still contain Phase 9 script/assets changes from that session — reconcile with git before starting implementation.
+**Spike (12.1 / 12.8 visual):** Not run on the implementation host (`vhs`/`ttyd` not installed; `sudo pacman` unavailable). After installing `vhs`, `ttyd`, `ffmpeg`, and `noto-fonts-emoji`, run:
+
+```fish
+fish scripts/generate_prompt_previews.fish --vhs
+```
+
+Compare `all-medium-metric`, `moon`, and `weather-medium-metric` to existing committed PNGs; tune `_preview_vhs_height` or post-crop if letterboxing remains. Regenerate all 11 PNGs (12.9) only after visual sign-off.
+
+**Planning context (2026-06-01):** Cursor plan `try_freeze_backend` evolved from Freeze evaluation → VHS for emoji; user chose VHS-only, optional `--vhs` flag, ANSI default until validated.

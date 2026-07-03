@@ -54,7 +54,7 @@ function __tide_report_github_auth_ok_doctor --description "Fresh gh auth check 
     if set -q TIDE_REPORT_TEST_GH_AUTH_FAIL
         return 1
     end
-    gh auth status -h github.com 2>/dev/null
+    gh auth status -h github.com >/dev/null 2>&1
 end
 
 function _tide_report_enabled_items --description "List TideReport prompt items enabled in Tide lists"
@@ -295,14 +295,7 @@ function __tide_report_health_check_openmeteo_ip --description "H-9: Open-Meteo 
 
     set -q tide_report_service_timeout_millis; or set -l tide_report_service_timeout_millis 6000
     set -l timeout_sec (math --scale=0 "$tide_report_service_timeout_millis / 1000")
-    set -q tide_report_user_agent; or set -l tide_report_user_agent "tide-report/unknown"
-    set -l ip_json (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "https://ipapi.co/json/")
-    if test $status -ne 0; or test -z "$ip_json"
-        __tide_report_health_warn "$stream" "IP-based weather location auto-detect failed."
-        __tide_report_health_hint "$stream" "Set an explicit tide_report_weather_location."
-        return 0
-    end
-    if not printf "%s" "$ip_json" | jq -e '.latitude != null and .longitude != null' 2>/dev/null >/dev/null
+    if not __tide_report_openmeteo_fetch_ip_geo $timeout_sec >/dev/null 2>&1
         __tide_report_health_warn "$stream" "IP-based weather location auto-detect failed."
         __tide_report_health_hint "$stream" "Set an explicit tide_report_weather_location."
     end

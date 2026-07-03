@@ -15,7 +15,7 @@ TideReport provides rich prompt items that display **Weather**, **Moon Phase**, 
 ![GitHub module](docs/assets/prompt-previews/github.png)
 ![Weather module — detailed format](docs/assets/prompt-previews/weather-detailed-metric.png)
 
-_Maintainers: regenerate committed preview PNGs with `fish scripts/generate_prompt_previews.fish`. Tune segment colors, Powerline glyphs, and fonts in `scripts/prompt_preview_appearance.fish`. Requires a [Nerd Font](https://www.nerdfonts.com/) and ImageMagick or rsvg-convert; the script creates `scripts/.preview-venv` with [termtosvg](https://github.com/nbedos/termtosvg) on first run. Repo-only — not installed by Fisher._
+_Maintainers: regenerate committed preview PNGs with `fish scripts/generate_prompt_previews.fish` (default ANSI→PNG). Pass `--vhs` for color emoji and reliable Powerline glyphs ([Charm VHS](https://github.com/charmbracelet/vhs) + `ttyd` + `ffmpeg` + [Noto Color Emoji](https://github.com/googlefonts/noto-emoji)); pass `--termtosvg` for the optional termtosvg path. Tune styling in `scripts/prompt_preview_appearance.fish`. Requires a [Nerd Font](https://www.nerdfonts.com/) and ImageMagick or rsvg-convert for the default backend. Not installed by Fisher and not run in CI._
 
 ## ⚡ Quick Start
 ### 1. Requirements
@@ -247,7 +247,7 @@ fish scripts/fetch_moon_phase_fixture.fish
 fish scripts/generate_prompt_previews.fish
 ```
 
-**Prompt preview images:** `scripts/generate_prompt_previews.fish` sources `_tide_report_install_show_preview` in an isolated temp `HOME`, applies Tide styling from `scripts/prompt_preview_appearance.fish`, and writes PNGs via the ANSI→SVG converter (accurate framing). Pass `--termtosvg` to use termtosvg instead (requires `scripts/.preview-venv`). Use `--open` to reveal the output folder. Set `TERM=xterm-256color` and install a Nerd Font locally so Powerline separators and icons match a real Tide segment.
+**Prompt preview images:** `scripts/generate_prompt_previews.fish` sources `_tide_report_install_show_preview` in an isolated temp `HOME`, applies Tide styling from `scripts/prompt_preview_appearance.fish`, and writes PNGs to `docs/assets/prompt-previews/`. The **default** path captures ANSI and converts with `scripts/ansi_preview_to_png.py` (fast, no browser). **`--vhs`** runs [Charm VHS](https://github.com/charmbracelet/vhs) for color emoji and Nerd Font Powerline (install `vhs`, `ttyd`, `ffmpeg`, a Nerd Font, and Noto Color Emoji; run `fc-cache -fv` after installing fonts). **`--termtosvg`** uses termtosvg instead (auto-creates `scripts/.preview-venv`). Use `--open` to reveal the output folder. Maintainer-only — not shipped by Fisher and not run in CI.
 
 The VS Code **Test** task and the optional pre-push hook also run tests through `scripts/run_tests_isolated.fish`, which uses a temporary `HOME` / `XDG_CONFIG_HOME` so any `set -U` inside tests does **not** modify your real Fish universals or prompt configuration.
 

@@ -8,14 +8,16 @@
 ##
 ## Requirements (maintainer machine):
 ##   - Fish 3.x+, Python 3, a Nerd Font (see prompt_preview_appearance.fish)
-##   - termtosvg (auto-installed into scripts/.preview-venv on first run)
-##   - ImageMagick `magick`/`convert` or rsvg-convert for PNG export
+##   - Default: ImageMagick `magick`/`convert` or rsvg-convert for ANSI→PNG
+##   - Optional --termtosvg: termtosvg in scripts/.preview-venv (auto-created)
+##   - Optional --vhs: vhs, ttyd, ffmpeg, Noto Color Emoji (see README)
 ##   - TERM=xterm-256color (set automatically; required for set_color output)
 ##
 ## Usage (from repo root):
 ##   fish scripts/generate_prompt_previews.fish
 ##   fish scripts/generate_prompt_previews.fish --open
 ##   fish scripts/generate_prompt_previews.fish --termtosvg   # optional alt renderer
+##   fish scripts/generate_prompt_previews.fish --vhs         # color emoji / Powerline
 ##
 ## Output: docs/assets/prompt-previews/*.png
 
@@ -24,12 +26,15 @@ set -l out_dir "$repo_root/docs/assets/prompt-previews"
 set -l appearance "$repo_root/scripts/prompt_preview_appearance.fish"
 set -l converter "$repo_root/scripts/ansi_preview_to_png.py"
 set -l postproc "$repo_root/scripts/termtosvg_still_to_png.py"
+set -l vhs_template "$repo_root/scripts/prompt_preview_vhs.tape.template"
+set -l vhs_postcrop "$repo_root/scripts/vhs_preview_postcrop.py"
 set -l venv "$repo_root/scripts/.preview-venv"
 set -l termtosvg "$venv/bin/termtosvg"
 set -l open_when_done 0
 set -l use_termtosvg 0
+set -l use_vhs 0
 
-argparse o/open t/termtosvg -- $argv
+argparse o/open t/termtosvg v/vhs -- $argv
 or exit $status
 if set -q _flag_open
     set open_when_done 1
@@ -37,18 +42,36 @@ end
 if set -q _flag_termtosvg
     set use_termtosvg 1
 end
+if set -q _flag_vhs
+    set use_vhs 1
+    set use_termtosvg 0
+end
 
 if not test -f "$appearance"
     echo "generate_prompt_previews.fish: missing $appearance" >&2
     exit 1
 end
-if not test -f "$converter"
-    echo "generate_prompt_previews.fish: missing $converter" >&2
-    exit 1
-end
-if not command -sq python3
-    echo "generate_prompt_previews.fish: python3 is required" >&2
-    exit 1
+
+if test $use_vhs -eq 1
+    if not test -f "$vhs_template"
+        echo "generate_prompt_previews.fish: missing $vhs_template" >&2
+        exit 1
+    end
+    for cmd in vhs ttyd ffmpeg
+        if not command -sq $cmd
+            echo "generate_prompt_previews.fish: --vhs requires $cmd on PATH" >&2
+            exit 1
+        end
+    end
+else
+    if not test -f "$converter"
+        echo "generate_prompt_previews.fish: missing $converter" >&2
+        exit 1
+    end
+    if not command -sq python3
+        echo "generate_prompt_previews.fish: python3 is required" >&2
+        exit 1
+    end
 end
 
 if test $use_termtosvg -eq 1
@@ -71,14 +94,21 @@ if test $use_termtosvg -eq 1
     end
 end
 
-if not command -sq magick; and not command -sq convert; and not command -sq rsvg-convert
-    echo "generate_prompt_previews.fish: install ImageMagick (magick) or rsvg-convert" >&2
-    exit 1
+if test $use_vhs -eq 0
+    if not command -sq magick; and not command -sq convert; and not command -sq rsvg-convert
+        echo "generate_prompt_previews.fish: install ImageMagick (magick) or rsvg-convert" >&2
+        exit 1
+    end
 end
 
 source "$appearance"
 if not fc-list : family | string match -qi "*Nerd*"
     echo "generate_prompt_previews.fish: warning — no Nerd Font detected via fc-list; icons may render incorrectly" >&2
+end
+if test $use_vhs -eq 1
+    if not fc-list : family | string match -qi "*Noto*Emoji*"
+        echo "generate_prompt_previews.fish: warning — Noto Color Emoji not found via fc-list; weather/moon emoji may be missing" >&2
+    end
 end
 
 mkdir -p "$out_dir"
@@ -178,6 +208,61 @@ function __preview_termtosvg_to_png --argument-names work_dir runner slug which 
     return $status
 end
 
+function __preview_substitute_vhs_tape --argument-names template dest runner which wfmt units png_capture throwaway_rel
+    set -l theme (__prompt_preview_vhs_theme_json)
+    command rm -f "$dest"
+    while read line
+        set line (string replace -a '{{THROWAWAY_GIF}}' "$throwaway_rel" -- $line)
+        set line (string replace -a '{{RUNNER}}' "$runner" -- $line)
+        set line (string replace -a '{{WHICH}}' "$which" -- $line)
+        set line (string replace -a '{{WFMT}}' "$wfmt" -- $line)
+        set line (string replace -a '{{UNITS}}' "$units" -- $line)
+        set line (string replace -a '{{PNG_CAPTURE}}' "$png_capture" -- $line)
+        set line (string replace -a '{{HOME}}' "$HOME" -- $line)
+        set line (string replace -a '{{XDG_CONFIG_HOME}}' "$XDG_CONFIG_HOME" -- $line)
+        set line (string replace -a '{{XDG_DATA_HOME}}' "$XDG_DATA_HOME" -- $line)
+        set line (string replace -a '{{XDG_STATE_HOME}}' "$XDG_STATE_HOME" -- $line)
+        set line (string replace -a '{{FONT_FAMILY}}' "$_preview_vhs_font_family" -- $line)
+        set line (string replace -a '{{FONT_SIZE}}' "$_preview_vhs_font_size" -- $line)
+        set line (string replace -a '{{WIDTH}}' "$_preview_vhs_width" -- $line)
+        set line (string replace -a '{{HEIGHT}}' "$_preview_vhs_height" -- $line)
+        set line (string replace -a '{{THEME_JSON}}' "$theme" -- $line)
+        echo "$line" >>"$dest"
+    end <$template
+end
+
+function __preview_vhs_to_png --argument-names repo_root work_dir template runner slug which wfmt units png_file postcrop_script
+    # VHS 0.11 parses Screenshot paths poorly when they contain slashes; capture flat, then mv.
+    set -l png_capture "preview-capture-$slug.png"
+    set -l throwaway_rel "throwaway.gif"
+    set -l tape_file "$work_dir/vhs-$slug.tape"
+    set -l capture_file "$repo_root/$png_capture"
+    mkdir -p "$work_dir"
+    __preview_substitute_vhs_tape "$template" "$tape_file" "$runner" "$which" "$wfmt" "$units" "$png_capture" "$throwaway_rel"
+
+    pushd "$repo_root" >/dev/null
+    set -l vhs_err (vhs "$tape_file" 2>&1)
+    set -l st $status
+    command rm -f "$repo_root/$throwaway_rel" 2>/dev/null
+    popd >/dev/null
+
+    if test $st -ne 0
+        for line in $vhs_err
+            echo $line >&2
+        end
+        return 1
+    end
+    if not test -f "$capture_file"
+        echo "generate_prompt_previews.fish: VHS did not write $capture_file" >&2
+        return 1
+    end
+    command mv -f "$capture_file" "$png_file"
+    if test -f "$postcrop_script"
+        python3 "$postcrop_script" "$png_file" --bg "$_preview_terminal_bg" --pad "$_preview_vhs_postcrop_pad" 2>/dev/null
+    end
+    return 0
+end
+
 set -l written_paths
 
 for spec in $variants
@@ -186,27 +271,37 @@ for spec in $variants
     set -l which $parts[2]
     set -l wfmt $parts[3]
     set -l units $parts[4]
-    set -l ansi_file "$tmp/$slug.ansi"
     set -l png_file "$out_dir/$slug.png"
 
-    fish --no-config "$preview_runner" $which $wfmt $units >"$ansi_file" 2>/dev/null
-    if test $status -ne 0; or not test -s "$ansi_file"
-        echo "generate_prompt_previews.fish: preview capture failed for $slug" >&2
-        command rm -rf "$tmp"
-        exit 1
-    end
-
     set -l ok 0
-    if test $use_termtosvg -eq 1
-        __preview_termtosvg_to_png "$tmp" "$preview_runner" "$slug" $which $wfmt $units "$png_file" "$termtosvg" "$postproc"
-        and set ok 1
-    end
-    if test $ok -eq 0
-        __preview_ansi_to_png "$converter" "$ansi_file" "$png_file"
+    if test $use_vhs -eq 1
+        __preview_vhs_to_png "$repo_root" "$tmp" "$vhs_template" "$preview_runner" "$slug" "$which" "$wfmt" "$units" "$png_file" "$vhs_postcrop"
         or begin
-            echo "generate_prompt_previews.fish: PNG conversion failed for $slug" >&2
+            echo "generate_prompt_previews.fish: VHS capture failed for $slug" >&2
             command rm -rf "$tmp"
             exit 1
+        end
+        set ok 1
+    else
+        set -l ansi_file "$tmp/$slug.ansi"
+        fish --no-config "$preview_runner" $which $wfmt $units >"$ansi_file" 2>/dev/null
+        if test $status -ne 0; or not test -s "$ansi_file"
+            echo "generate_prompt_previews.fish: preview capture failed for $slug" >&2
+            command rm -rf "$tmp"
+            exit 1
+        end
+
+        if test $use_termtosvg -eq 1
+            __preview_termtosvg_to_png "$tmp" "$preview_runner" "$slug" $which $wfmt $units "$png_file" "$termtosvg" "$postproc"
+            and set ok 1
+        end
+        if test $ok -eq 0
+            __preview_ansi_to_png "$converter" "$ansi_file" "$png_file"
+            or begin
+                echo "generate_prompt_previews.fish: PNG conversion failed for $slug" >&2
+                command rm -rf "$tmp"
+                exit 1
+            end
         end
     end
     set -a written_paths $png_file
@@ -214,7 +309,14 @@ end
 
 command rm -rf "$tmp"
 
-echo "Wrote "(count $written_paths)" preview PNG(s) to $out_dir:"
+set -l backend "ANSI→PNG"
+if test $use_vhs -eq 1
+    set backend "VHS"
+else if test $use_termtosvg -eq 1
+    set backend "termtosvg"
+end
+
+echo "Wrote "(count $written_paths)" preview PNG(s) via $backend to $out_dir:"
 for path in $written_paths
     echo "  $path"
 end

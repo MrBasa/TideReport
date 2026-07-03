@@ -20,13 +20,34 @@ function __tide_report_read_ip_location_cache --description "Read cached IP geol
     echo "$line[2],$line[3]"
 end
 
-function __tide_report_openmeteo_fetch_ip_geo --description "Fetch lat/lon (and optional display fields) via HTTPS IP geolocation" --argument-names timeout_sec fields
-    set -q fields; or set fields "lat,lon"
-    set -l ip_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "https://ipapi.co/json/")
-    if test $status -ne 0; or test -z "$ip_data"
+function __tide_report_openmeteo_ip_geo_response_valid --description "Return success when body is a JSON object" --argument-names body
+    test -n "$body"
+    printf "%s" "$body" | jq -e 'type == "object"' >/dev/null 2>&1
+end
+
+function __tide_report_openmeteo_curl_ip_endpoint --description "GET URL; echo body when HTTP 2xx and JSON object" --argument-names url timeout_sec
+    set -l body (curl -s -f -A "$tide_report_user_agent" --max-time $timeout_sec "$url" 2>/dev/null)
+    if test $status -ne 0; or test -z "$body"
         return 1
     end
-    echo "$ip_data"
+    if not __tide_report_openmeteo_ip_geo_response_valid "$body"
+        return 1
+    end
+    printf "%s" "$body"
+end
+
+function __tide_report_openmeteo_fetch_ip_geo --description "Fetch lat/lon (and optional display fields) via HTTPS IP geolocation" --argument-names timeout_sec fields
+    set -q fields; or set fields "lat,lon"
+    set -l providers \
+        "https://ipapi.co/json/" \
+        "https://get.geojs.io/v1/ip/geo.json"
+    for url in $providers
+        if set -l ip_data (__tide_report_openmeteo_curl_ip_endpoint "$url" "$timeout_sec")
+            printf "%s" "$ip_data"
+            return 0
+        end
+    end
+    return 1
 end
 
 function __tide_report_openmeteo_parse_lat_lon --description "Parse lat and lon from a coordinate string (forgiving whitespace)" --argument-names raw
@@ -48,18 +69,18 @@ function __tide_report_openmeteo_geocode --description "Geocode a place name via
     set -l location_escaped (string escape --style url "$name")
     set -l geo_url "https://geocoding-api.open-meteo.com/v1/search?name=$location_escaped&count=1"
     set -l geo_data (curl -s -A "$tide_report_user_agent" --max-time $timeout_sec "$geo_url")
-    if test $status -ne 0; or test -z "$geo_data"
+    if test $status -ne 0; or test -z "$geo_data"; or not __tide_report_openmeteo_ip_geo_response_valid "$geo_data"
         return 1
     end
-    set -l lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty')
-    set -l lon (printf "%s" "$geo_data" | jq -r '.results[0].longitude // empty')
+    set -l lat (printf "%s" "$geo_data" | jq -r '.results[0].latitude // empty' 2>/dev/null)
+    set -l lon (printf "%s" "$geo_data" | jq -r '.results[0].longitude // empty' 2>/dev/null)
     if test -z "$lat"; or test -z "$lon"
         return 1
     end
-    set -l tz (printf "%s" "$geo_data" | jq -r '.results[0].timezone // "auto"')
-    set -l geo_name (printf "%s" "$geo_data" | jq -r '.results[0].name // empty')
-    set -l admin1 (printf "%s" "$geo_data" | jq -r '.results[0].admin1 // empty')
-    set -l country (printf "%s" "$geo_data" | jq -r '.results[0].country // empty')
+    set -l tz (printf "%s" "$geo_data" | jq -r '.results[0].timezone // "auto"' 2>/dev/null)
+    set -l geo_name (printf "%s" "$geo_data" | jq -r '.results[0].name // empty' 2>/dev/null)
+    set -l admin1 (printf "%s" "$geo_data" | jq -r '.results[0].admin1 // empty' 2>/dev/null)
+    set -l country (printf "%s" "$geo_data" | jq -r '.results[0].country // empty' 2>/dev/null)
     echo "$lat"
     echo "$lon"
     echo "$tz"
@@ -82,8 +103,8 @@ function __tide_report_openmeteo_resolve_location --description "Resolve lat, lo
     else if test -z "$location"
         set -l ip_json (__tide_report_openmeteo_fetch_ip_geo "$timeout_sec" "lat,lon")
         if test $status -eq 0; and test -n "$ip_json"
-            set lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
-            set lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty')
+            set lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty' 2>/dev/null)
+            set lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty' 2>/dev/null)
             if test "$write_ip_cache" = true; and test -n "$lat"; and test -n "$lon"
                 if set -q TIDE_REPORT_PARENT_PID; and test -n "$TIDE_REPORT_PARENT_PID"
                     set -l ip_file "$HOME/.cache/tide-report/ip-location"
@@ -118,14 +139,14 @@ function __tide_report_openmeteo_wizard_ip_line --description "Build wizard disp
     if test $status -ne 0; or test -z "$ip_json"
         return 1
     end
-    set -l lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty')
-    set -l lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty')
+    set -l lat (printf "%s" "$ip_json" | jq -r '.latitude // .lat // empty' 2>/dev/null)
+    set -l lon (printf "%s" "$ip_json" | jq -r '.longitude // .lon // empty' 2>/dev/null)
     if test -z "$lat"; or test -z "$lon"
         return 1
     end
-    set -l city (printf "%s" "$ip_json" | jq -r '.city // empty')
-    set -l region (printf "%s" "$ip_json" | jq -r '.region // .regionName // empty')
-    set -l country (printf "%s" "$ip_json" | jq -r '.country_name // .country // empty')
+    set -l city (printf "%s" "$ip_json" | jq -r '.city // empty' 2>/dev/null)
+    set -l region (printf "%s" "$ip_json" | jq -r '.region // .regionName // empty' 2>/dev/null)
+    set -l country (printf "%s" "$ip_json" | jq -r '.country_name // .country // empty' 2>/dev/null)
     set -l parts $city $region $country
     printf "%s (%s, %s)\n" (string join ", " $parts) "$lat" "$lon"
 end

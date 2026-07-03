@@ -29,6 +29,12 @@ if test -n "$url"
         if set -q TIDE_REPORT_TEST_CURL_IP_STATUS
             set st $TIDE_REPORT_TEST_CURL_IP_STATUS
         end
+    else if string match -q '*get.geojs.io*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_GEOJS_RESPONSE
+        set matched_specific true
+        set response "$TIDE_REPORT_TEST_CURL_IP_GEOJS_RESPONSE"
+        if set -q TIDE_REPORT_TEST_CURL_IP_GEOJS_STATUS
+            set st $TIDE_REPORT_TEST_CURL_IP_GEOJS_STATUS
+        end
     else if string match -q '*ip-api.com*' -- "$url"; and set -q TIDE_REPORT_TEST_CURL_IP_RESPONSE
         set matched_specific true
         set response "$TIDE_REPORT_TEST_CURL_IP_RESPONSE"

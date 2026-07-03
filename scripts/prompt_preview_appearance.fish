@@ -39,6 +39,43 @@ set -g _preview_connection_color brblack
 set -g _preview_font_family "FiraCode Nerd Font Mono, Noto Color Emoji"
 set -g _preview_font_size 16
 
+# Charm VHS capture (--vhs): single font family, viewport, terminal theme JSON
+set -g _preview_vhs_font_family "FiraCode Nerd Font Mono"
+set -g _preview_vhs_font_size 16
+set -g _preview_vhs_width 1100
+# Must fit VHS/ffmpeg frame height (terminal canvas); post-crop trims letterbox.
+set -g _preview_vhs_height 400
+set -g _preview_vhs_postcrop_pad 12
+
+function __prompt_preview_color_to_hex --argument-names color
+    switch $color
+        case white
+            echo "#ffffff"
+            return
+        case brblack
+            echo "#444444"
+            return
+        case brwhite
+            echo "#e5e5e5"
+            return
+    end
+    if string match -qr '^[0-9a-fA-F]{6}$' -- "$color"
+        echo "#"(string lower -- "$color")
+        return
+    end
+    echo "#d0d0d0"
+end
+
+function __prompt_preview_vhs_theme_json --description "xterm.js theme JSON for VHS Set Theme from _preview_* colors"
+    set -l bg (__prompt_preview_color_to_hex $_preview_terminal_bg)
+    set -l segment (__prompt_preview_color_to_hex $_preview_segment_bg)
+    set -l cyan (__prompt_preview_color_to_hex $_preview_time_color)
+    set -l blue (__prompt_preview_color_to_hex $_preview_tide_color)
+    set -l white (__prompt_preview_color_to_hex $_preview_github_color)
+    printf '{"background":"%s","foreground":"#d0d0d0","cursor":"#d0d0d0","black":"%s","brightBlack":"%s","cyan":"%s","brightCyan":"%s","blue":"%s","white":"%s"}' \
+        $bg $bg $segment $cyan $cyan $blue $white
+end
+
 function __prompt_preview_apply_tide_appearance --description "Map _preview_* settings to tide_* for install_show_preview"
     set -g tide_time_color $_preview_time_color
     set -g tide_time_bg_color $_preview_segment_bg
