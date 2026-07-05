@@ -208,12 +208,12 @@ function __preview_termtosvg_to_png --argument-names work_dir runner slug which 
     return $status
 end
 
-function __preview_substitute_vhs_tape --argument-names template dest runner which wfmt units png_capture throwaway_rel
+function __preview_substitute_vhs_tape --argument-names template dest ansi_file which wfmt units png_capture throwaway_rel
     set -l theme (__prompt_preview_vhs_theme_json)
     command rm -f "$dest"
     while read line
         set line (string replace -a '{{THROWAWAY_GIF}}' "$throwaway_rel" -- $line)
-        set line (string replace -a '{{RUNNER}}' "$runner" -- $line)
+        set line (string replace -a '{{ANSI_FILE}}' "$ansi_file" -- $line)
         set line (string replace -a '{{WHICH}}' "$which" -- $line)
         set line (string replace -a '{{WFMT}}' "$wfmt" -- $line)
         set line (string replace -a '{{UNITS}}' "$units" -- $line)
@@ -237,8 +237,14 @@ function __preview_vhs_to_png --argument-names repo_root work_dir template runne
     set -l throwaway_rel "throwaway.gif"
     set -l tape_file "$work_dir/vhs-$slug.tape"
     set -l capture_file "$repo_root/$png_capture"
+    set -l ansi_file "$work_dir/$slug.ansi"
     mkdir -p "$work_dir"
-    __preview_substitute_vhs_tape "$template" "$tape_file" "$runner" "$which" "$wfmt" "$units" "$png_capture" "$throwaway_rel"
+    fish --no-config "$runner" $which $wfmt $units >"$ansi_file" 2>/dev/null
+    if test $status -ne 0; or not test -s "$ansi_file"
+        echo "generate_prompt_previews.fish: VHS ANSI capture failed for $slug" >&2
+        return 1
+    end
+    __preview_substitute_vhs_tape "$template" "$tape_file" "$ansi_file" "$which" "$wfmt" "$units" "$png_capture" "$throwaway_rel"
 
     pushd "$repo_root" >/dev/null
     set -l vhs_err (vhs "$tape_file" 2>&1)
@@ -258,7 +264,7 @@ function __preview_vhs_to_png --argument-names repo_root work_dir template runne
     end
     command mv -f "$capture_file" "$png_file"
     if test -f "$postcrop_script"
-        python3 "$postcrop_script" "$png_file" --bg "$_preview_terminal_bg" --pad "$_preview_vhs_postcrop_pad" 2>/dev/null
+        python3 "$postcrop_script" "$png_file" --bg "$_preview_terminal_bg" --segment-bg "$_preview_segment_bg" --pad "$_preview_vhs_postcrop_pad" 2>/dev/null
     end
     return 0
 end

@@ -2,6 +2,8 @@
 """Trim letterbox padding from VHS screenshot PNGs, then restore a small margin.
 
 Maintainer-only helper for scripts/generate_prompt_previews.fish --vhs.
+When the capture includes a ``cat`` command line above the preview, crop to rows
+that contain Tide segment background pixels before trim/pad.
 """
 
 from __future__ import annotations
@@ -13,11 +15,56 @@ import sys
 from pathlib import Path
 
 _DEFAULT_BG = "000000"
+_DEFAULT_SEGMENT_BG = "444444"
 _DEFAULT_PAD = 12
 
 
 def _magick() -> str | None:
     return shutil.which("magick") or shutil.which("convert")
+
+
+def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
+    h = hex_color.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+
+
+def _row_has_segment_color(
+    row_pixels: list[tuple[int, int, int]],
+    segment_rgb: tuple[int, int, int],
+    tolerance: int = 18,
+) -> bool:
+    sr, sg, sb = segment_rgb
+    for r, g, b in row_pixels:
+        if (
+            abs(r - sr) <= tolerance
+            and abs(g - sg) <= tolerance
+            and abs(b - sb) <= tolerance
+        ):
+            return True
+    return False
+
+
+def _crop_to_segment_rows(png_path: Path, segment_bg: str) -> bool:
+    try:
+        from PIL import Image
+    except ImportError:
+        return False
+
+    segment_rgb = _hex_to_rgb(segment_bg)
+    img = Image.open(png_path).convert("RGB")
+    width, height = img.size
+    rows: list[int] = []
+    for y in range(height):
+        row_pixels = [img.getpixel((x, y)) for x in range(width)]
+        if _row_has_segment_color(row_pixels, segment_rgb):
+            rows.append(y)
+    if not rows:
+        return False
+    top = max(0, min(rows) - 1)
+    bottom = min(height, max(rows) + 2)
+    cropped = img.crop((0, top, width, bottom))
+    cropped.save(png_path)
+    return True
 
 
 def _trim_and_pad(png_path: Path, bg_hex: str, pad: int) -> bool:
@@ -53,6 +100,11 @@ def main() -> int:
         help="Letterbox color without # (default: %(default)s)",
     )
     parser.add_argument(
+        "--segment-bg",
+        default=_DEFAULT_SEGMENT_BG,
+        help="Tide segment background hex without # (default: %(default)s)",
+    )
+    parser.add_argument(
         "--pad",
         type=int,
         default=_DEFAULT_PAD,
@@ -67,6 +119,7 @@ def main() -> int:
         return 1
     if args.pad == 0:
         return 0
+    _crop_to_segment_rows(args.png, args.segment_bg)
     if not _trim_and_pad(args.png, args.bg, args.pad):
         print(
             "vhs_preview_postcrop.py: ImageMagick magick/convert not found or failed; skipped",

@@ -11,9 +11,9 @@ Set Theme {{THEME_JSON}}
 Hide
 Type "clear"
 Enter
-Type "env TERM=xterm-256color HOME='{{HOME}}' XDG_CONFIG_HOME='{{XDG_CONFIG_HOME}}' XDG_DATA_HOME='{{XDG_DATA_HOME}}' XDG_STATE_HOME='{{XDG_STATE_HOME}}' fish --no-config {{RUNNER}} {{WHICH}} {{WFMT}} {{UNITS}}"
+Type "cat {{ANSI_FILE}}"
 Enter
 Show
-Sleep 2s
+Sleep 1s
 Screenshot {{PNG_CAPTURE}}
 Sleep 300ms

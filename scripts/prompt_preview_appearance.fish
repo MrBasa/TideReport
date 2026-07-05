@@ -43,8 +43,8 @@ set -g _preview_font_size 16
 set -g _preview_vhs_font_family "FiraCode Nerd Font Mono"
 set -g _preview_vhs_font_size 16
 set -g _preview_vhs_width 1100
-# Must fit VHS/ffmpeg frame height (terminal canvas); post-crop trims letterbox.
-set -g _preview_vhs_height 400
+# Small viewport: VHS replays pre-captured ANSI via cat; post-crop trims letterbox.
+set -g _preview_vhs_height 48
 set -g _preview_vhs_postcrop_pad 12
 
 function __prompt_preview_color_to_hex --argument-names color
